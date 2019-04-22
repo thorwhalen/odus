@@ -4,19 +4,18 @@ import pandas as pd
 from cachetools import cached
 import os
 import re
+from io import BytesIO
 
-import numpy as np
-
+# get py2store here: https://github.com/i2mint/py2store
 from py2store.base import Store
 from py2store.stores.local_store import RelativePathFormatStore
 from py2store.mixins import ReadOnlyMixin
-from io import BytesIO
+
+from odus.nothing import nothing
 from hyp.ppi.pot import Pot
 
 from ut.ml.feature_extraction.sequential_var_sets import PVar, VarSet, DfData, extract_kps
 from ut.pplot.matrix import heatmap
-
-from ocore.utils.nothing import nothing
 
 path_sep = os.path.sep
 
