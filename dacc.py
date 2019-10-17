@@ -8,7 +8,7 @@ from io import BytesIO
 
 # get py2store here: https://github.com/i2mint/py2store
 from py2store.base import Store
-from py2store.stores.local_store import RelativePathFormatStore
+from py2store.stores.local_store import RelativePathFormatStore, LocalBinaryStore
 from py2store.mixins import ReadOnlyMixin
 
 from odus.nothing import nothing
@@ -103,7 +103,7 @@ class HashableMixin:
         return hash(self) == hash(other)
 
 
-class DfStore(HashableMixin, ReadOnlyMixin, RelativePathFormatStore):
+class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
 
     @cached(cache={})
     def __getitem__(self, k):
@@ -176,7 +176,7 @@ class DelegMap:
 
 class Dacc:
     def __init__(self, xls_rootdir, categories=None):
-        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + '{}.xlsx', read='b', write='b')
+        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + '{}.xlsx', mode='b')
         if categories is None:
             categories = _commun_columns_of_dfs(self.s.values())
         self.categories = categories

@@ -16,7 +16,7 @@ dflt_figsize = (16, 5)
 
 
 def get_stores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
-    df_store = DfStore(survey_dir + sep + '{}.xlsx', read='b', write='b')
+    df_store = DfStore(survey_dir + sep + '{}.xlsx', mode='b')
     #     cstore = VarSetCountsStore(df_store)
     pstore = PotStore(df_store)
     v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -25,7 +25,7 @@ def get_stores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
 
 
 def get_cstores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
-    df_store = DfStore(survey_dir + sep + '{}.xlsx', read='b', write='b')
+    df_store = DfStore(survey_dir + sep + '{}.xlsx', mode='b')
     pstore = PotStore(df_store)
     v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
     s = mk_pvar_str_struct(v)
