@@ -1,7 +1,8 @@
 from collections import defaultdict, Counter
 import matplotlib.pylab as plt
+import numpy as np
 import pandas as pd
-from cachetools import cached
+from cachetools import cached  # replace by py2store cache tools
 import os
 import re
 from io import BytesIO
@@ -192,9 +193,12 @@ class Dacc:
     # def counts_of(self):
 
 
-def plot_life_course(df):
-    heatmap(df.T);
-    plt.grid(False);
+def plot_life_course(df, grid=False, figsize=3.5, **kwargs):
+    if isinstance(figsize, (int, float)):  # if figsize is a number, it's a factor of the df size (shape)
+        figsize = np.array(df.shape) / figsize
+    kwargs['figsize'] = figsize
+    heatmap(df.T, **kwargs);
+    plt.grid(grid);
 
 
 def counts_of_kps(store, categories, kps_list):
