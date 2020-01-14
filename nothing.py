@@ -72,6 +72,9 @@ class GreatUniversalNothing(object):
     def __getattribute__(self, name):
         return lambda x: x
 
+    def __bool__(self):
+        return False
+
     def __add__(self, other):
         return other
 
