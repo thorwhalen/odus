@@ -1,4 +1,4 @@
-version = '0.0.4'
+version = '0.0.5'
 root_url = 'https://github.com/thorwhalen'
 
 #import os
