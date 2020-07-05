@@ -1,4 +1,4 @@
-version = '0.0.1'
+version = '0.0.2'
 root_url = 'https://github.com/thorwhalen'
 
 #import os
@@ -54,6 +54,9 @@ more_setup_kwargs = dict(
         'py2store',
         'pandas',
         'numpy'
+        'Pillow',
+        'spyn',
+        'matplotlib',
     ],
     description="Tools to provide easy access to prepared data to data scientists that can't be asked.",
     keywords=['data', 'data access', 'drug use', 'markov', 'bayesian'],

@@ -4,11 +4,15 @@ import numpy as np
 import matplotlib.pylab as plt
 from itertools import combinations, chain
 
-from ut.ml.feature_extraction.sequential_var_sets import PVar, VarSet, DfData, VarSetFactory
+from odus.sequential_var_sets import PVar, VarSet, DfData, VarSetFactory
 from hyp.ppi.pot import Pot
-from odus.dacc import DfStore, counts_of_kps, Dacc, plot_life_course, VarSetCountsStore, \
+from odus.dacc import DfStore, counts_of_kps, Dacc, VarSetCountsStore, \
     mk_pvar_struct, PotStore, _commun_columns_of_dfs, Struct, mk_pvar_str_struct, \
     VarStr
+from odus.plot_utils import plot_life_course, plot_life, life_plots, write_trajectories_to_file
+
+# __all__ = ['plot_life_course', 'plot_life', 'life_plots', 'write_trajectories_to_file',
+#            'counts_of_kps', 'Dacc', 'VarSetCountsStore', 'PVar', 'VarSet', 'DfData', 'VarSetFactory']
 
 package_dir = dirname(__file__)
 DFLT_SURVEY_DIR = join(package_dir, )

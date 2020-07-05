@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 import matplotlib.pylab as plt
 import numpy as np
 import pandas as pd
-from cachetools import cached  # replace by py2store cache tools
+from py2store.caching import mk_memoizer  # like from cachetools import cached
 import os
 import re
 from io import BytesIO
@@ -15,8 +15,9 @@ from py2store.mixins import ReadOnlyMixin
 from odus.nothing import nothing
 from hyp.ppi.pot import Pot
 
-from ut.ml.feature_extraction.sequential_var_sets import PVar, VarSet, DfData, extract_kps
-from ut.pplot.matrix import heatmap
+from odus.sequential_var_sets import PVar, VarSet, DfData, extract_kps
+from odus.plot_utils import heatmap
+# from ut.pplot.matrix import heatmap
 
 path_sep = os.path.sep
 
@@ -106,7 +107,7 @@ class HashableMixin:
 
 class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
 
-    @cached(cache={})
+    @mk_memoizer({})
     def __getitem__(self, k):
         return super().__getitem__(k)
 
@@ -133,7 +134,7 @@ class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):
     def mk_pvar_attrs(self, only_for_cols_in_all_dfs=False):
         self.v = mk_pvar_struct(self.df_store, only_for_cols_in_all_dfs)
 
-    @cached(cache={})
+    @mk_memoizer({})
     def __getitem__(self, k):
         if isinstance(k, (tuple, PVar)):
             return self.__getitem__(VarSet(k))
@@ -147,7 +148,7 @@ class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):
 
 
 class PotStore(VarSetCountsStore):
-    @cached(cache={})
+    @mk_memoizer({})
     def __getitem__(self, k):
         if isinstance(k, (tuple, PVar)):
             return self.__getitem__(VarSet(k))
@@ -193,12 +194,6 @@ class Dacc:
     # def counts_of(self):
 
 
-def plot_life_course(df, grid=False, figsize=3.5, **kwargs):
-    if isinstance(figsize, (int, float)):  # if figsize is a number, it's a factor of the df size (shape)
-        figsize = np.array(df.shape) / figsize
-    kwargs['figsize'] = figsize
-    heatmap(df.T, **kwargs);
-    plt.grid(grid);
 
 
 def counts_of_kps(store, categories, kps_list):
