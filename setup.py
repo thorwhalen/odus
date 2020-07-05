@@ -1,4 +1,4 @@
-version = '0.0.2'
+version = '0.0.3'
 root_url = 'https://github.com/thorwhalen'
 
 #import os
@@ -53,7 +53,7 @@ more_setup_kwargs = dict(
     install_requires=[
         'py2store',
         'pandas',
-        'numpy'
+        'numpy',
         'Pillow',
         'spyn',
         'matplotlib',
