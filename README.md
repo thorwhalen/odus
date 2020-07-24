@@ -48,7 +48,7 @@ And if you want to donate: Donate to a charity that will help the people underst
 
 A simple flowchart about the architecture:
 
-<img src="odus_store.png" width=800 height=800>
+<img src="odus_store.png" width=800 height=200>
 
 # Getting some resources
 
