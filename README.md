@@ -441,7 +441,7 @@ plot_life(df_store[k])  # plot the trajectory
 
 
 
-![png](output_26_1.png)
+![png](img/output_26_1.png)
 
 
 
@@ -450,7 +450,7 @@ plot_life(df_store[k], fields=[s.in_treatment, s.injected])  # only want two fie
 ```
 
 
-![png](output_27_0.png)
+![png](img/output_27_0.png)
 
 
 ### Flip over all (or some) trajectories
@@ -473,7 +473,7 @@ next(gen)  # launch to get the next trajectory
 
 
 
-![png](output_30_1.png)
+![png](img/output_30_1.png)
 
 
 Get three trajectories, but only over two fields.
@@ -488,43 +488,43 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)];
 ```
 
 
-![png](output_32_0.png)
+![png](img/output_32_0.png)
 
 
 
-![png](output_32_1.png)
+![png](img/output_32_1.png)
 
 
 
-![png](output_32_2.png)
+![png](img/output_32_2.png)
 
 
 
-![png](output_32_3.png)
+![png](img/output_32_3.png)
 
 
 
-![png](output_32_4.png)
+![png](img/output_32_4.png)
 
 
 
-![png](output_32_5.png)
+![png](img/output_32_5.png)
 
 
 
-![png](output_32_6.png)
+![png](img/output_32_6.png)
 
 
 
-![png](output_32_7.png)
+![png](img/output_32_7.png)
 
 
 
-![png](output_32_8.png)
+![png](img/output_32_8.png)
 
 
 
-![png](output_32_9.png)
+![png](img/output_32_9.png)
 
 
 ## Making a pdf of trajectories
