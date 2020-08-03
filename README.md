@@ -1,11 +1,24 @@
-<h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Introduction" data-toc-modified-id="Introduction-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>Introduction</a></span></li><li><span><a href="#Installation" data-toc-modified-id="Installation-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>Installation</a></span></li><li><span><a href="#Getting-some-resources" data-toc-modified-id="Getting-some-resources-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>Getting some resources</a></span></li><li><span><a href="#Poking-around" data-toc-modified-id="Poking-around-4"><span class="toc-item-num">4&nbsp;&nbsp;</span>Poking around</a></span><ul class="toc-item"><li><span><a href="#df_store" data-toc-modified-id="df_store-4.1"><span class="toc-item-num">4.1&nbsp;&nbsp;</span>df_store</a></span></li><li><span><a href="#Viewing-trajectories" data-toc-modified-id="Viewing-trajectories-4.2"><span class="toc-item-num">4.2&nbsp;&nbsp;</span>Viewing trajectories</a></span><ul class="toc-item"><li><span><a href="#Viewing-a-single-trajectory" data-toc-modified-id="Viewing-a-single-trajectory-4.2.1"><span class="toc-item-num">4.2.1&nbsp;&nbsp;</span>Viewing a single trajectory</a></span></li><li><span><a href="#Flip-over-all-(or-some)-trajectories" data-toc-modified-id="Flip-over-all-(or-some)-trajectories-4.2.2"><span class="toc-item-num">4.2.2&nbsp;&nbsp;</span>Flip over all (or some) trajectories</a></span></li></ul></li><li><span><a href="#Making-a-pdf-of-trajectories" data-toc-modified-id="Making-a-pdf-of-trajectories-4.3"><span class="toc-item-num">4.3&nbsp;&nbsp;</span>Making a pdf of trajectories</a></span></li><li><span><a href="#Demo-s-and-v" data-toc-modified-id="Demo-s-and-v-4.4"><span class="toc-item-num">4.4&nbsp;&nbsp;</span>Demo s and v</a></span></li><li><span><a href="#cstore" data-toc-modified-id="cstore-4.5"><span class="toc-item-num">4.5&nbsp;&nbsp;</span>cstore</a></span></li><li><span><a href="#pstore" data-toc-modified-id="pstore-4.6"><span class="toc-item-num">4.6&nbsp;&nbsp;</span>pstore</a></span></li><li><span><a href="#Scrap-place" data-toc-modified-id="Scrap-place-4.7"><span class="toc-item-num">4.7&nbsp;&nbsp;</span>Scrap place</a></span></li></ul></li><li><span><a href="#Potential-Calculus-Experimentations" data-toc-modified-id="Potential-Calculus-Experimentations-5"><span class="toc-item-num">5&nbsp;&nbsp;</span>Potential Calculus Experimentations</a></span></li><li><span><a href="#Extra-scrap" data-toc-modified-id="Extra-scrap-6"><span class="toc-item-num">6&nbsp;&nbsp;</span>Extra scrap</a></span></li></ul></div>
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Getting some resources](#getting-some-resources)
+- [Poking around](#poking-around)
+  * [df_store](#df-store)
+  * [Viewing trajectories](#viewing-trajectories)
+    + [Viewing a single trajectory](#viewing-a-single-trajectory)
+    + [Flip over all (or some) trajectories](#flip-over-all--or-some--trajectories)
+  * [Making a pdf of trajectories](#making-a-pdf-of-trajectories)
+  * [Demo s and v](#demo-s-and-v)
+  * [cstore](#cstore)
+  * [pstore](#pstore)
+  * [Scrap place](#scrap-place)
+- [Potential Calculus Experimentations](#potential-calculus-experimentations)
+- [Extra scrap](#extra-scrap)
+- [Acknowledgements](#acknowledgements)
+  * [National Institutes of Health, National Institute on Drug Abuse](#national-institutes-of-health--national-institute-on-drug-abuse)
+  * [National Institutes of Health, National Institute on Drug Abuse,     American Recovery and Reinvestment Act](#national-institutes-of-health--national-institute-on-drug-abuse------american-recovery-and-reinvestment-act)
+  * [National Addiction & HIV Data Archive Program (NAHDAP)](#national-addiction---hiv-data-archive-program--nahdap-)
 
-
-```python
-# %load_ext autoreload
-# %autoreload 2
-```
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Introduction
 
@@ -44,11 +57,9 @@ Oh, and pull requests etc. are welcome!
 
 Stars, likes, references, and coffee also welcome.
 
-And if you want to donate: Donate to a charity that will help the people understand and make policies surrounding the use of substances.
-
 A simple flowchart about the architecture:
 
-<img src="odus_store.png" width=800 height=200>
+![png](img/odus_store.png)
 
 # Getting some resources
 
@@ -1432,7 +1443,40 @@ w / []
 # """.split('\n'))
 ```
 
+# Acknowledgements
 
-```python
+This study was supported by the National Institutes of Drug Abuse R15DA041657 and R21DA025298, and . 
+The content is solely the responsibility of the authors and does not necessarily represent 
+the official views of the National Institute on Drug Abuse or the National Institutes of Health. 
 
+Here are the grant numbers you worked on I think there are only two plus the one you got as PI from NAHDAP
+
+## National Institutes of Health, National Institute on Drug Abuse
+```
+2017-2020        
+    1 R15 DA041657 
+    Miriam Boeri, Aukje Lamonica, MPIs
+    Award: $341,565
+    “Suburban Opioid Study” (SOS) 
+
+```
+
+## National Institutes of Health, National Institute on Drug Abuse,     American Recovery and Reinvestment Act
+
+```
+2009-2011        
+    R21DA025298   
+    Miriam Boeri, PI          
+    Thor Whalen, Co-investigator
+    Award: $367,820
+    “Older Drug Users: A Life Course Study of Turning Points in Drug Use and Injection.”
+```
+
+## National Addiction & HIV Data Archive Program (NAHDAP)
+```
+2010-2011        
+    University of Michigan’s Inter-university Consortium for Political and Social                              
+    Research (ICPSR) 
+    Thor Whalen, PI
+    Data archived at http://dx.doi.org/10.3886/ICPSR34296.v1
 ```
