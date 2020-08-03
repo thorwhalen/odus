@@ -1,11 +1,10 @@
 version = '0.0.6'
 root_url = 'https://github.com/thorwhalen'
 
-#import os
+# import os
 # name = os.path.split(os.path.dirname(__file__))[-1]
 
 name = 'odus'
-
 
 
 def readme():
@@ -20,6 +19,7 @@ ujoin = lambda *args: '/'.join(args)
 
 if root_url.endswith('/'):
     root_url = root_url[:-1]
+
 
 def my_setup(print_params=True, **setup_kwargs):
     from setuptools import setup
@@ -57,10 +57,8 @@ more_setup_kwargs = dict(
         'Pillow',
         'spyn',
         'matplotlib',
-    ],
-    extras_require=[
-      'openpyxl',  # to do raw data diagnosis (namely to get colors from excel)
-      'argh'  # to create nicely-interfaced scripts easily
+        'openpyxl',  # to do raw data diagnosis (namely to get colors from excel)
+        'argh'  # to create nicely-interfaced scripts easily
     ],
     description="Tools to provide easy access to prepared data to data scientists that can't be asked.",
     keywords=['data', 'data access', 'drug use', 'markov', 'bayesian'],
@@ -68,6 +66,5 @@ more_setup_kwargs = dict(
 )
 
 setup_kwargs = dict(setup_kwargs, **more_setup_kwargs)
-
 
 my_setup(**setup_kwargs)
