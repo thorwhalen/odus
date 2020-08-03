@@ -58,6 +58,10 @@ more_setup_kwargs = dict(
         'spyn',
         'matplotlib',
     ],
+    extras_require=[
+      'openpyxl',  # to do raw data diagnosis (namely to get colors from excel)
+      'argh'  # to create nicely-interfaced scripts easily
+    ],
     description="Tools to provide easy access to prepared data to data scientists that can't be asked.",
     keywords=['data', 'data access', 'drug use', 'markov', 'bayesian'],
     # download_url='{root_url}/{name}/archive/v{version}.zip'),
