@@ -5,17 +5,33 @@ import matplotlib.pylab as plt
 from itertools import combinations, chain
 
 from odus.sequential_var_sets import PVar, VarSet, DfData, VarSetFactory
-from hyp.ppi.pot import Pot
-from odus.dacc import DfStore, counts_of_kps, Dacc, VarSetCountsStore, \
-    mk_pvar_struct, PotStore, _commun_columns_of_dfs, Struct, mk_pvar_str_struct, \
-    VarStr
-from odus.plot_utils import plot_life_course, plot_life, life_plots, write_trajectories_to_file
+from spyn.ppi.pot import Pot
+from odus.dacc import (
+    DfStore,
+    counts_of_kps,
+    Dacc,
+    VarSetCountsStore,
+    mk_pvar_struct,
+    PotStore,
+    _commun_columns_of_dfs,
+    Struct,
+    mk_pvar_str_struct,
+    VarStr,
+)
+from odus.plot_utils import (
+    plot_life_course,
+    plot_life,
+    life_plots,
+    write_trajectories_to_file,
+)
 
 # __all__ = ['plot_life_course', 'plot_life', 'life_plots', 'write_trajectories_to_file',
 #            'counts_of_kps', 'Dacc', 'VarSetCountsStore', 'PVar', 'VarSet', 'DfData', 'VarSetFactory']
 
 package_dir = dirname(__file__)
-DFLT_SURVEY_DIR = join(package_dir, )
+DFLT_SURVEY_DIR = join(
+    package_dir,
+)
 dflt_figsize = (16, 5)
 
 
@@ -48,11 +64,11 @@ def get_markov_rel_risk(pstore, fields=None):
         else:
             event = str(vs.varset[0])
             exposure = str(vs.varset[1])
-        rel_risk = p.relative_risk(event_var=event, exposure_var=exposure, event_val=1, exposure_val=1)
+        rel_risk = p.relative_risk(
+            event_var=event, exposure_var=exposure, event_val=1, exposure_val=1
+        )
 
-        c.append({'exposure': exposure,
-                  'event': event,
-                  'rel_risk': rel_risk})
+        c.append({'exposure': exposure, 'event': event, 'rel_risk': rel_risk})
 
     markov_rel_risk = pd.DataFrame(c)
     return markov_rel_risk.pivot(index='exposure', columns='event', values='rel_risk')
@@ -73,7 +89,10 @@ def remission_relative_risk(pstore, event, exposure):
     if isinstance(exposure, str):
         exposure = VarStr(exposure)
     p = pstore[exposure - 1, event - 1, event]
-    event_last_year = p * Pot.from_hard_evidence(**{event - 1: 1}) >> [exposure - 1, event]
+    event_last_year = p * Pot.from_hard_evidence(**{event - 1: 1}) >> [
+        exposure - 1,
+        event,
+    ]
     return event_last_year.relative_risk(event, exposure - 1, smooth_count=1)
 
 
@@ -81,14 +100,16 @@ def get_markov_remission_rel_risk(pstore, fields=None):
     if fields is None:
         fields = _commun_columns_of_dfs(pstore.df_store.values())
     c = list()
-    for event, exposure in chain(*([(x, y), (y, x)] for x, y in combinations(fields, 2))):
+    for event, exposure in chain(
+        *([(x, y), (y, x)] for x, y in combinations(fields, 2))
+    ):
         rel_risk = remission_relative_risk(pstore, event, exposure)
-        c.append({'exposure': exposure,
-                  'event': event,
-                  'remission_rel_risk': rel_risk})
+        c.append({'exposure': exposure, 'event': event, 'remission_rel_risk': rel_risk})
 
     markov_rel_risk = pd.DataFrame(c)
-    return markov_rel_risk.pivot(index='exposure', columns='event', values='remission_rel_risk')
+    return markov_rel_risk.pivot(
+        index='exposure', columns='event', values='remission_rel_risk'
+    )
 
 
 # Print ################################################################################################################
@@ -130,11 +151,15 @@ def print_remission_influence_supporting_info(pstore, event, exposure):
         exposure = VarStr(exposure)
     p = pstore[exposure - 1, event - 1, event]
     print(p)
-    event_last_year = p * Pot.from_hard_evidence(**{event - 1: 1}) >> [exposure - 1, event]
+    event_last_year = p * Pot.from_hard_evidence(**{event - 1: 1}) >> [
+        exposure - 1,
+        event,
+    ]
     print_relrisk_and_table_from_pot(event_last_year, event, exposure - 1)
 
 
 # Plot #################################################################################################################
+
 
 def get_tick_and_labels(y_ticks, y_tick_labels=None):
     y_tick = []
@@ -154,7 +179,7 @@ def format_for_influencer_plot():
     if max(abs(t)) > 1:
         plt.yticks(*get_tick_and_labels(t))
     else:
-        plt.yticks(t, list(map(lambda x: "{:0.2f}".format(2 ** x), t)))
+        plt.yticks(t, list(map(lambda x: "{:0.2f}".format(2**x), t)))
     plt.grid(axis='y')
 
 
@@ -174,24 +199,38 @@ def plot_diagonal(lrr, figsize=dflt_figsize, **kwargs):
 
 
 def plot_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(title='Log2 relative risks for event: {}'.format(var), figsize=figsize, **kwargs)
+    kwargs = dict(
+        title='Log2 relative risks for event: {}'.format(var), figsize=figsize, **kwargs
+    )
     lrr.loc[:, var].plot(kind='bar', **kwargs)
     format_for_influencer_plot()
 
 
 def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(title='Log2 relative risks when exposed to {}'.format(var), figsize=figsize, **kwargs)
+    kwargs = dict(
+        title='Log2 relative risks when exposed to {}'.format(var),
+        figsize=figsize,
+        **kwargs,
+    )
     lrr.loc[var - 1, :].plot(kind='bar', **kwargs)
     format_for_influencer_plot()
 
 
 def plot_remission_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(title='Log2 remission relative risks for event: {}'.format(var), figsize=figsize, **kwargs)
+    kwargs = dict(
+        title='Log2 remission relative risks for event: {}'.format(var),
+        figsize=figsize,
+        **kwargs,
+    )
     lrr.loc[:, var].plot(kind='bar', **kwargs)
     format_for_influencer_plot()
 
 
 def plot_remission_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(title='Log2 remission relative risks when exposed to {}'.format(var), figsize=figsize, **kwargs)
+    kwargs = dict(
+        title='Log2 remission relative risks when exposed to {}'.format(var),
+        figsize=figsize,
+        **kwargs,
+    )
     lrr.loc[var, :].plot(kind='bar', **kwargs)
     format_for_influencer_plot()

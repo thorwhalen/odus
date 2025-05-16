@@ -13,10 +13,11 @@ from py2store.stores.local_store import RelativePathFormatStore, LocalBinaryStor
 from py2store.mixins import ReadOnlyMixin
 
 from odus.nothing import nothing
-from hyp.ppi.pot import Pot
+from spyn.ppi.pot import Pot
 
 from odus.sequential_var_sets import PVar, VarSet, DfData, extract_kps
 from odus.plot_utils import heatmap
+
 # from ut.pplot.matrix import heatmap
 
 path_sep = os.path.sep
@@ -85,8 +86,9 @@ def mk_pvar_struct(df_store, only_for_cols_in_all_dfs=False):
         categories = _commun_columns_of_dfs(df_store.values())
     else:
         categories = _all_columns_of_dfs(df_store.values())
-    val_of_attr = {simple_cat_p.sub('_', c.lower().strip()): PVar(c)
-                   for c in categories}
+    val_of_attr = {
+        simple_cat_p.sub('_', c.lower().strip()): PVar(c) for c in categories
+    }
     return Struct(**val_of_attr)
 
 
@@ -94,7 +96,9 @@ def mk_pvar_str_struct(df_store, only_for_cols_in_all_dfs=False):
     if isinstance(df_store, Struct):
         return Struct(**{k: VarStr(v) for k, v in df_store.__dict__.items()})
     else:
-        return mk_pvar_str_struct(mk_pvar_str_struct(df_store, only_for_cols_in_all_dfs))
+        return mk_pvar_str_struct(
+            mk_pvar_str_struct(df_store, only_for_cols_in_all_dfs)
+        )
 
 
 class HashableMixin:
@@ -122,7 +126,9 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
         df = df.iloc[1:, 1:]  # TODO: would like to keep year, but not in column
         df = df.set_index('age')
         df = df.astype(int)
-        df[df != 0] = 1  # TODO: May want to remove this to expose mistakes instead of repairing them
+        df[df != 0] = (
+            1  # TODO: May want to remove this to expose mistakes instead of repairing them
+        )
         return df
 
 
@@ -160,7 +166,9 @@ class PotStore(VarSetCountsStore):
                 dd['pval'] = val
                 d.append(dd)
             # return pd.DataFrame(d)
-            return Pot.from_count_df_to_count(pd.DataFrame(d)[k.varset_strs + ['pval']], count_col='pval')
+            return Pot.from_count_df_to_count(
+                pd.DataFrame(d)[k.varset_strs + ['pval']], count_col='pval'
+            )
 
 
 class DelegMap:
@@ -192,8 +200,6 @@ class Dacc:
                 self.counts_of[k].update([v])
 
     # def counts_of(self):
-
-
 
 
 def counts_of_kps(store, categories, kps_list):
