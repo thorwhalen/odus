@@ -50,7 +50,7 @@ def _all_columns_of_dfs(dfs):
     return categories
 
 
-simple_cat_p = re.compile('\W')
+simple_cat_p = re.compile(r'\W')
 
 
 class Struct:

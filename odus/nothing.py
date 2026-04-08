@@ -7,7 +7,7 @@ from odus.pobj import add_method
 # TODO: ... (e.g. works for __add__ works, but not with +).
 
 
-class GreatUniversalNothing(object):
+class GreatUniversalNothing:
     """
     An object that is a neutral for any method.
     Only works with some operators (e.g. works for __add__ works, but not with +).

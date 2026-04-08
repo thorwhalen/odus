@@ -1,6 +1,6 @@
 import matplotlib.pylab as plt
 from itertools import islice
-from typing import Iterable
+from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 

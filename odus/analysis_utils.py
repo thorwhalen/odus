@@ -179,7 +179,7 @@ def format_for_influencer_plot():
     if max(abs(t)) > 1:
         plt.yticks(*get_tick_and_labels(t))
     else:
-        plt.yticks(t, list(map(lambda x: "{:0.2f}".format(2**x), t)))
+        plt.yticks(t, list(map(lambda x: f"{2**x:0.2f}", t)))
     plt.grid(axis='y')
 
 
@@ -200,7 +200,7 @@ def plot_diagonal(lrr, figsize=dflt_figsize, **kwargs):
 
 def plot_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title='Log2 relative risks for event: {}'.format(var), figsize=figsize, **kwargs
+        title=f'Log2 relative risks for event: {var}', figsize=figsize, **kwargs
     )
     lrr.loc[:, var].plot(kind='bar', **kwargs)
     format_for_influencer_plot()
@@ -208,7 +208,7 @@ def plot_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
 
 def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title='Log2 relative risks when exposed to {}'.format(var),
+        title=f'Log2 relative risks when exposed to {var}',
         figsize=figsize,
         **kwargs,
     )
@@ -218,7 +218,7 @@ def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
 
 def plot_remission_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title='Log2 remission relative risks for event: {}'.format(var),
+        title=f'Log2 remission relative risks for event: {var}',
         figsize=figsize,
         **kwargs,
     )
@@ -228,7 +228,7 @@ def plot_remission_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
 
 def plot_remission_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title='Log2 remission relative risks when exposed to {}'.format(var),
+        title=f'Log2 remission relative risks when exposed to {var}',
         figsize=figsize,
         **kwargs,
     )
