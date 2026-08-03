@@ -1,3 +1,10 @@
+"""High-level analyses of drug-use trajectories.
+
+Builds count/probability stores from the survey data and derives relative-risk
+and remission statistics from them, plus the plotting helpers that render those
+results (influencer/influenced plots, diagonal relative risk, ...).
+"""
+
 from os.path import dirname, join, sep
 import pandas as pd
 import numpy as np

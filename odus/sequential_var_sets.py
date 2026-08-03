@@ -1,3 +1,10 @@
+"""Variables and variable sets over sequential (time-indexed) data.
+
+``PVar`` describes a variable at a time offset, ``VarSet`` a set of such
+variables, and ``DfData`` extracts the corresponding key-point sequences from a
+trajectory dataframe.
+"""
+
 import itertools
 import re
 

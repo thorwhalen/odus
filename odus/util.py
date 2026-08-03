@@ -1,3 +1,9 @@
+"""General utilities: image conversion and multi-image file writing.
+
+Converts matplotlib figures / arrays / PIL images to ``PIL.Image`` and writes a
+sequence of them to a single file (e.g. a multi-page pdf).
+"""
+
 from io import BytesIO
 import os
 import matplotlib.pylab as plt

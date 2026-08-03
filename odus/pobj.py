@@ -1,3 +1,9 @@
+"""Dynamic method injection on objects and classes.
+
+``add_method`` returns a new object whose class has an extra method, and
+``inject_method`` adds methods to an existing object in place.
+"""
+
 from itertools import chain
 import types
 

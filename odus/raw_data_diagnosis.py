@@ -1,3 +1,10 @@
+"""Diagnosis of the raw survey spreadsheets.
+
+Reads the source ``.xlsx`` files with ``openpyxl`` (values *and* cell colors)
+and reports cells whose content and formatting disagree -- the data-entry
+anomalies that must be resolved before the data can be prepared.
+"""
+
 from functools import partial
 import os
 
