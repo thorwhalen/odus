@@ -1,0 +1,4 @@
+odus.sequential_var_sets
+========================
+.. automodule:: odus.sequential_var_sets
+   :members:

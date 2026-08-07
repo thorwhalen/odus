@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odus.pobj &mdash; odus 0.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            odus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus.html">odus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/analysis_utils.html">odus.analysis_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/dacc.html">odus.dacc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/nothing.html">odus.nothing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/plot_utils.html">odus.plot_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/pobj.html">odus.pobj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/sequential_var_sets.html">odus.sequential_var_sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/util.html">odus.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">odus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odus.pobj</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odus.pobj</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Dynamic method injection on objects and classes.</span>
+
+<span class="sd">``add_method`` returns a new object whose class has an extra method, and</span>
+<span class="sd">``inject_method`` adds methods to an existing object in place.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+
+
+<div class="viewcode-block" id="add_method">
+<a class="viewcode-back" href="../../module_docs/odus/pobj.html#odus.pobj.add_method">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method_func</span><span class="p">,</span> <span class="n">method_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamically add a method to an object.</span>
+
+<span class="sd">    :param obj: The object to add a method to</span>
+<span class="sd">    :param method_func: The function to use as a method. The first argument must be the object itself</span>
+<span class="sd">        (usually called self)</span>
+<span class="sd">    :param method_name: The desired function name. If None, will take method_func.__name__</span>
+<span class="sd">    :param class_name:  The desired class name. If None, will take type(obj).__name__</span>
+<span class="sd">    :return: the object, but with the additional method (or a different function for it)</span>
+
+<span class="sd">    &gt;&gt;&gt; class A:</span>
+<span class="sd">    ...     def __init__(self, x=10):</span>
+<span class="sd">    ...         self.x = x</span>
+<span class="sd">    &gt;&gt;&gt; def times(self, y):</span>
+<span class="sd">    ...     return self.x * y</span>
+<span class="sd">    &gt;&gt;&gt; def plus(self, y):</span>
+<span class="sd">    ...     return self.x + y</span>
+<span class="sd">    &gt;&gt;&gt; a = A(x=10)</span>
+<span class="sd">    &gt;&gt;&gt; a = add_method(a, plus, &#39;__call__&#39;)  # add a __call__ method, assigning it to plus</span>
+<span class="sd">    &gt;&gt;&gt; a(2)</span>
+<span class="sd">    12</span>
+<span class="sd">    &gt;&gt;&gt; a = add_method(a, times, &#39;__call__&#39;)  # reassign the __call__ method to times instead</span>
+<span class="sd">    &gt;&gt;&gt; a(2)</span>
+<span class="sd">    20</span>
+<span class="sd">    &gt;&gt;&gt; a = add_method(a, plus, &#39;__getitem__&#39;)  # assign the method __getitem__ to plus</span>
+<span class="sd">    &gt;&gt;&gt; a[2]  # see that it works</span>
+<span class="sd">    12</span>
+<span class="sd">    &gt;&gt;&gt; a(2)  # and that we still have our __call__ method</span>
+<span class="sd">    20</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_func</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="n">method_func</span>
+        <span class="n">method_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="n">method_func</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">class_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">bases</span> <span class="o">=</span> <span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="p">(</span><span class="n">base</span><span class="p">,)</span>
+    <span class="n">bases_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">bases</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="n">bases_names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+            <span class="n">class_name</span> <span class="o">+=</span> <span class="s1">&#39;_&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="n">bases_names</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can&#39;t find a name for class that is not taken by bases. Consider using explicit name&quot;</span><span class="p">)</span>
+
+    <span class="n">new_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">dir</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">]))</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">new_keys</span><span class="p">}</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">method_func</span>
+
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">d</span><span class="p">)()</span></div>
+
+
+
+<div class="viewcode-block" id="inject_method">
+<a class="viewcode-back" href="../../module_docs/odus/pobj.html#odus.pobj.inject_method">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">inject_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method_func</span><span class="p">,</span> <span class="n">method_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inject one or several methods to an object.</span>
+<span class="sd">    Note that it doesn&#39;t work if method_name is a dunder.</span>
+<span class="sd">    If you want to inject things like __call__, __getitem__, etc., use add_method instead.</span>
+<span class="sd">    :param obj: The object to add a method to</span>
+<span class="sd">    :param method_func: The function to use as a method. The first argument must be the object itself</span>
+<span class="sd">        (usually called self)</span>
+<span class="sd">    :param method_name: The desired function name. If None, will take method_func.__name__</span>
+<span class="sd">    :return: the object, but with the additional method (or a different function for it)</span>
+
+<span class="sd">    &gt;&gt;&gt; class A:</span>
+<span class="sd">    ...     def __init__(self, x=10):</span>
+<span class="sd">    ...         self.x = x</span>
+<span class="sd">    &gt;&gt;&gt; def times(self, y):</span>
+<span class="sd">    ...     return self.x * y</span>
+<span class="sd">    &gt;&gt;&gt; def plus(self, y):</span>
+<span class="sd">    ...     return self.x + y</span>
+<span class="sd">    &gt;&gt;&gt; a = A(x=10)</span>
+<span class="sd">    &gt;&gt;&gt; a = inject_method(a, plus, &#39;add&#39;)  # inject the plus method (but call it &#39;add&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; a.add(2)</span>
+<span class="sd">    12</span>
+<span class="sd">    &gt;&gt;&gt; a = inject_method(a, times)  # inject the times method (and use it&#39;s name automatically)</span>
+<span class="sd">    &gt;&gt;&gt; a.times(2)</span>
+<span class="sd">    20</span>
+<span class="sd">    &gt;&gt;&gt; a = inject_method(a, plus, &#39;times&#39;)  # be evil: Inject the plus method but call it &#39;times&#39;</span>
+<span class="sd">    &gt;&gt;&gt; a.times(2)</span>
+<span class="sd">    12</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_func</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">method_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">method_name</span> <span class="o">=</span> <span class="n">method_func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span>
+                <span class="n">method_name</span><span class="p">,</span>
+                <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">method_func</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_func</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">method_func</span> <span class="o">=</span> <span class="p">[(</span><span class="n">func</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">method_func</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">method_func</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">method</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">method</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">obj</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

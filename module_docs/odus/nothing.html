@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odus.nothing &mdash; odus 0.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="odus.plot_utils" href="plot_utils.html" />
+    <link rel="prev" title="odus.dacc" href="dacc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            odus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../odus.html">odus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis_utils.html">odus.analysis_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dacc.html">odus.dacc</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">odus.nothing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#odus.nothing.GreatUniversalNothing"><code class="docutils literal notranslate"><span class="pre">GreatUniversalNothing</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#odus.nothing.get_universal_neutral_for_method"><code class="docutils literal notranslate"><span class="pre">get_universal_neutral_for_method()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#odus.nothing.get_universal_neutral_for_methods"><code class="docutils literal notranslate"><span class="pre">get_universal_neutral_for_methods()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot_utils.html">odus.plot_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pobj.html">odus.pobj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequential_var_sets.html">odus.sequential_var_sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">odus.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">odus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">odus.nothing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/odus/nothing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-odus.nothing">
+<span id="odus-nothing"></span><h1>odus.nothing<a class="headerlink" href="#module-odus.nothing" title="Link to this heading"></a></h1>
+<p>Universal neutral (identity) elements for accumulation.</p>
+<p>Provides objects that act as the neutral element of an operation whatever the
+operand type, so accumulators can be initialized without knowing the type (or
+shape) of what they will accumulate.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odus.nothing.GreatUniversalNothing">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">odus.nothing.</span></span><span class="sig-name descname"><span class="pre">GreatUniversalNothing</span></span><a class="reference internal" href="../../_modules/odus/nothing.html#GreatUniversalNothing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.nothing.GreatUniversalNothing" title="Link to this definition"></a></dt>
+<dd><p>An object that is a neutral for any method.
+Only works with some operators (e.g. works for __add__ works, but not with +).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">GreatUniversalNothing</span><span class="p">()</span>  <span class="c1"># note, this is constructed ones, and used many times</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span> <span class="o">+</span> <span class="n">nothing</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">nothing</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="mf">3.14</span> <span class="o">*</span> <span class="n">nothing</span>
+<span class="go">3.14</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">|</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">|</span> <span class="n">nothing</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">&amp;</span> <span class="s1">&#39;hi there&#39;</span> <span class="o">&amp;</span> <span class="n">nothing</span>
+<span class="go">&#39;hi there&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we demo how we get the same behavior no matter what the type is</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">&quot;wassup world!&quot;</span><span class="p">))</span>
+<span class="go">wassup world!</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># No need to specify the array shape in advance!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])))</span>
+<span class="go">[1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and += works automatically!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">nothing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">[1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">[11 22 33 44]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with defaultdict (and multi type value cumulators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">nothing</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;world&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">{&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Works with other methods too!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="mi">314</span>
+<span class="go">314</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">&#39;foobar&#39;</span>
+<span class="go">&#39;foobar&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odus.nothing.get_universal_neutral_for_method">
+<span class="sig-prename descclassname"><span class="pre">odus.nothing.</span></span><span class="sig-name descname"><span class="pre">get_universal_neutral_for_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/odus/nothing.html#get_universal_neutral_for_method"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.nothing.get_universal_neutral_for_method" title="Link to this definition"></a></dt>
+<dd><p>A universal neutral element (synonyms: “identity element” and “unit element”).
+A neutral element is with respect to a binary operation op(a, b).
+A neutral element e (for op) is one such that op(e, b) = b for any b.
+(Formally, we should also have op(b, e) = b, but we’ll ignore that!)</p>
+<p>It is universal from the point of view of type, not method.
+Here, you specify what method (operation) you want it to be a neutral element for.
+Typically, you use this when you want to initialize a variable that will “accumulate/aggregate” objects one by one.
+For example, you say</p>
+<blockquote>
+<div><p>cumul = 0</p>
+</div></blockquote>
+<dl class="simple">
+<dt>and then add elements to cumul</dt><dd><p>cumul = cumul + x</p>
+</dd>
+<dt>or</dt><dd><p>cumul += x</p>
+</dd>
+</dl>
+<p>etc.</p>
+<dl class="simple">
+<dt>Depending on what the type is, you need to initialize in different ways.</dt><dd><p>cumul = 0   for ints
+cumul = []  for lists
+cumul = numpy.array(array_shape) for numpy arrays (and better know the dims of the arrays you’ll be feeding!)
+cumul = “” for strings</p>
+</dd>
+<dt>With the universal element, you don’t need to initialize according to type. You just need to say:</dt><dd><p>cumul = get_universal_neutral_for_method(“__add__”)</p>
+</dd>
+</dl>
+<p>and you’ll have something that behaves as expected: Be transparent.</p>
+<p>Other examples of common methods where you want a neutral:  __mul__, update, etc.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__add__&#39;</span><span class="p">)</span>  <span class="c1"># note, this is constructed ones, and used many times</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">&quot;wassup world!&quot;</span><span class="p">))</span>
+<span class="go">wassup world!</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># No need to specify the array shape in advance!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])))</span>
+<span class="go">[1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and += works automatically!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">nothing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">[1 2 3 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">[11 22 33 44]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with defaultdict (and multi type value cumulators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">nothing</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;world&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">{&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Works with other methods too!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__mul__&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="mi">314</span>
+<span class="go">314</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">&#39;foobar&#39;</span>
+<span class="go">&#39;foobar&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odus.nothing.get_universal_neutral_for_methods">
+<span class="sig-prename descclassname"><span class="pre">odus.nothing.</span></span><span class="sig-name descname"><span class="pre">get_universal_neutral_for_methods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/odus/nothing.html#get_universal_neutral_for_methods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.nothing.get_universal_neutral_for_methods" title="Link to this definition"></a></dt>
+<dd><p>See get_universal_neutral_for_method(method_name).
+This is just the “multiple methods” version of that one.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dacc.html" class="btn btn-neutral float-left" title="odus.dacc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="plot_utils.html" class="btn btn-neutral float-right" title="odus.plot_utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

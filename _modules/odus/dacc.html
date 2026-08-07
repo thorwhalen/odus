@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odus.dacc &mdash; odus 0.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            odus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus.html">odus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/analysis_utils.html">odus.analysis_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/dacc.html">odus.dacc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/nothing.html">odus.nothing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/plot_utils.html">odus.plot_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/pobj.html">odus.pobj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/sequential_var_sets.html">odus.sequential_var_sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/util.html">odus.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">odus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odus.dacc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odus.dacc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Data access: stores and accessors over the survey data.</span>
+
+<span class="sd">Defines the ``py2store``-based stores (``DfStore``, ``VarSetCountsStore``,</span>
+<span class="sd">``PotStore``) and the ``Dacc`` facade that give easy access to the prepared</span>
+<span class="sd">trajectory dataframes, their count tables, and the corresponding potentials.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">mk_memoizer</span>  <span class="c1"># like from cachetools import cached</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+
+<span class="c1"># get py2store here: https://github.com/i2mint/py2store</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Store</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.stores.local_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelativePathFormatStore</span><span class="p">,</span> <span class="n">LocalBinaryStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReadOnlyMixin</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.nothing</span><span class="w"> </span><span class="kn">import</span> <span class="n">nothing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spyn.ppi.pot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pot</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.sequential_var_sets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PVar</span><span class="p">,</span> <span class="n">VarSet</span><span class="p">,</span> <span class="n">DfData</span><span class="p">,</span> <span class="n">extract_kps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="c1"># from ut.pplot.matrix import heatmap</span>
+
+<span class="n">path_sep</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_slash_suffix</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">path_sep</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">path_sep</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_commun_columns_of_dfs</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="n">nothing</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs</span><span class="p">:</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">categories</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_all_columns_of_dfs</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+                <span class="n">categories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">categories</span>
+
+
+<span class="n">simple_cat_p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\W&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Struct</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="VarStr">
+<a class="viewcode-back" href="../../module_docs/odus/dacc.html#odus.dacc.VarStr">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VarStr</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">two_way_map</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">val_of_key_func</span><span class="p">):</span>
+    <span class="n">val_of_key</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">key_of_val</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">val_of_key_func</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">val_of_key</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">key_of_val</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">val_of_key</span><span class="p">,</span> <span class="n">key_of_val</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">only_for_cols_in_all_dfs</span><span class="p">:</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="n">_commun_columns_of_dfs</span><span class="p">(</span><span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="n">_all_columns_of_dfs</span><span class="p">(</span><span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">val_of_attr</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">simple_cat_p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span> <span class="n">PVar</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">categories</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">Struct</span><span class="p">(</span><span class="o">**</span><span class="n">val_of_attr</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mk_pvar_str_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">Struct</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Struct</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">VarStr</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">df_store</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mk_pvar_str_struct</span><span class="p">(</span>
+            <span class="n">mk_pvar_str_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="p">)</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HashableMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DfStore">
+<a class="viewcode-back" href="../../module_docs/odus/dacc.html#odus.dacc.DfStore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DfStore</span><span class="p">(</span><span class="n">HashableMixin</span><span class="p">,</span> <span class="n">ReadOnlyMixin</span><span class="p">,</span> <span class="n">LocalBinaryStore</span><span class="p">):</span>
+
+    <span class="nd">@mk_memoizer</span><span class="p">({})</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_obj_of_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;year&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;age&#39;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;INTERVIEW ID NUMBER (enter in red)&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">})</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># TODO: would like to keep year, but not in column</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">df</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span>  <span class="c1"># TODO: May want to remove this to expose mistakes instead of repairing them</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="VarSetCountsStore">
+<a class="viewcode-back" href="../../module_docs/odus/dacc.html#odus.dacc.VarSetCountsStore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VarSetCountsStore</span><span class="p">(</span><span class="n">HashableMixin</span><span class="p">,</span> <span class="n">ReadOnlyMixin</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_store</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_store</span> <span class="o">=</span> <span class="n">df_store</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mk_pvar_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="p">)</span>
+
+    <span class="nd">@mk_memoizer</span><span class="p">({})</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">PVar</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">VarSet</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="c1"># counts = DfData(df).extract_kps(k)</span>
+                <span class="n">counts</span> <span class="o">=</span> <span class="n">extract_kps</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">c</span></div>
+
+
+
+<div class="viewcode-block" id="PotStore">
+<a class="viewcode-back" href="../../module_docs/odus/dacc.html#odus.dacc.PotStore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PotStore</span><span class="p">(</span><span class="n">VarSetCountsStore</span><span class="p">):</span>
+    <span class="nd">@mk_memoizer</span><span class="p">({})</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">PVar</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">VarSet</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dd</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">varset</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span> <span class="n">var_val</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key</span><span class="p">)}</span>
+                <span class="n">dd</span><span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+            <span class="c1"># return pd.DataFrame(d)</span>
+            <span class="k">return</span> <span class="n">Pot</span><span class="o">.</span><span class="n">from_count_df_to_count</span><span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)[</span><span class="n">k</span><span class="o">.</span><span class="n">varset_strs</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]],</span> <span class="n">count_col</span><span class="o">=</span><span class="s1">&#39;pval&#39;</span>
+            <span class="p">)</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DelegMap</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dfunc</span><span class="p">,</span> <span class="n">dmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dmap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dmap</span> <span class="o">=</span> <span class="n">dmap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dfunc</span> <span class="o">=</span> <span class="n">dfunc</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dmap</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dmap</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfunc</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dmap</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Dacc</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xls_rootdir</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">ensure_slash_suffix</span><span class="p">(</span><span class="n">xls_rootdir</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.xlsx&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">categories</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">categories</span> <span class="o">=</span> <span class="n">_commun_columns_of_dfs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Counter</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mk_counts_of_kps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kps_list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">]</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">DfData</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dd</span><span class="o">.</span><span class="n">extract_with_key_pattern_sets</span><span class="p">(</span><span class="n">kps_list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">v</span><span class="p">])</span>
+
+    <span class="c1"># def counts_of(self):</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">counts_of_kps</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">kps_list</span><span class="p">):</span>
+    <span class="n">counts_of</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Counter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="n">categories</span><span class="p">]</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="n">DfData</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dd</span><span class="o">.</span><span class="n">extract_with_key_pattern_sets</span><span class="p">(</span><span class="n">kps_list</span><span class="p">):</span>
+            <span class="n">counts_of</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">v</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">counts_of</span>
+
+
+<span class="c1"># vs = tuple(map(str, VarSet.from_str(s)))</span>
+<span class="c1"># d = list()</span>
+<span class="c1"># for k, v in t.items():</span>
+<span class="c1">#     dd = {vs[i]: kk for i, kk in enumerate(k)}</span>
+<span class="c1">#     dd[&#39;pval&#39;] = v</span>
+<span class="c1">#     d.append(dd)</span>
+<span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col=&#39;pval&#39;)</span>
+<span class="c1"># u</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="n">proj_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">pjoin</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proj_root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">xls_rootdir</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="s1">&#39;data/surveys/&#39;</span><span class="p">)</span>
+
+    <span class="c1"># vs = tuple(map(str, VarSet.from_str(s)))</span>
+
+    <span class="c1"># d = list()</span>
+    <span class="c1"># for k, v in counts_of.items():</span>
+    <span class="c1">#     dd = {vs[i]: kk for i, kk in enumerate(k)}</span>
+    <span class="c1">#     dd[&#39;pval&#39;] = v</span>
+    <span class="c1">#     d.append(dd)</span>
+    <span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col=&#39;pval&#39;)</span>
+    <span class="c1"># u</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

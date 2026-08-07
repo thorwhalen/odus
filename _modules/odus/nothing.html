@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odus.nothing &mdash; odus 0.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            odus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus.html">odus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/analysis_utils.html">odus.analysis_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/dacc.html">odus.dacc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/nothing.html">odus.nothing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/plot_utils.html">odus.plot_utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/pobj.html">odus.pobj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/sequential_var_sets.html">odus.sequential_var_sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/odus/util.html">odus.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">odus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odus.nothing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odus.nothing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Universal neutral (identity) elements for accumulation.</span>
+
+<span class="sd">Provides objects that act as the neutral element of an operation whatever the</span>
+<span class="sd">operand type, so accumulators can be initialized without knowing the type (or</span>
+<span class="sd">shape) of what they will accumulate.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.pobj</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_method</span>
+
+<span class="c1">########################################################################################################################</span>
+<span class="c1"># If you want an element that is neutral for any type and any method (well, all non-operator methods, plus a few ops)...</span>
+
+<span class="c1"># TODO: Added __add__, __mul__, etc. because __getattribute__ doesn&#39;t work with operator overloading</span>
+<span class="c1"># TODO: ... (e.g. works for __add__ works, but not with +).</span>
+
+
+<div class="viewcode-block" id="GreatUniversalNothing">
+<a class="viewcode-back" href="../../module_docs/odus/nothing.html#odus.nothing.GreatUniversalNothing">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GreatUniversalNothing</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An object that is a neutral for any method.</span>
+<span class="sd">    Only works with some operators (e.g. works for __add__ works, but not with +).</span>
+
+<span class="sd">    &gt;&gt;&gt; nothing = GreatUniversalNothing()  # note, this is constructed ones, and used many times</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; nothing + 2</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; 2 + nothing</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; nothing + 2 + nothing</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; nothing * 3.14 * nothing</span>
+<span class="sd">    3.14</span>
+<span class="sd">    &gt;&gt;&gt; nothing | [1, 2, 3] | nothing</span>
+<span class="sd">    [1, 2, 3]</span>
+<span class="sd">    &gt;&gt;&gt; nothing &amp; &#39;hi there&#39; &amp; nothing</span>
+<span class="sd">    &#39;hi there&#39;</span>
+<span class="sd">    &gt;&gt;&gt; # Now we demo how we get the same behavior no matter what the type is</span>
+<span class="sd">    &gt;&gt;&gt; nothing + 2</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; nothing + [1, 2, 3]</span>
+<span class="sd">    [1, 2, 3]</span>
+<span class="sd">    &gt;&gt;&gt; print((nothing + &quot;wassup world!&quot;))</span>
+<span class="sd">    wassup world!</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
+<span class="sd">    &gt;&gt;&gt; # No need to specify the array shape in advance!</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; print((nothing + np.array([1, 2, 3, 4])))</span>
+<span class="sd">    [1 2 3 4]</span>
+<span class="sd">    &gt;&gt;&gt; # and += works automatically!</span>
+<span class="sd">    &gt;&gt;&gt; t = nothing</span>
+<span class="sd">    &gt;&gt;&gt; t += np.array([1, 2, 3, 4])</span>
+<span class="sd">    &gt;&gt;&gt; print(t)</span>
+<span class="sd">    [1 2 3 4]</span>
+<span class="sd">    &gt;&gt;&gt; t += np.array([10, 20, 30, 40])</span>
+<span class="sd">    &gt;&gt;&gt; print(t)</span>
+<span class="sd">    [11 22 33 44]</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Example with defaultdict (and multi type value cumulators</span>
+<span class="sd">    &gt;&gt;&gt; from collections import defaultdict</span>
+<span class="sd">    &gt;&gt;&gt; t = defaultdict(lambda: nothing)</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;foo&#39;] += 2</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;bar&#39;] += [1,2,3]</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;bar&#39;] += [10,20]</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;is&#39;] += np.array([1,2,3,4])</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;is&#39;] += np.array([1,2,3,4])</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot;hello&quot;</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot; &quot;</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot;world&quot;</span>
+<span class="sd">    &gt;&gt;&gt; dict(t)</span>
+<span class="sd">    {&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Works with other methods too!</span>
+<span class="sd">    &gt;&gt;&gt; nothing * 314</span>
+<span class="sd">    314</span>
+<span class="sd">    &gt;&gt;&gt; nothing * &#39;foobar&#39;</span>
+<span class="sd">    &#39;foobar&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span></div>
+
+
+
+<span class="n">nothing</span> <span class="o">=</span> <span class="n">GreatUniversalNothing</span><span class="p">()</span>  <span class="c1"># most of the time, this is the only thing you need to import</span>
+
+
+<span class="c1">########################################################################################################################</span>
+<span class="c1"># If you want an element that is neutral for any type but only a specific method</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">transparent_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<div class="viewcode-block" id="get_universal_neutral_for_method">
+<a class="viewcode-back" href="../../module_docs/odus/nothing.html#odus.nothing.get_universal_neutral_for_method">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_universal_neutral_for_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A universal neutral element (synonyms: &quot;identity element&quot; and &quot;unit element&quot;).</span>
+<span class="sd">    A neutral element is with respect to a binary operation op(a, b).</span>
+<span class="sd">    A neutral element e (for op) is one such that op(e, b) = b for any b.</span>
+<span class="sd">    (Formally, we should also have op(b, e) = b, but we&#39;ll ignore that!)</span>
+
+<span class="sd">    It is universal from the point of view of type, not method.</span>
+<span class="sd">    Here, you specify what method (operation) you want it to be a neutral element for.</span>
+<span class="sd">    Typically, you use this when you want to initialize a variable that will &quot;accumulate/aggregate&quot; objects one by one.</span>
+<span class="sd">    For example, you say</span>
+<span class="sd">        cumul = 0</span>
+<span class="sd">    and then add elements to cumul</span>
+<span class="sd">        cumul = cumul + x</span>
+<span class="sd">    or</span>
+<span class="sd">        cumul += x</span>
+<span class="sd">    etc.</span>
+
+<span class="sd">    Depending on what the type is, you need to initialize in different ways.</span>
+<span class="sd">        cumul = 0   for ints</span>
+<span class="sd">        cumul = []  for lists</span>
+<span class="sd">        cumul = numpy.array(array_shape) for numpy arrays (and better know the dims of the arrays you&#39;ll be feeding!)</span>
+<span class="sd">        cumul = &quot;&quot; for strings</span>
+
+<span class="sd">    With the universal element, you don&#39;t need to initialize according to type. You just need to say:</span>
+<span class="sd">        cumul = get_universal_neutral_for_method(&quot;__add__&quot;)</span>
+<span class="sd">    and you&#39;ll have something that behaves as expected: Be transparent.</span>
+
+<span class="sd">    Other examples of common methods where you want a neutral:  __mul__, update, etc.</span>
+
+<span class="sd">    &gt;&gt;&gt; nothing = get_universal_neutral_for_method(&#39;__add__&#39;)  # note, this is constructed ones, and used many times</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; nothing + 2</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; nothing + [1, 2, 3]</span>
+<span class="sd">    [1, 2, 3]</span>
+<span class="sd">    &gt;&gt;&gt; print((nothing + &quot;wassup world!&quot;))</span>
+<span class="sd">    wassup world!</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
+<span class="sd">    &gt;&gt;&gt; # No need to specify the array shape in advance!</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; print((nothing + np.array([1, 2, 3, 4])))</span>
+<span class="sd">    [1 2 3 4]</span>
+<span class="sd">    &gt;&gt;&gt; # and += works automatically!</span>
+<span class="sd">    &gt;&gt;&gt; t = nothing</span>
+<span class="sd">    &gt;&gt;&gt; t += np.array([1, 2, 3, 4])</span>
+<span class="sd">    &gt;&gt;&gt; print(t)</span>
+<span class="sd">    [1 2 3 4]</span>
+<span class="sd">    &gt;&gt;&gt; t += np.array([10, 20, 30, 40])</span>
+<span class="sd">    &gt;&gt;&gt; print(t)</span>
+<span class="sd">    [11 22 33 44]</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Example with defaultdict (and multi type value cumulators</span>
+<span class="sd">    &gt;&gt;&gt; from collections import defaultdict</span>
+<span class="sd">    &gt;&gt;&gt; t = defaultdict(lambda: nothing)</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;foo&#39;] += 2</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;bar&#39;] += [1,2,3]</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;bar&#39;] += [10,20]</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;is&#39;] += np.array([1,2,3,4])</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;is&#39;] += np.array([1,2,3,4])</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot;hello&quot;</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot; &quot;</span>
+<span class="sd">    &gt;&gt;&gt; t[&#39;overused&#39;] += &quot;world&quot;</span>
+<span class="sd">    &gt;&gt;&gt; dict(t)</span>
+<span class="sd">    {&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Works with other methods too!</span>
+<span class="sd">    &gt;&gt;&gt; nothing = get_universal_neutral_for_method(&#39;__mul__&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nothing * 314</span>
+<span class="sd">    314</span>
+<span class="sd">    &gt;&gt;&gt; nothing * &#39;foobar&#39;</span>
+<span class="sd">    &#39;foobar&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">add_method</span><span class="p">(</span><span class="nb">object</span><span class="p">(),</span> <span class="n">method_func</span><span class="o">=</span><span class="n">transparent_method</span><span class="p">,</span> <span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+                      <span class="n">class_name</span><span class="o">=</span><span class="n">method_name</span> <span class="o">+</span> <span class="s1">&#39;_UniversalNeutral&#39;</span><span class="p">)</span></div>
+
+
+
+<span class="n">addition_neutral</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__add__&#39;</span><span class="p">)</span>
+<span class="n">multiplication_neutral</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__mul__&#39;</span><span class="p">)</span>
+<span class="n">update_neutral</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">)</span>
+
+
+<span class="c1">########################################################################################################################</span>
+<span class="c1"># If you want an element that is neutral for any type and an explicit list of methods</span>
+
+<div class="viewcode-block" id="get_universal_neutral_for_methods">
+<a class="viewcode-back" href="../../module_docs/odus/nothing.html#odus.nothing.get_universal_neutral_for_methods">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_universal_neutral_for_methods</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See get_universal_neutral_for_method(method_name).</span>
+<span class="sd">    This is just the &quot;multiple methods&quot; version of that one.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nothing</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">method_names</span><span class="p">:</span>
+        <span class="n">nothing</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">nothing</span><span class="p">,</span> <span class="n">method_func</span><span class="o">=</span><span class="n">transparent_method</span><span class="p">,</span> <span class="n">method_name</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+                             <span class="n">class_name</span><span class="o">=</span><span class="s1">&#39;UniversalNeutral&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nothing</span></div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

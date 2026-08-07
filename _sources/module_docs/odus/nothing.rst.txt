@@ -1,0 +1,4 @@
+odus.nothing
+============
+.. automodule:: odus.nothing
+   :members:
