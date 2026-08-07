@@ -1,3 +1,10 @@
+"""Universal neutral (identity) elements for accumulation.
+
+Provides objects that act as the neutral element of an operation whatever the
+operand type, so accumulators can be initialized without knowing the type (or
+shape) of what they will accumulate.
+"""
+
 from odus.pobj import add_method
 
 ########################################################################################################################
@@ -60,7 +67,7 @@ class GreatUniversalNothing:
     >>> t['overused'] += " "
     >>> t['overused'] += "world"
     >>> dict(t)
-    {'overused': 'hello world', 'is': array([2, 4, 6, 8]), 'foo': 2, 'bar': [1, 2, 3, 10, 20]}
+    {'foo': 2, 'bar': [1, 2, 3, 10, 20], 'is': array([2, 4, 6, 8]), 'overused': 'hello world'}
     >>>
     >>> # Works with other methods too!
     >>> nothing * 314
@@ -176,7 +183,7 @@ def get_universal_neutral_for_method(method_name):
     >>> t['overused'] += " "
     >>> t['overused'] += "world"
     >>> dict(t)
-    {'overused': 'hello world', 'is': array([2, 4, 6, 8]), 'foo': 2, 'bar': [1, 2, 3, 10, 20]}
+    {'foo': 2, 'bar': [1, 2, 3, 10, 20], 'is': array([2, 4, 6, 8]), 'overused': 'hello world'}
     >>>
     >>> # Works with other methods too!
     >>> nothing = get_universal_neutral_for_method('__mul__')

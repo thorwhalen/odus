@@ -1,3 +1,10 @@
+"""Data access: stores and accessors over the survey data.
+
+Defines the ``py2store``-based stores (``DfStore``, ``VarSetCountsStore``,
+``PotStore``) and the ``Dacc`` facade that give easy access to the prepared
+trajectory dataframes, their count tables, and the corresponding potentials.
+"""
+
 from collections import defaultdict, Counter
 import matplotlib.pylab as plt
 import numpy as np

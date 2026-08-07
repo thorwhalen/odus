@@ -1,3 +1,9 @@
+"""Plotting helpers for trajectories and matrices.
+
+Heatmaps, life-course plots, iteration over a store's trajectory plots, and
+writing a selection of trajectories out to a (multi-page) file.
+"""
+
 import matplotlib.pylab as plt
 from itertools import islice
 from collections.abc import Iterable
