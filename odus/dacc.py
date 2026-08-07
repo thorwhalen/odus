@@ -57,7 +57,7 @@ def _all_columns_of_dfs(dfs):
     return categories
 
 
-simple_cat_p = re.compile(r'\W')
+simple_cat_p = re.compile(r"\W")
 
 
 class Struct:
@@ -69,12 +69,12 @@ class Struct:
 class VarStr(str):
     def __add__(self, other):
         if isinstance(other, int):
-            other = '+' + str(other)
+            other = "+" + str(other)
         return super().__add__(other)
 
     def __sub__(self, other):
         if isinstance(other, int):
-            other = '-' + str(other)
+            other = "-" + str(other)
         return super().__add__(other)
 
 
@@ -94,7 +94,7 @@ def mk_pvar_struct(df_store, only_for_cols_in_all_dfs=False):
     else:
         categories = _all_columns_of_dfs(df_store.values())
     val_of_attr = {
-        simple_cat_p.sub('_', c.lower().strip()): PVar(c) for c in categories
+        simple_cat_p.sub("_", c.lower().strip()): PVar(c) for c in categories
     }
     return Struct(**val_of_attr)
 
@@ -117,7 +117,6 @@ class HashableMixin:
 
 
 class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
-
     @mk_memoizer({})
     def __getitem__(self, k):
         return super().__getitem__(k)
@@ -125,13 +124,13 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
     def _obj_of_data(self, data):
         df = pd.read_excel(BytesIO(data), header=0)
         df = df.iloc[:, 1:]
-        df.iloc[0, 0] = 'year'
-        df.iloc[1, 0] = 'age'
-        df = df.rename(columns={'INTERVIEW ID NUMBER (enter in red)': 'category'})
+        df.iloc[0, 0] = "year"
+        df.iloc[1, 0] = "age"
+        df = df.rename(columns={"INTERVIEW ID NUMBER (enter in red)": "category"})
         df = df.T
         df.columns = df.iloc[0, :]
         df = df.iloc[1:, 1:]  # TODO: would like to keep year, but not in column
-        df = df.set_index('age')
+        df = df.set_index("age")
         df = df.astype(int)
         df[df != 0] = (
             1  # TODO: May want to remove this to expose mistakes instead of repairing them
@@ -170,11 +169,11 @@ class PotStore(VarSetCountsStore):
             d = list()
             for key, val in counter.items():
                 dd = {str(k.varset[i]): var_val for i, var_val in enumerate(key)}
-                dd['pval'] = val
+                dd["pval"] = val
                 d.append(dd)
             # return pd.DataFrame(d)
             return Pot.from_count_df_to_count(
-                pd.DataFrame(d)[k.varset_strs + ['pval']], count_col='pval'
+                pd.DataFrame(d)[k.varset_strs + ["pval"]], count_col="pval"
             )
 
 
@@ -193,7 +192,7 @@ class DelegMap:
 
 class Dacc:
     def __init__(self, xls_rootdir, categories=None):
-        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + '{}.xlsx', mode='b')
+        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + "{}.xlsx", mode="b")
         if categories is None:
             categories = _commun_columns_of_dfs(self.s.values())
         self.categories = categories
@@ -228,12 +227,12 @@ def counts_of_kps(store, categories, kps_list):
 # u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col='pval')
 # u
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import os
 
     proj_root = os.path.dirname(__file__)
     pjoin = lambda f: os.path.join(proj_root, f)
-    xls_rootdir = pjoin('data/surveys/')
+    xls_rootdir = pjoin("data/surveys/")
 
     # vs = tuple(map(str, VarSet.from_str(s)))
 

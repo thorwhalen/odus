@@ -53,11 +53,13 @@ def add_method(obj, method_func, method_name=None, class_name=None):
     bases_names = set(map(lambda x: x.__name__, bases))
     if class_name in bases_names:
         for i in range(6):
-            class_name += '_'
+            class_name += "_"
             if not class_name in bases_names:
                 break
         else:
-            raise ValueError("can't find a name for class that is not taken by bases. Consider using explicit name")
+            raise ValueError(
+                "can't find a name for class that is not taken by bases. Consider using explicit name"
+            )
 
     new_keys = set(dir(obj)) - set(chain(*[dir(b) for b in bases]))
 
@@ -99,9 +101,7 @@ def inject_method(obj, method_func, method_name=None):
     if isinstance(method_func, types.FunctionType):
         if method_name is None:
             method_name = method_func.__name__
-        setattr(obj,
-                method_name,
-                types.MethodType(method_func, obj))
+        setattr(obj, method_name, types.MethodType(method_func, obj))
     else:
         if isinstance(method_func, dict):
             method_func = [(func, func_name) for func_name, func in method_func.items()]

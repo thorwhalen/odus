@@ -81,13 +81,28 @@ from collections import UserDict, Counter
 import numpy as np
 import pandas as pd
 
-from ut.ml.feature_extraction.sequential_var_sets import PVar, VarSet, DfData, VarSetFactory
+from ut.ml.feature_extraction.sequential_var_sets import (
+    PVar,
+    VarSet,
+    DfData,
+    VarSetFactory,
+)
 from IPython.display import Image
 
 from odus.analysis_utils import *
 
-from odus.dacc import DfStore, counts_of_kps, Dacc, VarSetCountsStore, \
-    mk_pvar_struct, PotStore, _commun_columns_of_dfs, Struct, mk_pvar_str_struct, VarStr
+from odus.dacc import (
+    DfStore,
+    counts_of_kps,
+    Dacc,
+    VarSetCountsStore,
+    mk_pvar_struct,
+    PotStore,
+    _commun_columns_of_dfs,
+    Struct,
+    mk_pvar_str_struct,
+    VarStr,
+)
 
 from odus.plot_utils import plot_life_course
 ```
@@ -95,6 +110,7 @@ from odus.plot_utils import plot_life_course
 
 ```python
 from odus import data_dir, data_path_of
+
 survey_dir = data_dir
 data_dir
 ```
@@ -108,7 +124,7 @@ data_dir
 
 
 ```python
-df_store = DfStore(data_dir + '/{}.xlsx')
+df_store = DfStore(data_dir + "/{}.xlsx")
 len(df_store)
 cstore = VarSetCountsStore(df_store)
 v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -309,7 +325,7 @@ print(df.columns.values)
 
 
 ```python
-t = df[['ALCOHOL', 'TOBACCO']]
+t = df[["ALCOHOL", "TOBACCO"]]
 t.head(3)
 ```
 
@@ -391,7 +407,7 @@ def count_tuples(dataframe):
 
 
 ```python
-fields = ['ALCOHOL', 'TOBACCO']
+fields = ["ALCOHOL", "TOBACCO"]
 # do it for every one
 c = Counter()
 for df in df_store.values():
@@ -495,7 +511,7 @@ Get three trajectories, but only over two fields.
 fields = [s.physical_illness, s.as_prescribed_opioid, s.heroin, s.other_opioid]
 keys = list(df_store)[:10]
 # print(f"keys={keys}")
-axs = [x for x in life_plots(df_store, fields, keys=keys)];
+axs = [x for x in life_plots(df_store, fields, keys=keys)]
 ```
 
 
@@ -542,24 +558,26 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)];
 
 
 ```python
-write_trajectories_to_file(df_store, fields, keys, fp='three_respondents_two_fields.pdf');
+write_trajectories_to_file(
+    df_store, fields, keys, fp="three_respondents_two_fields.pdf"
+)
 ```
 
 
 ```python
-write_trajectories_to_file(df_store, fp='all_respondents_all_fields.pdf');
+write_trajectories_to_file(df_store, fp="all_respondents_all_fields.pdf")
 ```
 
 
 ```python
- 
+
 ```
 
 ## Demo s and v
 
 
 ```python
-print(list(filter(lambda x: not x.startswith('__'), dir(s))))
+print(list(filter(lambda x: not x.startswith("__"), dir(s))))
 ```
 
     ['alcohol', 'as_prescribed_opioid', 'cocaine_crack', 'father_mother', 'hal_lsd_xtc_clubdrug', 'heroin', 'homeless', 'in_treatment', 'incarceration', 'injected', 'loss_of_loved_one', 'marijuana', 'mental_illness', 'methamphetamine', 'not_as_prescribed_opioid', 'other_opioid', 'physical_illness', 'rural', 'sibling', 'son_daughter', 'suburban', 'tobacco', 'urban_city', 'work']
@@ -606,7 +624,7 @@ v.heroin - 1
 
 ```python
 # cstore[v.alcohol, v.tobacco]
-cstore[v.as_prescribed_opioid-1, v.heroin]
+cstore[v.as_prescribed_opioid - 1, v.heroin]
 ```
 
 
@@ -618,7 +636,7 @@ cstore[v.as_prescribed_opioid-1, v.heroin]
 
 
 ```python
-pd.Series(cstore[v.as_prescribed_opioid-1, v.heroin])
+pd.Series(cstore[v.as_prescribed_opioid - 1, v.heroin])
 ```
 
 
@@ -653,7 +671,7 @@ cstore[v.alcohol, v.tobacco, v.heroin]
 
 
 ```python
-cstore[v.alcohol-1, v.alcohol]
+cstore[v.alcohol - 1, v.alcohol]
 ```
 
 
@@ -665,7 +683,7 @@ cstore[v.alcohol-1, v.alcohol]
 
 
 ```python
-cstore[v.alcohol-1, v.alcohol, v.tobacco]
+cstore[v.alcohol - 1, v.alcohol, v.tobacco]
 ```
 
 
@@ -684,7 +702,7 @@ cstore[v.alcohol-1, v.alcohol, v.tobacco]
 
 
 ```python
-t = pd.Series(cstore[v.alcohol-1, v.alcohol, v.tobacco])
+t = pd.Series(cstore[v.alcohol - 1, v.alcohol, v.tobacco])
 t.loc[t.index]
 ```
 
@@ -699,7 +717,7 @@ t.loc[t.index]
 
 
 ```python
-t = pstore[s.alcohol-1, s.alcohol]
+t = pstore[s.alcohol - 1, s.alcohol]
 t
 ```
 
@@ -796,7 +814,7 @@ t / []
 
 
 ```python
-t[s.alcohol-1]
+t[s.alcohol - 1]
 ```
 
 
@@ -811,7 +829,7 @@ t[s.alcohol-1]
 
 
 ```python
-t / t[s.alcohol-1]  # cond prob!
+t / t[s.alcohol - 1]  # cond prob!
 ```
 
 
@@ -887,9 +905,8 @@ tt / tt[s.tobacco]
 
 
 ```python
-t = pstore[s.as_prescribed_opioid-1, s.heroin-1, s.heroin]
+t = pstore[s.as_prescribed_opioid - 1, s.heroin - 1, s.heroin]
 t
-
 ```
 
 
@@ -910,7 +927,7 @@ t
 
 
 ```python
-tt = t / t[s.as_prescribed_opioid-1, s.heroin-1]  # cond prob!
+tt = t / t[s.as_prescribed_opioid - 1, s.heroin - 1]  # cond prob!
 tt
 ```
 
@@ -1082,7 +1099,7 @@ prob_of_heroin_given_not_presc_op / prob_of_heroin_given_presc_op
 
 ```python
 # survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'
-df_store = DfStore(survey_dir + '/{}.xlsx')
+df_store = DfStore(survey_dir + "/{}.xlsx")
 len(df_store)
 ```
 
@@ -1258,7 +1275,16 @@ cstore.mk_pvar_attrs()
 
 
 ```python
-from odus.dacc import DfStore, counts_of_kps, Dacc, plot_life_course, VarSetCountsStore, mk_pvar_struct, PotStore
+from odus.dacc import (
+    DfStore,
+    counts_of_kps,
+    Dacc,
+    plot_life_course,
+    VarSetCountsStore,
+    mk_pvar_struct,
+    PotStore,
+)
+
 pstore = PotStore(df_store)
 pstore.mk_pvar_attrs()
 p = pstore[v.homeless - 1, v.incarceration]
@@ -1311,7 +1337,7 @@ pstore[v.incarceration]
 
 
 ```python
-pstore[v.alcohol-1, v.loss_of_loved_one]
+pstore[v.alcohol - 1, v.loss_of_loved_one]
 ```
 
 
@@ -1332,7 +1358,6 @@ tw = pstore[v.tobacco, v.work]
 mw = pstore[v.marijuana, v.work]
 aw = pstore[v.alcohol, v.work]
 w = pstore[v.work]
-
 ```
 
 

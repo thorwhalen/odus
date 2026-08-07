@@ -107,7 +107,9 @@ class GreatUniversalNothing:
         return other
 
 
-nothing = GreatUniversalNothing()  # most of the time, this is the only thing you need to import
+nothing = (
+    GreatUniversalNothing()
+)  # most of the time, this is the only thing you need to import
 
 
 ########################################################################################################################
@@ -192,17 +194,22 @@ def get_universal_neutral_for_method(method_name):
     >>> nothing * 'foobar'
     'foobar'
     """
-    return add_method(object(), method_func=transparent_method, method_name=method_name,
-                      class_name=method_name + '_UniversalNeutral')
+    return add_method(
+        object(),
+        method_func=transparent_method,
+        method_name=method_name,
+        class_name=method_name + "_UniversalNeutral",
+    )
 
 
-addition_neutral = get_universal_neutral_for_method('__add__')
-multiplication_neutral = get_universal_neutral_for_method('__mul__')
-update_neutral = get_universal_neutral_for_method('update')
+addition_neutral = get_universal_neutral_for_method("__add__")
+multiplication_neutral = get_universal_neutral_for_method("__mul__")
+update_neutral = get_universal_neutral_for_method("update")
 
 
 ########################################################################################################################
 # If you want an element that is neutral for any type and an explicit list of methods
+
 
 def get_universal_neutral_for_methods(method_names):
     """
@@ -211,8 +218,10 @@ def get_universal_neutral_for_methods(method_names):
     """
     nothing = object
     for method_name in method_names:
-        nothing = add_method(nothing, method_func=transparent_method, method_name=method_name,
-                             class_name='UniversalNeutral')
+        nothing = add_method(
+            nothing,
+            method_func=transparent_method,
+            method_name=method_name,
+            class_name="UniversalNeutral",
+        )
     return nothing
-
-

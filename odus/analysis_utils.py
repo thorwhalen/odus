@@ -43,7 +43,7 @@ dflt_figsize = (16, 5)
 
 
 def get_stores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
-    df_store = DfStore(survey_dir + sep + '{}.xlsx', mode='b')
+    df_store = DfStore(survey_dir + sep + "{}.xlsx", mode="b")
     #     cstore = VarSetCountsStore(df_store)
     pstore = PotStore(df_store)
     v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -52,7 +52,7 @@ def get_stores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
 
 
 def get_cstores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
-    df_store = DfStore(survey_dir + sep + '{}.xlsx', mode='b')
+    df_store = DfStore(survey_dir + sep + "{}.xlsx", mode="b")
     pstore = PotStore(df_store)
     v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
     s = mk_pvar_str_struct(v)
@@ -75,10 +75,10 @@ def get_markov_rel_risk(pstore, fields=None):
             event_var=event, exposure_var=exposure, event_val=1, exposure_val=1
         )
 
-        c.append({'exposure': exposure, 'event': event, 'rel_risk': rel_risk})
+        c.append({"exposure": exposure, "event": event, "rel_risk": rel_risk})
 
     markov_rel_risk = pd.DataFrame(c)
-    return markov_rel_risk.pivot(index='exposure', columns='event', values='rel_risk')
+    return markov_rel_risk.pivot(index="exposure", columns="event", values="rel_risk")
 
 
 def remission_relative_risk(pstore, event, exposure):
@@ -111,19 +111,19 @@ def get_markov_remission_rel_risk(pstore, fields=None):
         *([(x, y), (y, x)] for x, y in combinations(fields, 2))
     ):
         rel_risk = remission_relative_risk(pstore, event, exposure)
-        c.append({'exposure': exposure, 'event': event, 'remission_rel_risk': rel_risk})
+        c.append({"exposure": exposure, "event": event, "remission_rel_risk": rel_risk})
 
     markov_rel_risk = pd.DataFrame(c)
     return markov_rel_risk.pivot(
-        index='exposure', columns='event', values='remission_rel_risk'
+        index="exposure", columns="event", values="remission_rel_risk"
     )
 
 
 # Print ################################################################################################################
 def print_counts(pot):
     df = pot.tb.copy()
-    df['count'] = df['pval']
-    del df['pval']
+    df["count"] = df["pval"]
+    del df["pval"]
     print(df)
 
 
@@ -177,7 +177,7 @@ def get_tick_and_labels(y_ticks, y_tick_labels=None):
             if y == 0:
                 y_tick_label.append("")
             else:
-                y_tick_label.append(str(np.sign(y) * int(2 ** abs(y))) + 'x')
+                y_tick_label.append(str(np.sign(y) * int(2 ** abs(y))) + "x")
     return y_tick, y_tick_label
 
 
@@ -187,57 +187,57 @@ def format_for_influencer_plot():
         plt.yticks(*get_tick_and_labels(t))
     else:
         plt.yticks(t, list(map(lambda x: f"{2**x:0.2f}", t)))
-    plt.grid(axis='y')
+    plt.grid(axis="y")
 
 
 def diagonal_rr(lrr):
     c = list()
     for i, j in zip(lrr.index, lrr.columns):
         assert i.startswith(j)
-        c.append({'x': i, 'var': j, 'val': lrr.loc[i, j]})
-    return pd.DataFrame(c)[['var', 'val']].set_index('var')['val']
+        c.append({"x": i, "var": j, "val": lrr.loc[i, j]})
+    return pd.DataFrame(c)[["var", "val"]].set_index("var")["val"]
 
 
 def plot_diagonal(lrr, figsize=dflt_figsize, **kwargs):
     t = diagonal_rr(lrr)
-    kwargs = dict(title='Self (log2) relative risk', figsize=figsize, **kwargs)
-    t.plot(kind='bar', **kwargs)
+    kwargs = dict(title="Self (log2) relative risk", figsize=figsize, **kwargs)
+    t.plot(kind="bar", **kwargs)
     format_for_influencer_plot()
 
 
 def plot_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title=f'Log2 relative risks for event: {var}', figsize=figsize, **kwargs
+        title=f"Log2 relative risks for event: {var}", figsize=figsize, **kwargs
     )
-    lrr.loc[:, var].plot(kind='bar', **kwargs)
+    lrr.loc[:, var].plot(kind="bar", **kwargs)
     format_for_influencer_plot()
 
 
 def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title=f'Log2 relative risks when exposed to {var}',
+        title=f"Log2 relative risks when exposed to {var}",
         figsize=figsize,
         **kwargs,
     )
-    lrr.loc[var - 1, :].plot(kind='bar', **kwargs)
+    lrr.loc[var - 1, :].plot(kind="bar", **kwargs)
     format_for_influencer_plot()
 
 
 def plot_remission_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title=f'Log2 remission relative risks for event: {var}',
+        title=f"Log2 remission relative risks for event: {var}",
         figsize=figsize,
         **kwargs,
     )
-    lrr.loc[:, var].plot(kind='bar', **kwargs)
+    lrr.loc[:, var].plot(kind="bar", **kwargs)
     format_for_influencer_plot()
 
 
 def plot_remission_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
     kwargs = dict(
-        title=f'Log2 remission relative risks when exposed to {var}',
+        title=f"Log2 remission relative risks when exposed to {var}",
         figsize=figsize,
         **kwargs,
     )
-    lrr.loc[var, :].plot(kind='bar', **kwargs)
+    lrr.loc[var, :].plot(kind="bar", **kwargs)
     format_for_influencer_plot()

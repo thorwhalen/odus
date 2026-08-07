@@ -10,7 +10,7 @@ import re
 
 
 class PVar:
-    p = re.compile(r'^(.+)-(\d+)$|^(.+)$')
+    p = re.compile(r"^(.+)-(\d+)$|^(.+)$")
 
     def __init__(self, var: str, i: int = 0):
         self.var = var
@@ -90,7 +90,9 @@ class VarSet:
             varset = varset[0]
         varset = list(map(PVar.from_, varset))
         self.varset = sorted(varset)
-        self.min_abs_i = abs(min(x.i for x in self))  # TODO: Not enough: Need to check on upper bound of sliding win
+        self.min_abs_i = abs(
+            min(x.i for x in self)
+        )  # TODO: Not enough: Need to check on upper bound of sliding win
 
     @property
     def varset_strs(self):
@@ -144,11 +146,14 @@ class VarSetFactory:
 
     @staticmethod
     def markov_pairs(varnames):
-        return map(lambda v: VarSet(PVar(v[0], -1), PVar(v[1], 0)), itertools.product(varnames, varnames))
+        return map(
+            lambda v: VarSet(PVar(v[0], -1), PVar(v[1], 0)),
+            itertools.product(varnames, varnames),
+        )
 
     @staticmethod
     def from_str(s):
-        return VarSet(*map(PVar.from_str, list(s[1:-1].split(','))))
+        return VarSet(*map(PVar.from_str, list(s[1:-1].split(","))))
 
     # @classmethod
     # def pairs(cls, vars):
