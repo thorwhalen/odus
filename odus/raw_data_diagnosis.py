@@ -161,9 +161,3 @@ def print_diagnosis(source_dir=".", sheetname=None):
         t = t[t != ""]
         print(*t, sep=", ")
         print("\n")
-
-
-if __name__ == "__main__":
-    import argh
-
-    argh.dispatch_command(print_diagnosis)
