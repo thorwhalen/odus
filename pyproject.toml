@@ -41,7 +41,6 @@ dependencies = [
     "spyn",
     "matplotlib",
     "openpyxl",
-    "argh",
 ]
 
 [project.urls]
