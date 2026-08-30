@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>odus.nothing &mdash; odus 0.0.8 documentation</title>
+  <title>odus.nothing &mdash; odus 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,14 +112,14 @@ Only works with some operators (e.g. works for __add__ works, but not with +).</
 <span class="go">3.14</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">|</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">|</span> <span class="n">nothing</span>
 <span class="go">[1, 2, 3]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">&amp;</span> <span class="s1">&#39;hi there&#39;</span> <span class="o">&amp;</span> <span class="n">nothing</span>
-<span class="go">&#39;hi there&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">&amp;</span> <span class="s1">'hi there'</span> <span class="o">&amp;</span> <span class="n">nothing</span>
+<span class="go">'hi there'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now we demo how we get the same behavior no matter what the type is</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span>
 <span class="go">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="go">[1, 2, 3]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">&quot;wassup world!&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">"wassup world!"</span><span class="p">))</span>
 <span class="go">wassup world!</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
@@ -139,22 +139,22 @@ Only works with some operators (e.g. works for __add__ works, but not with +).</
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with defaultdict (and multi type value cumulators</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">nothing</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;world&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'foo'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'is'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'is'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">"hello"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">" "</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">"world"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-<span class="go">{&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="go">{'foo': 2, 'bar': [1, 2, 3, 10, 20], 'is': array([2, 4, 6, 8]), 'overused': 'hello world'}</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Works with other methods too!</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="mi">314</span>
 <span class="go">314</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">&#39;foobar&#39;</span>
-<span class="go">&#39;foobar&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">'foobar'</span>
+<span class="go">'foobar'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -191,13 +191,13 @@ cumul = “” for strings</p>
 </dl>
 <p>and you’ll have something that behaves as expected: Be transparent.</p>
 <p>Other examples of common methods where you want a neutral:  __mul__, update, etc.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__add__&#39;</span><span class="p">)</span>  <span class="c1"># note, this is constructed ones, and used many times</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">'__add__'</span><span class="p">)</span>  <span class="c1"># note, this is constructed ones, and used many times</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="mi">2</span>
 <span class="go">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="go">[1, 2, 3]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">&quot;wassup world!&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">((</span><span class="n">nothing</span> <span class="o">+</span> <span class="s2">"wassup world!"</span><span class="p">))</span>
 <span class="go">wassup world!</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Useful as an alternative of using zeros(shape_of_your_array) to initialized array cumulators.</span>
@@ -217,23 +217,23 @@ cumul = “” for strings</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Example with defaultdict (and multi type value cumulators</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">nothing</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;bar&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;is&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;hello&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;overused&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;world&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'foo'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'bar'</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'is'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'is'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">"hello"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">" "</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">'overused'</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">"world"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">dict</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-<span class="go">{&#39;foo&#39;: 2, &#39;bar&#39;: [1, 2, 3, 10, 20], &#39;is&#39;: array([2, 4, 6, 8]), &#39;overused&#39;: &#39;hello world&#39;}</span>
+<span class="go">{'foo': 2, 'bar': [1, 2, 3, 10, 20], 'is': array([2, 4, 6, 8]), 'overused': 'hello world'}</span>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Works with other methods too!</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">&#39;__mul__&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">=</span> <span class="n">get_universal_neutral_for_method</span><span class="p">(</span><span class="s1">'__mul__'</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="mi">314</span>
 <span class="go">314</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">&#39;foobar&#39;</span>
-<span class="go">&#39;foobar&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nothing</span> <span class="o">*</span> <span class="s1">'foobar'</span>
+<span class="go">'foobar'</span>
 </pre></div>
 </div>
 </dd></dl>

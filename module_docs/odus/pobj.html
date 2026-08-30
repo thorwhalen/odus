@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>odus.pobj &mdash; odus 0.0.8 documentation</title>
+  <title>odus.pobj &mdash; odus 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -119,13 +119,13 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">plus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">)</span>  <span class="c1"># add a __call__ method, assigning it to plus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">'__call__'</span><span class="p">)</span>  <span class="c1"># add a __call__ method, assigning it to plus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">12</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">)</span>  <span class="c1"># reassign the __call__ method to times instead</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="s1">'__call__'</span><span class="p">)</span>  <span class="c1"># reassign the __call__ method to times instead</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">20</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">)</span>  <span class="c1"># assign the method __getitem__ to plus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">add_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">'__getitem__'</span><span class="p">)</span>  <span class="c1"># assign the method __getitem__ to plus</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># see that it works</span>
 <span class="go">12</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># and that we still have our __call__ method</span>
@@ -161,13 +161,13 @@ If you want to inject things like __call__, __getitem__, etc., use add_method in
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">plus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">)</span>  <span class="c1"># inject the plus method (but call it &#39;add&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">)</span>  <span class="c1"># inject the plus method (but call it 'add')</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">12</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>  <span class="c1"># inject the times method (and use it&#39;s name automatically)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>  <span class="c1"># inject the times method (and use it's name automatically)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">20</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">&#39;times&#39;</span><span class="p">)</span>  <span class="c1"># be evil: Inject the plus method but call it &#39;times&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">inject_method</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="s1">'times'</span><span class="p">)</span>  <span class="c1"># be evil: Inject the plus method but call it 'times'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">12</span>
 </pre></div>

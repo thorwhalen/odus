@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>odus.dacc &mdash; odus 0.0.8 documentation</title>
+  <title>odus.dacc &mdash; odus 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -82,12 +82,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for odus.dacc</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Data access: stores and accessors over the survey data.</span>
+<span></span><span class="sd">"""Data access: stores and accessors over the survey data.</span>
 
 <span class="sd">Defines the ``py2store``-based stores (``DfStore``, ``VarSetCountsStore``,</span>
 <span class="sd">``PotStore``) and the ``Dacc`` facade that give easy access to the prepared</span>
 <span class="sd">trajectory dataframes, their count tables, and the corresponding potentials.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -141,7 +141,7 @@
     <span class="k">return</span> <span class="n">categories</span>
 
 
-<span class="n">simple_cat_p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\W&#39;</span><span class="p">)</span>
+<span class="n">simple_cat_p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\W"</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Struct</span><span class="p">:</span>
@@ -155,12 +155,12 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">VarStr</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="s2">"+"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="s2">"-"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
 
 
@@ -181,7 +181,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">categories</span> <span class="o">=</span> <span class="n">_all_columns_of_dfs</span><span class="p">(</span><span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="n">val_of_attr</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">simple_cat_p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span> <span class="n">PVar</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">categories</span>
+        <span class="n">simple_cat_p</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span> <span class="n">PVar</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">categories</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">Struct</span><span class="p">(</span><span class="o">**</span><span class="n">val_of_attr</span><span class="p">)</span>
 
@@ -206,7 +206,6 @@
 <div class="viewcode-block" id="DfStore">
 <a class="viewcode-back" href="../../module_docs/odus/dacc.html#odus.dacc.DfStore">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DfStore</span><span class="p">(</span><span class="n">HashableMixin</span><span class="p">,</span> <span class="n">ReadOnlyMixin</span><span class="p">,</span> <span class="n">LocalBinaryStore</span><span class="p">):</span>
-
     <span class="nd">@mk_memoizer</span><span class="p">({})</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -214,13 +213,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_of_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;year&#39;</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;age&#39;</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;INTERVIEW ID NUMBER (enter in red)&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">})</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"year"</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"age"</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"INTERVIEW ID NUMBER (enter in red)"</span><span class="p">:</span> <span class="s2">"category"</span><span class="p">})</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span>
         <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># TODO: would like to keep year, but not in column</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"age"</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">df</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="mi">1</span>  <span class="c1"># TODO: May want to remove this to expose mistakes instead of repairing them</span>
@@ -265,11 +264,11 @@
             <span class="n">d</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">dd</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">varset</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span> <span class="n">var_val</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">key</span><span class="p">)}</span>
-                <span class="n">dd</span><span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="n">dd</span><span class="p">[</span><span class="s2">"pval"</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                 <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
             <span class="c1"># return pd.DataFrame(d)</span>
             <span class="k">return</span> <span class="n">Pot</span><span class="o">.</span><span class="n">from_count_df_to_count</span><span class="p">(</span>
-                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)[</span><span class="n">k</span><span class="o">.</span><span class="n">varset_strs</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]],</span> <span class="n">count_col</span><span class="o">=</span><span class="s1">&#39;pval&#39;</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)[</span><span class="n">k</span><span class="o">.</span><span class="n">varset_strs</span> <span class="o">+</span> <span class="p">[</span><span class="s2">"pval"</span><span class="p">]],</span> <span class="n">count_col</span><span class="o">=</span><span class="s2">"pval"</span>
             <span class="p">)</span></div>
 
 
@@ -289,7 +288,7 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Dacc</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xls_rootdir</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">ensure_slash_suffix</span><span class="p">(</span><span class="n">xls_rootdir</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.xlsx&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">ensure_slash_suffix</span><span class="p">(</span><span class="n">xls_rootdir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">categories</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">categories</span> <span class="o">=</span> <span class="n">_commun_columns_of_dfs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
@@ -319,26 +318,26 @@
 <span class="c1"># d = list()</span>
 <span class="c1"># for k, v in t.items():</span>
 <span class="c1">#     dd = {vs[i]: kk for i, kk in enumerate(k)}</span>
-<span class="c1">#     dd[&#39;pval&#39;] = v</span>
+<span class="c1">#     dd['pval'] = v</span>
 <span class="c1">#     d.append(dd)</span>
-<span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col=&#39;pval&#39;)</span>
+<span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col='pval')</span>
 <span class="c1"># u</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
     <span class="n">proj_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">pjoin</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proj_root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-    <span class="n">xls_rootdir</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="s1">&#39;data/surveys/&#39;</span><span class="p">)</span>
+    <span class="n">xls_rootdir</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="s2">"data/surveys/"</span><span class="p">)</span>
 
     <span class="c1"># vs = tuple(map(str, VarSet.from_str(s)))</span>
 
     <span class="c1"># d = list()</span>
     <span class="c1"># for k, v in counts_of.items():</span>
     <span class="c1">#     dd = {vs[i]: kk for i, kk in enumerate(k)}</span>
-    <span class="c1">#     dd[&#39;pval&#39;] = v</span>
+    <span class="c1">#     dd['pval'] = v</span>
     <span class="c1">#     d.append(dd)</span>
-    <span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col=&#39;pval&#39;)</span>
+    <span class="c1"># u = ProbPot.from_count_df_to_count(pd.DataFrame(d), count_col='pval')</span>
     <span class="c1"># u</span>
 </pre></div>
 

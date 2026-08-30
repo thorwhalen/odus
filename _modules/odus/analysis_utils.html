@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>odus.analysis_utils &mdash; odus 0.0.8 documentation</title>
+  <title>odus.analysis_utils &mdash; odus 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -82,12 +82,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for odus.analysis_utils</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;High-level analyses of drug-use trajectories.</span>
+<span></span><span class="sd">"""High-level analyses of drug-use trajectories.</span>
 
 <span class="sd">Builds count/probability stores from the survey data and derives relative-risk</span>
 <span class="sd">and remission statistics from them, plus the plotting helpers that render those</span>
 <span class="sd">results (influencer/influenced plots, diagonal relative risk, ...).</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">sep</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -116,8 +116,8 @@
     <span class="n">write_trajectories_to_file</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># __all__ = [&#39;plot_life_course&#39;, &#39;plot_life&#39;, &#39;life_plots&#39;, &#39;write_trajectories_to_file&#39;,</span>
-<span class="c1">#            &#39;counts_of_kps&#39;, &#39;Dacc&#39;, &#39;VarSetCountsStore&#39;, &#39;PVar&#39;, &#39;VarSet&#39;, &#39;DfData&#39;, &#39;VarSetFactory&#39;]</span>
+<span class="c1"># __all__ = ['plot_life_course', 'plot_life', 'life_plots', 'write_trajectories_to_file',</span>
+<span class="c1">#            'counts_of_kps', 'Dacc', 'VarSetCountsStore', 'PVar', 'VarSet', 'DfData', 'VarSetFactory']</span>
 
 <span class="n">package_dir</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 <span class="n">DFLT_SURVEY_DIR</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span>
@@ -127,7 +127,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_stores_v_and_s</span><span class="p">(</span><span class="n">survey_dir</span><span class="o">=</span><span class="n">DFLT_SURVEY_DIR</span><span class="p">):</span>
-    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.xlsx&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
     <span class="c1">#     cstore = VarSetCountsStore(df_store)</span>
     <span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -136,7 +136,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cstores_v_and_s</span><span class="p">(</span><span class="n">survey_dir</span><span class="o">=</span><span class="n">DFLT_SURVEY_DIR</span><span class="p">):</span>
-    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.xlsx&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
     <span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">mk_pvar_str_struct</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -159,24 +159,24 @@
             <span class="n">event_var</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">exposure_var</span><span class="o">=</span><span class="n">exposure</span><span class="p">,</span> <span class="n">event_val</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">exposure_val</span><span class="o">=</span><span class="mi">1</span>
         <span class="p">)</span>
 
-        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;exposure&#39;</span><span class="p">:</span> <span class="n">exposure</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">event</span><span class="p">,</span> <span class="s1">&#39;rel_risk&#39;</span><span class="p">:</span> <span class="n">rel_risk</span><span class="p">})</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"exposure"</span><span class="p">:</span> <span class="n">exposure</span><span class="p">,</span> <span class="s2">"event"</span><span class="p">:</span> <span class="n">event</span><span class="p">,</span> <span class="s2">"rel_risk"</span><span class="p">:</span> <span class="n">rel_risk</span><span class="p">})</span>
 
     <span class="n">markov_rel_risk</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">markov_rel_risk</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;exposure&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;rel_risk&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">markov_rel_risk</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">"exposure"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"event"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"rel_risk"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="remission_relative_risk">
 <a class="viewcode-back" href="../../module_docs/odus/analysis_utils.html#odus.analysis_utils.remission_relative_risk">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remission_relative_risk</span><span class="p">(</span><span class="n">pstore</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns the remission influence of exposure on event.</span>
-<span class="sd">    By &quot;remission influence&quot; we mean the relative risk of the event, given the exposure to an influencer</span>
-<span class="sd">    during the &quot;previous&quot; time tick, conditioned on the existence of the event.</span>
-<span class="sd">    That is, we&#39;re looking at:</span>
+<span class="sd">    By "remission influence" we mean the relative risk of the event, given the exposure to an influencer</span>
+<span class="sd">    during the "previous" time tick, conditioned on the existence of the event.</span>
+<span class="sd">    That is, we're looking at:</span>
 <span class="sd">        P(event=true | exposure-1=true, event-1=true)</span>
 <span class="sd">    divided by</span>
 <span class="sd">        P(event=true | exposure-1=false, event-1=true)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">event</span> <span class="o">=</span> <span class="n">VarStr</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exposure</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -198,49 +198,49 @@
         <span class="o">*</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)]</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="p">):</span>
         <span class="n">rel_risk</span> <span class="o">=</span> <span class="n">remission_relative_risk</span><span class="p">(</span><span class="n">pstore</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">)</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;exposure&#39;</span><span class="p">:</span> <span class="n">exposure</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">:</span> <span class="n">event</span><span class="p">,</span> <span class="s1">&#39;remission_rel_risk&#39;</span><span class="p">:</span> <span class="n">rel_risk</span><span class="p">})</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"exposure"</span><span class="p">:</span> <span class="n">exposure</span><span class="p">,</span> <span class="s2">"event"</span><span class="p">:</span> <span class="n">event</span><span class="p">,</span> <span class="s2">"remission_rel_risk"</span><span class="p">:</span> <span class="n">rel_risk</span><span class="p">})</span>
 
     <span class="n">markov_rel_risk</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">markov_rel_risk</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span>
-        <span class="n">index</span><span class="o">=</span><span class="s1">&#39;exposure&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;remission_rel_risk&#39;</span>
+        <span class="n">index</span><span class="o">=</span><span class="s2">"exposure"</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"event"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"remission_rel_risk"</span>
     <span class="p">)</span>
 
 
 <span class="c1"># Print ################################################################################################################</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">print_counts</span><span class="p">(</span><span class="n">pot</span><span class="p">):</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pot</span><span class="o">.</span><span class="n">tb</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span>
-    <span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pval&#39;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"pval"</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s2">"pval"</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">print_relrisk_and_table</span><span class="p">(</span><span class="n">pstore</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">):</span>
     <span class="n">pot</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">exposure</span><span class="p">,</span> <span class="n">event</span><span class="p">]</span>
     <span class="n">rr</span> <span class="o">=</span> <span class="n">pot</span><span class="o">.</span><span class="n">relative_risk</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">,</span> <span class="n">smooth_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relative risk of </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2"> when </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">:</span><span class="se">\n\t</span><span class="si">{</span><span class="n">rr</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Based on the count table:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Relative risk of </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2"> when </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">:</span><span class="se">\n\t</span><span class="si">{</span><span class="n">rr</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Based on the count table:"</span><span class="p">)</span>
     <span class="n">print_counts</span><span class="p">(</span><span class="n">pot</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">print_relrisk_and_table_from_pot</span><span class="p">(</span><span class="n">pot</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">):</span>
     <span class="n">rr</span> <span class="o">=</span> <span class="n">pot</span><span class="o">.</span><span class="n">relative_risk</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">,</span> <span class="n">smooth_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relative risk of </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2"> when </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">:</span><span class="se">\n\t</span><span class="si">{</span><span class="n">rr</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Based on the count table:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Relative risk of </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2"> when </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">:</span><span class="se">\n\t</span><span class="si">{</span><span class="n">rr</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Based on the count table:"</span><span class="p">)</span>
     <span class="n">print_counts</span><span class="p">(</span><span class="n">pot</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="print_remission_influence_supporting_info">
 <a class="viewcode-back" href="../../module_docs/odus/analysis_utils.html#odus.analysis_utils.print_remission_influence_supporting_info">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">print_remission_influence_supporting_info</span><span class="p">(</span><span class="n">pstore</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">exposure</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Prints remission influence supporting information.</span>
-<span class="sd">    By &quot;remission influence&quot; we mean the relative risk of the event, given the exposure to an influencer</span>
-<span class="sd">    during the &quot;previous&quot; time tick, conditioned on the existence of the event.</span>
-<span class="sd">    That is, we&#39;re looking at:</span>
+<span class="sd">    By "remission influence" we mean the relative risk of the event, given the exposure to an influencer</span>
+<span class="sd">    during the "previous" time tick, conditioned on the existence of the event.</span>
+<span class="sd">    That is, we're looking at:</span>
 <span class="sd">        P(event=true | exposure-1=true, event-1=true)</span>
 <span class="sd">    divided by</span>
 <span class="sd">        P(event=true | exposure-1=false, event-1=true)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">event</span> <span class="o">=</span> <span class="n">VarStr</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exposure</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -265,9 +265,9 @@
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="n">y</span><span class="p">:</span>
             <span class="n">y_tick</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">y_tick_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">y_tick_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">y_tick_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span> <span class="o">+</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+                <span class="n">y_tick_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span> <span class="o">+</span> <span class="s2">"x"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">y_tick</span><span class="p">,</span> <span class="n">y_tick_label</span>
 
 
@@ -276,60 +276,60 @@
     <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="o">*</span><span class="n">get_tick_and_labels</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="mi">2</span><span class="o">**</span><span class="n">x</span><span class="si">:</span><span class="s2">0.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">t</span><span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">diagonal_rr</span><span class="p">(</span><span class="n">lrr</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lrr</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">lrr</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;var&#39;</span><span class="p">:</span> <span class="n">j</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]})</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">c</span><span class="p">)[[</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">)[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"var"</span><span class="p">:</span> <span class="n">j</span><span class="p">,</span> <span class="s2">"val"</span><span class="p">:</span> <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]})</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">c</span><span class="p">)[[</span><span class="s2">"var"</span><span class="p">,</span> <span class="s2">"val"</span><span class="p">]]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"var"</span><span class="p">)[</span><span class="s2">"val"</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_diagonal</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">diagonal_rr</span><span class="p">(</span><span class="n">lrr</span><span class="p">)</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Self (log2) relative risk&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">t</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Self (log2) relative risk"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_influencers</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Log2 relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_influenced</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Log2 relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_remission_influencers</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Log2 remission relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 remission relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_remission_influenced</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Log2 remission relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 remission relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 </pre></div>
 

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>odus.raw_data_diagnosis &mdash; odus 0.0.8 documentation</title>
+  <title>odus.raw_data_diagnosis &mdash; odus 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=53b53b71"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -82,23 +82,28 @@
            <div itemprop="articleBody">
              
   <h1>Source code for odus.raw_data_diagnosis</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Diagnosis of the raw survey spreadsheets.</span>
+<span></span><span class="sd">"""Diagnosis of the raw survey spreadsheets.</span>
 
 <span class="sd">Reads the source ``.xlsx`` files with ``openpyxl`` (values *and* cell colors)</span>
 <span class="sd">and reports cells whose content and formatting disagree -- the data-entry</span>
 <span class="sd">anomalies that must be resolved before the data can be prepared.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openpyxl</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_workbook</span>  <span class="c1"># Get it here: https://pypi.org/project/openpyxl/ (or pip install openpyxl)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openpyxl</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_workbook</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># Get it here: https://pypi.org/project/openpyxl/ (or pip install openpyxl)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pra</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">()),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">()),</span>
+        <span class="n">sep</span><span class="o">=</span><span class="s2">"</span><span class="se">\t</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">last_true_idx</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
@@ -106,7 +111,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">mk_dotpath_getter</span><span class="p">(</span><span class="n">dotpath</span><span class="p">):</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="n">dotpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="n">dotpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">attr_get</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
@@ -116,14 +121,14 @@
     <span class="k">return</span> <span class="n">attr_get</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s2">"value"</span><span class="p">):</span>
     <span class="n">attr_get</span> <span class="o">=</span> <span class="n">mk_dotpath_getter</span><span class="p">(</span><span class="n">dotpath</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">attr_get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sheet</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">coord_val_and_bgcolor_of_cell</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;coordinate&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">coordinate</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;rgb&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">fill</span><span class="o">.</span><span class="n">bgColor</span><span class="o">.</span><span class="n">rgb</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"coordinate"</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">coordinate</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s2">"rgb"</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">fill</span><span class="o">.</span><span class="n">bgColor</span><span class="o">.</span><span class="n">rgb</span><span class="p">}</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">crop</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">last_row_idx</span><span class="p">,</span> <span class="n">last_col_idx</span><span class="p">):</span>
@@ -134,7 +139,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">values</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">d</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">d</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
 
@@ -142,12 +147,14 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">row_lidx</span><span class="p">,</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 
 
-<span class="n">white</span> <span class="o">=</span> <span class="s1">&#39;00000000&#39;</span>
+<span class="n">white</span> <span class="o">=</span> <span class="s2">"00000000"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">valid_vals_int_coords</span><span class="p">(</span><span class="n">vals_df</span><span class="p">):</span>
     <span class="n">first_column</span> <span class="o">=</span> <span class="n">vals_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">last_row_idx</span> <span class="o">=</span> <span class="n">last_true_idx</span><span class="p">((</span><span class="n">first_column</span> <span class="o">!=</span> <span class="s1">&#39;List of States&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">first_column</span><span class="o">.</span><span class="n">isna</span><span class="p">()))</span>
+    <span class="n">last_row_idx</span> <span class="o">=</span> <span class="n">last_true_idx</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">first_column</span> <span class="o">!=</span> <span class="s2">"List of States"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">first_column</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span>
+    <span class="p">)</span>
 
     <span class="n">age_row</span> <span class="o">=</span> <span class="n">vals_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">last_col_idx</span> <span class="o">=</span> <span class="n">last_true_idx</span><span class="p">(</span><span class="o">~</span><span class="n">age_row</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span>
@@ -156,16 +163,20 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">sheet_to_format_prepped_df</span><span class="p">(</span><span class="n">sheet</span><span class="p">):</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
-    <span class="n">color</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s1">&#39;fill.bgColor.rgb&#39;</span><span class="p">)</span>
-    <span class="n">coordinate</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s1">&#39;coordinate&#39;</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s2">"fill.bgColor.rgb"</span><span class="p">)</span>
+    <span class="n">coordinate</span> <span class="o">=</span> <span class="n">dfof</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">dotpath</span><span class="o">=</span><span class="s2">"coordinate"</span><span class="p">)</span>
     <span class="c1">#     print(vals.shape, color.shape, coordinate.shape)</span>
 
     <span class="n">int_coords</span> <span class="o">=</span> <span class="n">valid_vals_int_coords</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-    <span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">crop</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">int_coords</span><span class="p">),</span> <span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">)))</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">crop</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">int_coords</span><span class="p">),</span> <span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">))</span>
+    <span class="p">)</span>
     <span class="c1">#     print(vals.shape, color.shape, coordinate.shape)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;coordinate&#39;</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s2">"vals"</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">,</span> <span class="s2">"coordinate"</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1">#     df = df[~df.iloc[:, 0].isna()]</span>
 
     <span class="k">return</span> <span class="n">df</span>
@@ -184,7 +195,7 @@
     <span class="n">lidx</span> <span class="o">=</span> <span class="n">mk_mat_lidx</span><span class="p">([</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_rows</span> <span class="o">-</span> <span class="mi">3</span><span class="p">))</span>
     <span class="n">lidx</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">lidx</span> <span class="o">&amp;=</span> <span class="n">mk_mat_lidx</span><span class="p">(</span><span class="o">~</span><span class="n">vals_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">())</span>
-    <span class="n">lidx</span> <span class="o">&amp;=</span> <span class="n">mk_mat_lidx</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">vals_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Select States below&#39;</span><span class="p">))</span>
+    <span class="n">lidx</span> <span class="o">&amp;=</span> <span class="n">mk_mat_lidx</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">vals_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Select States below"</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">lidx</span>
 
 
@@ -206,7 +217,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">diagnosis_items</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">is_excel</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xlsx&#39;</span><span class="p">)</span>
+    <span class="n">is_excel</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".xlsx"</span><span class="p">)</span>
     <span class="n">join_dir</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">p</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">xls_filepath</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">join_dir</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">is_excel</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">source_dir</span><span class="p">))):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">xls_filepath</span><span class="p">)</span>
@@ -217,32 +228,26 @@
 
 <div class="viewcode-block" id="print_diagnosis">
 <a class="viewcode-back" href="../../module_docs/odus/raw_data_diagnosis.html#odus.raw_data_diagnosis.print_diagnosis">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">print_diagnosis</span><span class="p">(</span><span class="n">source_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print the diagnosis of the raw xls files in `source_dir`.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_diagnosis</span><span class="p">(</span><span class="n">source_dir</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Print the diagnosis of the raw xls files in `source_dir`.</span>
 <span class="sd">    Namely, for every file that has a problem, the script will print the name of the problematic files,</span>
 <span class="sd">    and print the coordinates of the cells that should be checked for problems.</span>
 
 <span class="sd">    The problems that are checked for:</span>
-<span class="sd">    - Cells (in the &quot;data&quot; range) that are (a) empty, but have color or (b) NOT empty, but without color.</span>
+<span class="sd">    - Cells (in the "data" range) that are (a) empty, but have color or (b) NOT empty, but without color.</span>
 
 <span class="sd">    See functions `lidx_of_empty_non_white_or_non_empty_white` and `mk_known_exceptions_lidx` functions for details.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">source_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">source_dir</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Diagnosing xls files of &quot;</span><span class="si">{</span><span class="n">source_dir</span><span class="si">}</span><span class="s1">&quot; ...</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Diagnosing xls files of "</span><span class="si">{</span><span class="n">source_dir</span><span class="si">}</span><span class="s1">" ...</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">lidx</span> <span class="ow">in</span> <span class="n">diagnosis_items</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">sheetname</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The possibly problematic cells for </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The possibly problematic cells for </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">matmask</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">lidx</span><span class="p">))</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">", "</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
 
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">argh</span>
-
-    <span class="n">argh</span><span class="o">.</span><span class="n">dispatch_command</span><span class="p">(</span><span class="n">print_diagnosis</span><span class="p">)</span>
 </pre></div>
 
            </div>
