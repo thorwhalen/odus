@@ -571,7 +571,7 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Dacc</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xls_rootdir</span><span class="p">,</span> <span class="n">categories</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">ensure_slash_suffix</span><span class="p">(</span><span class="n">xls_rootdir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">ensure_slash_suffix</span><span class="p">(</span><span class="n">xls_rootdir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">categories</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">categories</span> <span class="o">=</span> <span class="n">_commun_columns_of_dfs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
@@ -650,7 +650,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=6b09a97f"></script>
+</div><script src="../../_static/documentation_options.js?v=832ae8cf"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

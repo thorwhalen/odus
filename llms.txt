@@ -16,7 +16,7 @@
 - [odus.raw_data_diagnosis](_autosummary/odus.raw_data_diagnosis.html.md): Diagnosis of the raw survey spreadsheets.
 - [odus.sequential_var_sets](_autosummary/odus.sequential_var_sets.html.md): Variables and variable sets over sequential (time-indexed) data.
 - [odus.util](_autosummary/odus.util.html.md): General utilities: image conversion and multi-image file writing.
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-19 11:43 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-19 11:54 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

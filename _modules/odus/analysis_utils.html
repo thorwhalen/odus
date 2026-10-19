@@ -285,14 +285,12 @@
 <span class="c1">#            'counts_of_kps', 'Dacc', 'VarSetCountsStore', 'PVar', 'VarSet', 'DfData', 'VarSetFactory']</span>
 
 <span class="n">package_dir</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="n">DFLT_SURVEY_DIR</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span>
-    <span class="n">package_dir</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">DFLT_SURVEY_DIR</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"surveys"</span><span class="p">)</span>
 <span class="n">dflt_figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_stores_v_and_s</span><span class="p">(</span><span class="n">survey_dir</span><span class="o">=</span><span class="n">DFLT_SURVEY_DIR</span><span class="p">):</span>
-    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
+    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
     <span class="c1">#     cstore = VarSetCountsStore(df_store)</span>
     <span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -301,10 +299,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cstores_v_and_s</span><span class="p">(</span><span class="n">survey_dir</span><span class="o">=</span><span class="n">DFLT_SURVEY_DIR</span><span class="p">):</span>
-    <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="s2">"</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"b"</span><span class="p">)</span>
-    <span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">mk_pvar_str_struct</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">pstore</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">get_stores_v_and_s</span><span class="p">(</span><span class="n">survey_dir</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pstore</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">s</span>
 
 
@@ -524,7 +519,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=6b09a97f"></script>
+</div><script src="../../_static/documentation_options.js?v=832ae8cf"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

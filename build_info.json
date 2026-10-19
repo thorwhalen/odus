@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-19T11:43:16Z",
+  "built_at": "2026-10-19T11:54:34Z",
   "package": {
     "name": "odus",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "display_name": "odus",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "0e275fb7c88d18316591b312f84346f50bec20bb",
-    "short_commit": "0e275fb",
+    "commit": "c72c8a21140d35af54ddf72a5277c673f5596c85",
+    "short_commit": "c72c8a2",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/odus",
-    "commit_url": "https://github.com/thorwhalen/odus/commit/0e275fb7c88d18316591b312f84346f50bec20bb",
+    "commit_url": "https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/odus",
-    "sha": "0e275fb7c88d18316591b312f84346f50bec20bb",
+    "sha": "c72c8a21140d35af54ddf72a5277c673f5596c85",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "39246444259",
-    "run_url": "https://github.com/thorwhalen/odus/actions/runs/39246444259",
+    "run_id": "39247785959",
+    "run_url": "https://github.com/thorwhalen/odus/actions/runs/39247785959",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -61,15 +61,13 @@
   "pypi": {
     "checked": true,
     "latest": "0.0.14",
-    "relation": "behind",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/odus && cd odus\ngit checkout 0e275fb7c88d18316591b312f84346f50bec20bb\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/odus && cd odus\ngit checkout c72c8a21140d35af54ddf72a5277c673f5596c85\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.13) is behind the latest release on PyPI (0.0.14): `pip install odus` gives newer code than these docs describe."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }
