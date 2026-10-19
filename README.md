@@ -146,7 +146,9 @@ Where the data is read from is configuration, in `odus.raw_formats`:
 from odus.raw_formats import SurveyLayout
 
 df_store = DfStore(my_folder + "/{}.csv")
-df_store.layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1, empty_value=0)
+df_store.layout = SurveyLayout(
+    year_row=None, age_row=0, data_start_row=1, empty_value=0
+)
 ```
 
   The diagnosis tools take the same `layout` (`diagnose_file(path, layout=...)`).
