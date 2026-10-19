@@ -39,7 +39,7 @@ dependencies = [
     "numpy",
     "Pillow",
     "spyn",
-    "matplotlib",
+    "matplotlib>=3.5",
     "openpyxl",
 ]
 
