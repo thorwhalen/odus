@@ -480,6 +480,31 @@ plot_life(df_store[k], fields=[s.in_treatment, s.injected])  # only want two fie
 ![png](img/output_27_0.png)
 
 
+### Styling a trajectory
+
+`plot_life` draws with `plot_trajectory`, and takes its keyword arguments. Cells are separated by small gaps, wider before every age that is a multiple of 5 (`major_every`), and rows alternate between white and grey so a row is easy to follow back to its variable. You can also give variables their own colors (`row_colors`), and lightly shade a few groups of variables (`row_groups`), which also puts a wider gap between groups.
+
+
+```python
+from odus.plot_utils import plot_trajectory
+
+plot_trajectory(
+    df_store[k],
+    row_groups={
+        "social": ["SON/DAUGHTER", "SIBLING", "FATHER/MOTHER", "SPOUSE", "FRIEND USER", "FRIEND NON USER"],
+        "opioids": ["AS PRESCRIBED OPIOID", "NOT AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID", "INJECTED"],
+    },
+    row_colors={"HEROIN": "#c0392b", "INJECTED": "#8e44ad", "IN TREATMENT": "#27ae60"},
+)
+```
+
+
+![png](img/trajectory_styled.png)
+
+
+To color variables as the source spreadsheet does, read the colors from it with `row_colors_of_xls(xls_filepath)` and pass them as `row_colors`. `life_plots` takes the same keyword arguments, and `write_trajectories_to_file` takes them as `plot_kwargs`.
+
+
 ### Flip over all (or some) trajectories
 
 
