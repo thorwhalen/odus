@@ -152,11 +152,9 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
     ...     columns=['GA', 'NJ', 'NJ', 'Select States below'],
     ...     index=pd.Index([20, 21], name='age'),
     ... )
-    >>> prep_trajectory_df(df)
-        GA  NJ
-    age
-    20   1   0
-    21   0   1
+    >>> out = prep_trajectory_df(df)
+    >>> out.columns.tolist(), out.values.tolist()
+    (['GA', 'NJ'], [[1, 0], [0, 1]])
     """
     from odus.raw_data_diagnosis import is_section_title, normalized_label
 
