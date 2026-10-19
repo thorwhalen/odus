@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>odus explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="plotly.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>odus explorer</h1>
+    <nav class="respondent" aria-label="Respondent">
+      <button id="prev" type="button" title="Previous respondent (←)" aria-label="Previous respondent">‹</button>
+      <label for="respondent" class="visually-hidden">Respondent</label>
+      <select id="respondent" disabled><option>Loading respondents…</option></select>
+      <button id="next" type="button" title="Next respondent (→)" aria-label="Next respondent">›</button>
+    </nav>
+  </header>
+
+  <main>
+    <details id="variables-panel">
+      <summary>Variables: <span id="variables-summary">all</span></summary>
+      <div class="variables-tools">
+        <input id="variables-filter" type="search" placeholder="Filter variables" aria-label="Filter variables">
+        <button id="variables-clear" type="button">Show all</button>
+      </div>
+      <ul id="variables" aria-label="Variables to show"></ul>
+    </details>
+
+    <section id="view" aria-live="polite">
+      <p id="status" class="status"></p>
+      <div id="plot" role="img" aria-label="Trajectory"></div>
+    </section>
+  </main>
+</body>
+</html>

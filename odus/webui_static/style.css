@@ -1,0 +1,81 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1b2a49;
+  --muted: #5b6475;
+  --line: #d9dde5;
+  --accent: #2f5fb3;
+  --error: #b3261e;
+  --skeleton: #eef0f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c;
+    --fg: #e6e9ef;
+    --muted: #9aa3b2;
+    --line: #2d333d;
+    --accent: #7aa7ff;
+    --error: #ff8a80;
+    --skeleton: #1f242c;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0 16px 32px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+h1 { font-size: 18px; margin: 0; }
+.respondent { display: flex; gap: 6px; align-items: center; }
+select, input, button {
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+button { cursor: pointer; }
+button:disabled, select:disabled { opacity: 0.5; cursor: default; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); }
+
+#variables-panel { margin: 12px 0; }
+#variables-panel summary { cursor: pointer; color: var(--muted); }
+.variables-tools { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+#variables {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 16em;
+  max-height: 40vh;
+  overflow: auto;
+}
+#variables li { break-inside: avoid; }
+#variables label { display: flex; gap: 6px; align-items: baseline; }
+#variables .count { color: var(--muted); font-size: 12px; }
+
+#view { overflow-x: auto; }
+.status { color: var(--muted); min-height: 1.4em; margin: 8px 0; }
+.status.error { color: var(--error); }
+#plot[aria-busy="true"] {
+  min-height: 300px;
+  border-radius: 8px;
+  background: var(--skeleton);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { #plot[aria-busy="true"] { animation: none; } }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
