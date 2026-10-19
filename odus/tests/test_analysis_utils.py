@@ -32,8 +32,10 @@ def test_get_stores_v_and_s_default_to_the_bundled_surveys():
 
     df_store, pstore, v, s = get_stores_v_and_s()
     assert len(df_store) == N_SURVEYS
+    assert "A01.xlsx" in df_store  # keys relative to the bundled surveys folder
     assert hasattr(v, "heroin") and s.heroin == "HEROIN"
 
     pstore, v, s = get_cstores_v_and_s()
     pot = pstore[VarSet(PVar("HEROIN", -1), PVar("HEROIN", 0))]
-    assert pot.tb.pval.sum() > 0
+    counts = pot.tb.set_index(["HEROIN-1", "HEROIN"]).pval.to_dict()
+    assert counts == {(0, 0): 1176, (0, 1): 205, (1, 0): 114, (1, 1): 1051}

@@ -50,10 +50,7 @@ def get_stores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
 
 
 def get_cstores_v_and_s(survey_dir=DFLT_SURVEY_DIR):
-    df_store = DfStore(survey_dir + sep + "{}.xlsx")
-    pstore = PotStore(df_store)
-    v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
-    s = mk_pvar_str_struct(v)
+    _, pstore, v, s = get_stores_v_and_s(survey_dir)
     return pstore, v, s
 
 
