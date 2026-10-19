@@ -12,6 +12,7 @@ odus.dacc
       ensure_slash_suffix
       mk_pvar_str_struct
       mk_pvar_struct
+      prep_trajectory_df
       two_way_map
    
    .. rubric:: Classes

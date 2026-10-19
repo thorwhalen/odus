@@ -1,4 +1,4 @@
-> built 2026-10-19 11:12 UTC from 96daf5c (master) · odus 0.0.11. Details: build_info.json
+> built 2026-10-19 11:30 UTC from 327cc25 (master) · odus 0.0.12. Details: build_info.json
 
 # index.html.md
 
@@ -125,6 +125,8 @@ s = mk_pvar_str_struct(v)
 f, df = cstore.df_store.head()
 pstore = PotStore(df_store)
 ```
+
+`DfStore` cleans each trajectory with `prep_trajectory_df`. It drops section-title rows (“Select States below”), merges a variable entered on two rows (a state lived in during two periods) into one column, and sets values other than 0 and 1 to 1 with a warning that names them. Change that with `df_store.non_binary = "keep"` (or `"raise"`, or `"binarize"` to set them to 1 silently) and `df_store.duplicates = "keep"` (or `"raise"`).
 
 # Poking around
 
@@ -1447,28 +1449,35 @@ trajectory dataframes, their count tables, and the corresponding potentials.
 
 ### Functions
 
-| `counts_of_kps`(store, categories, kps_list)   |    |
-|------------------------------------------------|----|
-| `ensure_slash_suffix`(x)                       |    |
-| `mk_pvar_str_struct`(df_store[, ...])          |    |
-| `mk_pvar_struct`(df_store[, ...])              |    |
-| `two_way_map`(keys, val_of_key_func)           |    |
+| `counts_of_kps`(store, categories, kps_list)                                               |                                                                 |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| `ensure_slash_suffix`(x)                                                                   |                                                                 |
+| `mk_pvar_str_struct`(df_store[, ...])                                                      |                                                                 |
+| `mk_pvar_struct`(df_store[, ...])                                                          |                                                                 |
+| [`prep_trajectory_df`](_autosummary/odus.dacc.html.md#odus.dacc.prep_trajectory_df)(df, \*[, source, ...]) | Clean a trajectory DataFrame (index: ages, columns: variables). |
+| `two_way_map`(keys, val_of_key_func)                                                       |                                                                 |
 
 ### Classes
 
-| `Dacc`(xls_rootdir[, categories])                                                     |    |
-|---------------------------------------------------------------------------------------|----|
-| `DelegMap`(dfunc[, dmap])                                                             |    |
-| [`DfStore`](_autosummary/odus.dacc.html.md#odus.dacc.DfStore)(path_format[, max_levels])   |    |
-| `HashableMixin`()                                                                     |    |
-| [`PotStore`](_autosummary/odus.dacc.html.md#odus.dacc.PotStore)(df_store[, store])          |    |
-| `Struct`(\*\*kwargs)                                                                  |    |
-| [`VarSetCountsStore`](_autosummary/odus.dacc.html.md#odus.dacc.VarSetCountsStore)(df_store[, store]) |    |
-| [`VarStr`](_autosummary/odus.dacc.html.md#odus.dacc.VarStr)                               |    |
+| `Dacc`(xls_rootdir[, categories])                                                     |                                                               |
+|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| `DelegMap`(dfunc[, dmap])                                                             |                                                               |
+| [`DfStore`](_autosummary/odus.dacc.html.md#odus.dacc.DfStore)(path_format[, max_levels])   | The trajectory DataFrames of a folder of survey spreadsheets. |
+| `HashableMixin`()                                                                     |                                                               |
+| [`PotStore`](_autosummary/odus.dacc.html.md#odus.dacc.PotStore)(df_store[, store])          |                                                               |
+| `Struct`(\*\*kwargs)                                                                  |                                                               |
+| [`VarSetCountsStore`](_autosummary/odus.dacc.html.md#odus.dacc.VarSetCountsStore)(df_store[, store]) |                                                               |
+| [`VarStr`](_autosummary/odus.dacc.html.md#odus.dacc.VarStr)                               |                                                               |
 
 ### *class* odus.dacc.DfStore(path_format, max_levels=None)
 
 Bases: `HashableMixin`, `ReadOnlyMixin`, `LocalBinaryStore`
+
+The trajectory DataFrames of a folder of survey spreadsheets.
+
+Values are cleaned by `prep_trajectory_df`, with the `non_binary` and
+`duplicates` policies set as attributes (`store.non_binary = "raise"`, or
+in a subclass).
 
 ### *class* odus.dacc.PotStore(df_store, store=None)
 
@@ -1481,6 +1490,34 @@ Bases: `HashableMixin`, `ReadOnlyMixin`, `Store`
 ### *class* odus.dacc.VarStr
 
 Bases: [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+### odus.dacc.prep_trajectory_df(df, , source=None, non_binary='warn', duplicates='merge')
+
+Clean a trajectory DataFrame (index: ages, columns: variables).
+
+- Columns named like a section title of the survey sheet (`NON_VARIABLE_LABELS`
+  of `odus.raw_data_diagnosis`, e.g. “Select States below”) are dropped.
+- `duplicates`: what to do with variables appearing more than once (e.g. a
+  state lived in during two periods, entered as two rows), names compared
+  ignoring case and extra spaces. `"merge"`: one column (with the first
+  name), holding at each age the first non-zero value of the duplicates;
+  `"keep"`: leave them; `"raise"`: raise a `ValueError`.
+- `non_binary`: what to do with values other than 0 and 1. `"warn"`: set
+  them to 1 and say which (variable, ages, values); `"binarize"`: set them to
+  1 silently; `"keep"`: leave them; `"raise"`: raise a `ValueError`.
+
+`source` (e.g. the file name) is only used in messages.
+
+```pycon
+>>> df = pd.DataFrame(
+...     [[1, 0, 0, 0], [0, 0, 1, 2]],
+...     columns=['GA', 'NJ', 'NJ', 'Select States below'],
+...     index=pd.Index([20, 21], name='age'),
+... )
+>>> out = prep_trajectory_df(df)
+>>> out.columns.tolist(), out.values.tolist()
+(['GA', 'NJ'], [[1, 0], [0, 1]])
+```
 
 
 # _autosummary/odus.html.md
@@ -1907,11 +1944,13 @@ passing any `{name: Rule}` mapping as `rules`:
 | `diagnosis_lidx`(df)                                                                             |                                                                        |
 | `diagnosis_lidx_of_xls_file`(xls_filepath[, ...])                                                |                                                                        |
 | [`diagnosis_table`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.diagnosis_table)(problems)                       | A DataFrame with one row per problem (columns: the `Problem` fields).  |
+| [`is_section_title`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.is_section_title)(label, \*[, section_titles])   | Whether a row label is a section title (like "Select States below").   |
 | `last_true_idx`(series)                                                                          |                                                                        |
 | `lidx_of_empty_non_white_or_non_empty_white`(df)                                                 |                                                                        |
 | `matmask`(df, mask)                                                                              |                                                                        |
 | `mk_dotpath_getter`(dotpath)                                                                     |                                                                        |
 | `mk_known_exceptions_lidx`(vals_df)                                                              |                                                                        |
+| [`normalized_label`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.normalized_label)(label)                         | A label with case and extra whitespace ignored, to compare labels.     |
 | `pra`(obj)                                                                                       |                                                                        |
 | [`print_diagnosis`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.print_diagnosis)([source_dir, sheetname, rules]) | Print the diagnosis of the raw xls files in `source_dir`.              |
 | `row_lidx_to_mat_lidx`(row_lidx, n_cols)                                                         |                                                                        |
@@ -1987,6 +2026,24 @@ A DataFrame with one row per problem (columns: the `Problem` fields).
 * **Return type:**
   `DataFrame`
 
+### odus.raw_data_diagnosis.is_section_title(label, , section_titles=('List of States', 'Select States below', 'Selects States below'))
+
+Whether a row label is a section title (like “Select States below”).
+
+```pycon
+>>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
+(True, False)
+```
+
+### odus.raw_data_diagnosis.normalized_label(label)
+
+A label with case and extra whitespace ignored, to compare labels.
+
+```pycon
+>>> normalized_label('  New   York ') == normalized_label('new york')
+True
+```
+
 ### odus.raw_data_diagnosis.print_diagnosis(source_dir='.', sheetname=None, \*, rules={'age_not_consecutive': Rule(name='age_not_consecutive', flag=<function \_age_not_consecutive>, message="age {value!r} in {coordinate} doesn't follow the previous age"), 'age_year_mismatch': Rule(name = 'age_year_mismatch', flag=<function \_age_year_mismatch>, message="age {value!r} in {coordinate} doesn't match its year (year - age differs from the first column's)"), 'duplicate_variable': Rule(name = 'duplicate_variable', flag=<function \_duplicate_variable>, message='{coordinate}: variable {value!r} appears more than once'), 'empty_but_colored': Rule(name = 'empty_but_colored', flag=<function \_empty_but_colored>, message='{coordinate} ({label}) is colored but empty'), 'filled_but_uncolored': Rule(name = 'filled_but_uncolored', flag=<function \_filled_but_uncolored>, message='{coordinate} ({label}) has a value ({value!r}) but no color'), 'not_binary': Rule(name = 'not_binary', flag=<function \_not_binary>, message='{coordinate} ({label}) should be 0 or 1, but is {value!r}'), 'year_not_consecutive': Rule(name = 'year_not_consecutive', flag=<function \_year_not_consecutive>, message="year {value!r} in {coordinate} doesn't follow the previous year")}, \*\*view_kwargs)
 
 Print the diagnosis of the raw xls files in `source_dir`.
@@ -2017,7 +2074,7 @@ Make a `{name: Rule}` mapping: turn rules on or off, and add your own.
 True
 ```
 
-### odus.raw_data_diagnosis.sheet_view(sheet, , year_row=1, age_row=2, data_start_row=3, non_variable_labels=('List of States', 'Select States below'))
+### odus.raw_data_diagnosis.sheet_view(sheet, , year_row=1, age_row=2, data_start_row=3, non_variable_labels=('List of States', 'Select States below', 'Selects States below'))
 
 Make a `SheetView` of an `openpyxl` worksheet.
 
@@ -2086,18 +2143,18 @@ Write images or figs into pdf pages (one image per page)
 
 # About this build
 
-This documentation was built on **2026-10-19 11:12 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/96daf5cb22450a121bf8dea85cece6ab9e6aca41"><code>96daf5c</code></a> on branch <code>master</code>, for **odus 0.0.11** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 11:30 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/327cc251e48e03964d233eb9b7efb4cb8775e26f"><code>327cc25</code></a> on branch <code>master</code>, for **odus 0.0.12** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.11) is behind the latest release on PyPI (0.0.12): `pip install odus` gives newer code than these docs describe.
+- The documented version (0.0.12) is behind the latest release on PyPI (0.0.13): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/96daf5cb22450a121bf8dea85cece6ab9e6aca41"><code>96daf5cb22450a121bf8dea85cece6ab9e6aca41</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/327cc251e48e03964d233eb9b7efb4cb8775e26f"><code>327cc251e48e03964d233eb9b7efb4cb8775e26f</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2108,15 +2165,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39242700937">39242700937</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39244811546">39244811546</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>96daf5cb22450a121bf8dea85cece6ab9e6aca41</code> (in the history of the built commit) |
+| Event commit | <code>327cc251e48e03964d233eb9b7efb4cb8775e26f</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.17  |
+| epythet  | 0.2.18  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -2135,14 +2192,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.12/">0.0.12</a>, newer than the documented version (0.0.11).
+Latest release: <a href="https://pypi.org/project/odus/0.0.13/">0.0.13</a>, newer than the documented version (0.0.12).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 96daf5cb22450a121bf8dea85cece6ab9e6aca41
-pip install "epythet==0.2.17"
+git checkout 327cc251e48e03964d233eb9b7efb4cb8775e26f
+pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

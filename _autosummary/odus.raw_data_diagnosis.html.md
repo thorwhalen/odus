@@ -34,11 +34,13 @@ passing any `{name: Rule}` mapping as `rules`:
 | `diagnosis_lidx`(df)                                                                             |                                                                        |
 | `diagnosis_lidx_of_xls_file`(xls_filepath[, ...])                                                |                                                                        |
 | [`diagnosis_table`](#odus.raw_data_diagnosis.diagnosis_table)(problems)                       | A DataFrame with one row per problem (columns: the `Problem` fields).  |
+| [`is_section_title`](#odus.raw_data_diagnosis.is_section_title)(label, \*[, section_titles])   | Whether a row label is a section title (like "Select States below").   |
 | `last_true_idx`(series)                                                                          |                                                                        |
 | `lidx_of_empty_non_white_or_non_empty_white`(df)                                                 |                                                                        |
 | `matmask`(df, mask)                                                                              |                                                                        |
 | `mk_dotpath_getter`(dotpath)                                                                     |                                                                        |
 | `mk_known_exceptions_lidx`(vals_df)                                                              |                                                                        |
+| [`normalized_label`](#odus.raw_data_diagnosis.normalized_label)(label)                         | A label with case and extra whitespace ignored, to compare labels.     |
 | `pra`(obj)                                                                                       |                                                                        |
 | [`print_diagnosis`](#odus.raw_data_diagnosis.print_diagnosis)([source_dir, sheetname, rules]) | Print the diagnosis of the raw xls files in `source_dir`.              |
 | `row_lidx_to_mat_lidx`(row_lidx, n_cols)                                                         |                                                                        |
@@ -114,6 +116,24 @@ A DataFrame with one row per problem (columns: the `Problem` fields).
 * **Return type:**
   `DataFrame`
 
+### odus.raw_data_diagnosis.is_section_title(label, , section_titles=('List of States', 'Select States below', 'Selects States below'))
+
+Whether a row label is a section title (like “Select States below”).
+
+```pycon
+>>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
+(True, False)
+```
+
+### odus.raw_data_diagnosis.normalized_label(label)
+
+A label with case and extra whitespace ignored, to compare labels.
+
+```pycon
+>>> normalized_label('  New   York ') == normalized_label('new york')
+True
+```
+
 ### odus.raw_data_diagnosis.print_diagnosis(source_dir='.', sheetname=None, \*, rules={'age_not_consecutive': Rule(name='age_not_consecutive', flag=<function \_age_not_consecutive>, message="age {value!r} in {coordinate} doesn't follow the previous age"), 'age_year_mismatch': Rule(name = 'age_year_mismatch', flag=<function \_age_year_mismatch>, message="age {value!r} in {coordinate} doesn't match its year (year - age differs from the first column's)"), 'duplicate_variable': Rule(name = 'duplicate_variable', flag=<function \_duplicate_variable>, message='{coordinate}: variable {value!r} appears more than once'), 'empty_but_colored': Rule(name = 'empty_but_colored', flag=<function \_empty_but_colored>, message='{coordinate} ({label}) is colored but empty'), 'filled_but_uncolored': Rule(name = 'filled_but_uncolored', flag=<function \_filled_but_uncolored>, message='{coordinate} ({label}) has a value ({value!r}) but no color'), 'not_binary': Rule(name = 'not_binary', flag=<function \_not_binary>, message='{coordinate} ({label}) should be 0 or 1, but is {value!r}'), 'year_not_consecutive': Rule(name = 'year_not_consecutive', flag=<function \_year_not_consecutive>, message="year {value!r} in {coordinate} doesn't follow the previous year")}, \*\*view_kwargs)
 
 Print the diagnosis of the raw xls files in `source_dir`.
@@ -144,7 +164,7 @@ Make a `{name: Rule}` mapping: turn rules on or off, and add your own.
 True
 ```
 
-### odus.raw_data_diagnosis.sheet_view(sheet, , year_row=1, age_row=2, data_start_row=3, non_variable_labels=('List of States', 'Select States below'))
+### odus.raw_data_diagnosis.sheet_view(sheet, , year_row=1, age_row=2, data_start_row=3, non_variable_labels=('List of States', 'Select States below', 'Selects States below'))
 
 Make a `SheetView` of an `openpyxl` worksheet.
 

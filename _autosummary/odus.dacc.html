@@ -277,7 +277,10 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_pvar_struct</span></code>(df_store[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">two_way_map</span></code>(keys, val_of_key_func)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#odus.dacc.prep_trajectory_df" title="odus.dacc.prep_trajectory_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prep_trajectory_df</span></code></a>(df, *[, source, ...])</p></td>
+<td><p>Clean a trajectory DataFrame (index: ages, columns: variables).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">two_way_map</span></code>(keys, val_of_key_func)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -294,7 +297,7 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#odus.dacc.DfStore" title="odus.dacc.DfStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DfStore</span></code></a>(path_format[, max_levels])</p></td>
-<td><p></p></td>
+<td><p>The trajectory DataFrames of a folder of survey spreadsheets.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">HashableMixin</span></code>()</p></td>
 <td><p></p></td>
@@ -318,6 +321,10 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <dt class="sig sig-object py" id="odus.dacc.DfStore">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">odus.dacc.</span></span><span class="sig-name descname"><span class="pre">DfStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/dacc.html#DfStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.dacc.DfStore" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">HashableMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LocalBinaryStore</span></code></p>
+<p>The trajectory DataFrames of a folder of survey spreadsheets.</p>
+<p>Values are cleaned by <code class="docutils literal notranslate"><span class="pre">prep_trajectory_df</span></code>, with the <code class="docutils literal notranslate"><span class="pre">non_binary</span></code> and
+<code class="docutils literal notranslate"><span class="pre">duplicates</span></code> policies set as attributes (<code class="docutils literal notranslate"><span class="pre">store.non_binary</span> <span class="pre">=</span> <span class="pre">&quot;raise&quot;</span></code>, or
+in a subclass).</p>
 </dd></dl>
 
 <dl class="py class">
@@ -336,6 +343,35 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <dt class="sig sig-object py" id="odus.dacc.VarStr">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">odus.dacc.</span></span><span class="sig-name descname"><span class="pre">VarStr</span></span><a class="reference internal" href="../_modules/odus/dacc.html#VarStr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.dacc.VarStr" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odus.dacc.prep_trajectory_df">
+<span class="sig-prename descclassname"><span class="pre">odus.dacc.</span></span><span class="sig-name descname"><span class="pre">prep_trajectory_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'merge'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/dacc.html#prep_trajectory_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.dacc.prep_trajectory_df" title="Link to this definition">¶</a></dt>
+<dd><p>Clean a trajectory DataFrame (index: ages, columns: variables).</p>
+<ul class="simple">
+<li><p>Columns named like a section title of the survey sheet (<code class="docutils literal notranslate"><span class="pre">NON_VARIABLE_LABELS</span></code>
+of <code class="docutils literal notranslate"><span class="pre">odus.raw_data_diagnosis</span></code>, e.g. “Select States below”) are dropped.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">duplicates</span></code>: what to do with variables appearing more than once (e.g. a
+state lived in during two periods, entered as two rows), names compared
+ignoring case and extra spaces. <code class="docutils literal notranslate"><span class="pre">&quot;merge&quot;</span></code>: one column (with the first
+name), holding at each age the first non-zero value of the duplicates;
+<code class="docutils literal notranslate"><span class="pre">&quot;keep&quot;</span></code>: leave them; <code class="docutils literal notranslate"><span class="pre">&quot;raise&quot;</span></code>: raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">non_binary</span></code>: what to do with values other than 0 and 1. <code class="docutils literal notranslate"><span class="pre">&quot;warn&quot;</span></code>: set
+them to 1 and say which (variable, ages, values); <code class="docutils literal notranslate"><span class="pre">&quot;binarize&quot;</span></code>: set them to
+1 silently; <code class="docutils literal notranslate"><span class="pre">&quot;keep&quot;</span></code>: leave them; <code class="docutils literal notranslate"><span class="pre">&quot;raise&quot;</span></code>: raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">source</span></code> (e.g. the file name) is only used in messages.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+<span class="gp">... </span>    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'GA'</span><span class="p">,</span> <span class="s1">'NJ'</span><span class="p">,</span> <span class="s1">'NJ'</span><span class="p">,</span> <span class="s1">'Select States below'</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">'age'</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">prep_trajectory_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">out</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="go">(['GA', 'NJ'], [[1, 0], [0, 1]])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -396,6 +432,7 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <li><a class="reference internal" href="#odus.dacc.PotStore"><code class="docutils literal notranslate"><span class="pre">PotStore</span></code></a></li>
 <li><a class="reference internal" href="#odus.dacc.VarSetCountsStore"><code class="docutils literal notranslate"><span class="pre">VarSetCountsStore</span></code></a></li>
 <li><a class="reference internal" href="#odus.dacc.VarStr"><code class="docutils literal notranslate"><span class="pre">VarStr</span></code></a></li>
+<li><a class="reference internal" href="#odus.dacc.prep_trajectory_df"><code class="docutils literal notranslate"><span class="pre">prep_trajectory_df()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -407,7 +444,7 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=e2f847f2"></script>
+</div><script src="../_static/documentation_options.js?v=c249dd19"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
