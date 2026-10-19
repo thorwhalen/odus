@@ -275,6 +275,37 @@ def _set_xticks(
     ax.set_xticks([xs[j] for j in ticks], [labels[j] for j in ticks], fontsize=fontsize)
 
 
+def trajectory_colors(
+    df,
+    *,
+    row_colors=None,
+    default_color=DFLT_FG_COLOR,
+    row_backgrounds=DFLT_ROW_BACKGROUNDS,
+    row_groups=None,
+    group_colors=None,
+    group_tint=DFLT_GROUP_TINT,
+):
+    """The colors of the cells of a trajectory: the styling every renderer shares.
+
+    Returns ``(img, group_of_row)``: an ``(n_variables, n_ages, 3)`` RGB array (in
+    [0, 1]), and the group (or None) of each variable. See ``plot_trajectory``
+    for the arguments.
+    """
+    varnames = list(df.columns)
+    if df.shape[0] == 0 or df.shape[1] == 0:
+        raise ValueError(f"Nothing to plot: the trajectory has shape {df.shape}")
+    v = _normalized_values(df.T.to_numpy(dtype=float))[..., None]
+    fg = _row_foregrounds(varnames, row_colors, default_color)[:, None, :]
+    bg, group_of_row = _row_backgrounds(
+        varnames,
+        row_backgrounds=row_backgrounds,
+        row_groups=row_groups,
+        group_colors=group_colors,
+        group_tint=group_tint,
+    )
+    return (1 - v) * bg[:, None, :] + v * fg, group_of_row
+
+
 def plot_trajectory(
     df,
     fields=None,
@@ -341,21 +372,17 @@ def plot_trajectory(
         The matplotlib axes drawn on.
     """
     df = _select_fields(df, fields)
-    varnames, times = list(df.columns), list(df.index)
-    n_rows, n_cols = len(varnames), len(times)
-    if n_rows == 0 or n_cols == 0:
-        raise ValueError(f"Nothing to plot: the trajectory has shape {df.shape}")
-
-    v = _normalized_values(df.T.to_numpy(dtype=float))[..., None]
-    fg = _row_foregrounds(varnames, row_colors, default_color)[:, None, :]
-    bg, group_of_row = _row_backgrounds(
-        varnames,
+    img, group_of_row = trajectory_colors(
+        df,
+        row_colors=row_colors,
+        default_color=default_color,
         row_backgrounds=row_backgrounds,
         row_groups=row_groups,
         group_colors=group_colors,
         group_tint=group_tint,
     )
-    img = (1 - v) * bg[:, None, :] + v * fg
+    varnames, times = list(df.columns), list(df.index)
+    n_rows, n_cols = len(varnames), len(times)
 
     if x is None:
         xs, tick_values = np.arange(n_cols), times
