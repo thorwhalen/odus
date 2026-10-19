@@ -1,0 +1,13 @@
+odus.util
+=========
+
+.. automodule:: odus.util
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      func_to_get_pil_images_like_this_one
+      write_images
+   

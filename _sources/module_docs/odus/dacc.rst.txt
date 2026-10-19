@@ -1,4 +1,0 @@
-odus.dacc
-=========
-.. automodule:: odus.dacc
-   :members:

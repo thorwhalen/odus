@@ -1,0 +1,19 @@
+odus.plot\_utils
+================
+
+.. automodule:: odus.plot_utils
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      heatmap
+      ihead
+      life_plots
+      plot_life
+      plot_life_course
+      plot_trajectory
+      row_colors_of_xls
+      write_trajectories_to_file
+   

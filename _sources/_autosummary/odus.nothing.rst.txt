@@ -1,0 +1,20 @@
+odus.nothing
+============
+
+.. automodule:: odus.nothing
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_universal_neutral_for_method
+      get_universal_neutral_for_methods
+      transparent_method
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      GreatUniversalNothing
+   

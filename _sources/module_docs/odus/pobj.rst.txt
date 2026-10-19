@@ -1,4 +1,0 @@
-odus.pobj
-=========
-.. automodule:: odus.pobj
-   :members:

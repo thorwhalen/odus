@@ -1,4 +1,0 @@
-odus.analysis_utils
-===================
-.. automodule:: odus.analysis_utils
-   :members:

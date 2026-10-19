@@ -1,170 +1,1498 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="API reference" href="api.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>odus</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
 
 
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to odus’s documentation! &mdash; odus 0.0.9 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
-
+<style>
+  body {
+    --color-code-background: #f0f0f0;
+  --color-code-foreground: black;
+  --color-brand-primary: #555f00;
+  --color-brand-content: #555f00;
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f7cdbf68"></script>
-      <script src="_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="odus" href="module_docs/odus.html" /> 
-</head>
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #b3c25a;
+  --color-brand-content: #b3c25a;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #b3c25a;
+  --color-brand-content: #b3c25a;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
 
-          
-          
-          <a href="#" class="icon icon-home">
-            odus
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus.html">odus</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/analysis_utils.html">odus.analysis_utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/dacc.html">odus.dacc</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/nothing.html">odus.nothing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/plot_utils.html">odus.plot_utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/pobj.html">odus.pobj</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/sequential_var_sets.html">odus.sequential_var_sets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/util.html">odus.util</a></li>
-</ul>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">odus</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to odus’s documentation!</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="welcome-to-odus-s-documentation">
-<h1>Welcome to odus’s documentation!<a class="headerlink" href="#welcome-to-odus-s-documentation" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus.html">odus</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/analysis_utils.html">odus.analysis_utils</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/analysis_utils.html#odus.analysis_utils.print_remission_influence_supporting_info"><code class="docutils literal notranslate"><span class="pre">print_remission_influence_supporting_info()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/analysis_utils.html#odus.analysis_utils.remission_relative_risk"><code class="docutils literal notranslate"><span class="pre">remission_relative_risk()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/dacc.html">odus.dacc</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/dacc.html#odus.dacc.DfStore"><code class="docutils literal notranslate"><span class="pre">DfStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/dacc.html#odus.dacc.PotStore"><code class="docutils literal notranslate"><span class="pre">PotStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/dacc.html#odus.dacc.VarSetCountsStore"><code class="docutils literal notranslate"><span class="pre">VarSetCountsStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/dacc.html#odus.dacc.VarStr"><code class="docutils literal notranslate"><span class="pre">VarStr</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/nothing.html">odus.nothing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/nothing.html#odus.nothing.GreatUniversalNothing"><code class="docutils literal notranslate"><span class="pre">GreatUniversalNothing</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/nothing.html#odus.nothing.get_universal_neutral_for_method"><code class="docutils literal notranslate"><span class="pre">get_universal_neutral_for_method()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/nothing.html#odus.nothing.get_universal_neutral_for_methods"><code class="docutils literal notranslate"><span class="pre">get_universal_neutral_for_methods()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/plot_utils.html">odus.plot_utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/pobj.html">odus.pobj</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/pobj.html#odus.pobj.add_method"><code class="docutils literal notranslate"><span class="pre">add_method()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/pobj.html#odus.pobj.inject_method"><code class="docutils literal notranslate"><span class="pre">inject_method()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/raw_data_diagnosis.html">odus.raw_data_diagnosis</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/raw_data_diagnosis.html#odus.raw_data_diagnosis.print_diagnosis"><code class="docutils literal notranslate"><span class="pre">print_diagnosis()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/sequential_var_sets.html">odus.sequential_var_sets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/odus/util.html">odus.util</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/util.html#odus.util.func_to_get_pil_images_like_this_one"><code class="docutils literal notranslate"><span class="pre">func_to_get_pil_images_like_this_one()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/odus/util.html#odus.util.write_images"><code class="docutils literal notranslate"><span class="pre">write_images()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-<p>Release: 0.0.9</p>
-<p>Last change: Aug 30, 2026</p>
-</section>
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="module_docs/odus.html" class="btn btn-neutral float-right" title="odus" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
     </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p></p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+    <div class="header-center">
+      <a href="#"><div class="brand">odus</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+  
+  <span class="sidebar-brand-text">odus</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API reference</a><input aria-label="Toggle navigation of API reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/odus.html">odus</a><input aria-label="Toggle navigation of odus" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.analysis_utils.html">odus.analysis_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.dacc.html">odus.dacc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.nothing.html">odus.nothing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.pobj.html">odus.pobj</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.util.html">odus.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-</body>
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/index.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <!-- generated by epythet -->
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#installation">Installation</a></p></li>
+<li><p><a class="reference internal" href="#getting-some-resources">Getting some resources</a></p></li>
+<li><p><a class="reference internal" href="#poking-around">Poking around</a></p>
+<ul>
+<li><p><a class="reference internal" href="#df-store"><span class="xref myst">df_store</span></a></p></li>
+<li><p><a class="reference internal" href="#viewing-trajectories">Viewing trajectories</a></p>
+<ul>
+<li><p><a class="reference internal" href="#viewing-a-single-trajectory">Viewing a single trajectory</a></p></li>
+<li><p><a class="reference internal" href="#flip-over-all--or-some--trajectories"><span class="xref myst">Flip over all (or some) trajectories</span></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#making-a-pdf-of-trajectories">Making a pdf of trajectories</a></p></li>
+<li><p><a class="reference internal" href="#demo-s-and-v">Demo s and v</a></p></li>
+<li><p><a class="reference internal" href="#cstore">cstore</a></p></li>
+<li><p><a class="reference internal" href="#pstore">pstore</a></p></li>
+<li><p><a class="reference internal" href="#scrap-place">Scrap place</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#potential-calculus-experimentations">Potential Calculus Experimentations</a></p></li>
+<li><p><a class="reference internal" href="#extra-scrap">Extra scrap</a></p></li>
+<li><p><a class="reference internal" href="#acknowledgements">Acknowledgements</a></p>
+<ul>
+<li><p><a class="reference internal" href="#national-institutes-of-health--national-institute-on-drug-abuse"><span class="xref myst">National Institutes of Health, National Institute on Drug Abuse</span></a></p></li>
+<li><p><a class="reference internal" href="#national-institutes-of-health--national-institute-on-drug-abuse------american-recovery-and-reinvestment-act"><span class="xref myst">National Institutes of Health, National Institute on Drug Abuse,     American Recovery and Reinvestment Act</span></a></p></li>
+<li><p><a class="reference internal" href="#national-addiction---hiv-data-archive-program--nahdap-"><span class="xref myst">National Addiction &amp; HIV Data Archive Program (NAHDAP)</span></a></p></li>
+</ul>
+</li>
+</ul>
+<p><small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small></p>
+<section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
+<p>ODUS (for Older Drug User Study) contains data and tools to study the drug use of older drug users.</p>
+<p>Essentially, there are these are tools:</p>
+<ul class="simple">
+<li><p>To get prepared data on the 119 “trajectories” describing 31 variables (drug use, social, etc.) over time of 119 different respondents.</p></li>
+<li><p>To vizualize these trajectories in various ways</p></li>
+<li><p>To create pdfs of any selection of these trajectories and variables</p></li>
+<li><p>To make count tables for any combinations of the variables: Essential step of any Markovian or Bayesian analysis.</p></li>
+<li><p>To make probability (joint or conditional) tables from any combination of the variables</p></li>
+<li><p>To operate on these count and probability tables, thus enabling inference operations</p></li>
+</ul>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<p>You need to have python 3.7+ to run this notebook.</p>
+<p>And you’ll need to have <code class="docutils literal notranslate"><span class="pre">odus</span></code>, which you get by doing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">odus</span>
+</pre></div>
+</div>
+<p>(And if you don’t have pip then, well… how to put it… ha ha ha!)</p>
+<p>But if you’re the type, you can also just get the source from <code class="docutils literal notranslate"><span class="pre">https://github.com/thorwhalen/odus</span></code>.</p>
+<p>Oh, and pull requests etc. are welcome!</p>
+<p>Stars, likes, references, and coffee also welcome.</p>
+<p>A simple flowchart about the architecture:</p>
+<p><img alt="png" src="_images/odus_store.png" /></p>
+</section>
+<section id="getting-some-resources">
+<h1>Getting some resources<a class="headerlink" href="#getting-some-resources" title="Link to this heading">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pylab</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.stores.local_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">RelativePathFormatStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReadOnlyMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">py2store.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Store</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spyn.ppi.pot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pot</span><span class="p">,</span> <span class="n">ProbPot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ut.ml.feature_extraction.sequential_var_sets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PVar</span><span class="p">,</span>
+    <span class="n">VarSet</span><span class="p">,</span>
+    <span class="n">DfData</span><span class="p">,</span>
+    <span class="n">VarSetFactory</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.analysis_utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.dacc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DfStore</span><span class="p">,</span>
+    <span class="n">counts_of_kps</span><span class="p">,</span>
+    <span class="n">Dacc</span><span class="p">,</span>
+    <span class="n">VarSetCountsStore</span><span class="p">,</span>
+    <span class="n">mk_pvar_struct</span><span class="p">,</span>
+    <span class="n">PotStore</span><span class="p">,</span>
+    <span class="n">_commun_columns_of_dfs</span><span class="p">,</span>
+    <span class="n">Struct</span><span class="p">,</span>
+    <span class="n">mk_pvar_str_struct</span><span class="p">,</span>
+    <span class="n">VarStr</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_life_course</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">data_path_of</span>
+
+<span class="n">survey_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+<span class="n">data_dir</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'/D/Dropbox/dev/p3/proj/odus/odus/data'
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+<span class="n">cstore</span> <span class="o">=</span> <span class="n">VarSetCountsStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">mk_pvar_str_struct</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">cstore</span><span class="o">.</span><span class="n">df_store</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="poking-around">
+<h1>Poking around<a class="headerlink" href="#poking-around" title="Link to this heading">¶</a></h1>
+<section id="df-store">
+<h2>df_store<a class="headerlink" href="#df-store" title="Link to this heading">¶</a></h2>
+<p>A df_store is a key-value store where the key is the xls file and the value is the prepared dataframe</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>119
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>  <span class="c1"># skip five first</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>  <span class="c1"># get the one I want</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>category</th>
+      <th>RURAL</th>
+      <th>SUBURBAN</th>
+      <th>URBAN/CITY</th>
+      <th>HOMELESS</th>
+      <th>INCARCERATION</th>
+      <th>WORK</th>
+      <th>SON/DAUGHTER</th>
+      <th>SIBLING</th>
+      <th>FATHER/MOTHER</th>
+      <th>SPOUSE</th>
+      <th>...</th>
+      <th>METHAMPHETAMINE</th>
+      <th>AS PRESCRIBED OPIOID</th>
+      <th>NOT AS PRESCRIBED OPIOID</th>
+      <th>HEROIN</th>
+      <th>OTHER OPIOID</th>
+      <th>INJECTED</th>
+      <th>IN TREATMENT</th>
+      <th>Selects States below</th>
+      <th>Georgia</th>
+      <th>Pennsylvania</th>
+    </tr>
+    <tr>
+      <th>age</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>11</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 31 columns</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>['RURAL' 'SUBURBAN' 'URBAN/CITY' 'HOMELESS' 'INCARCERATION' 'WORK'
+ 'SON/DAUGHTER' 'SIBLING' 'FATHER/MOTHER' 'SPOUSE'
+ 'OTHER (WHO?, FILL IN BRACKETS HERE)' 'FRIEND USER' 'FRIEND NON USER'
+ 'MENTAL ILLNESS' 'PHYSICAL ILLNESS' 'LOSS OF LOVED ONE' 'TOBACCO'
+ 'MARIJUANA' 'ALCOHOL' 'HAL/LSD/XTC/CLUBDRUG' 'COCAINE/CRACK'
+ 'METHAMPHETAMINE' 'AS PRESCRIBED OPIOID' 'NOT AS PRESCRIBED OPIOID'
+ 'HEROIN' 'OTHER OPIOID' 'INJECTED' 'IN TREATMENT' 'Selects States below'
+ 'Georgia' 'Pennsylvania']
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">"ALCOHOL"</span><span class="p">,</span> <span class="s2">"TOBACCO"</span><span class="p">]]</span>
+<span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>category</th>
+      <th>ALCOHOL</th>
+      <th>TOBACCO</th>
+    </tr>
+    <tr>
+      <th>age</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>11</th>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_list</span><span class="p">())])</span>
+<span class="n">c</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 0): 6, (1, 0): 4, (1, 1): 9, (0, 1): 2})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">count_tuples</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_list</span><span class="p">())])</span>
+    <span class="k">return</span> <span class="n">c</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ALCOHOL"</span><span class="p">,</span> <span class="s2">"TOBACCO"</span><span class="p">]</span>
+<span class="c1"># do it for every one</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_store</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">count_tuples</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">fields</span><span class="p">]))</span>
+<span class="n">c</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 1): 903, (1, 1): 1343, (0, 0): 240, (1, 0): 179})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0  1     903
+1  1    1343
+0  0     240
+1  0     179
+dtype: int64
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Powerful! You can use that with several pairs and get some nice probabilities. Look up Naive Bayes.</span>
+</pre></div>
+</div>
+</section>
+<section id="viewing-trajectories">
+<h2>Viewing trajectories<a class="headerlink" href="#viewing-trajectories" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_images</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_life</span><span class="p">,</span> <span class="n">life_plots</span><span class="p">,</span> <span class="n">write_trajectories_to_file</span>
+
+<span class="n">ihead</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">itertools</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="viewing-a-single-trajectory">
+<h3>Viewing a single trajectory<a class="headerlink" href="#viewing-a-single-trajectory" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">df_store</span><span class="p">))</span>  <span class="c1"># get the first key</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"k: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># print it</span>
+<span class="n">plot_life</span><span class="p">(</span><span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>  <span class="c1"># plot the trajectory</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>k: surveys/B24.xlsx
+</pre></div>
+</div>
+<p><img alt="png" src="_images/output_26_1.png" /></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_life</span><span class="p">(</span><span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">in_treatment</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">injected</span><span class="p">])</span>  <span class="c1"># only want two fields</span>
+</pre></div>
+</div>
+<p><img alt="png" src="_images/output_27_0.png" /></p>
+</section>
+<section id="styling-a-trajectory">
+<h3>Styling a trajectory<a class="headerlink" href="#styling-a-trajectory" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">plot_life</span></code> draws with <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code>, and takes its keyword arguments. Cells are separated by small gaps, wider before every age that is a multiple of 5 (<code class="docutils literal notranslate"><span class="pre">major_every</span></code>), and rows alternate between white and grey so a row is easy to follow back to its variable. You can also give variables their own colors (<code class="docutils literal notranslate"><span class="pre">row_colors</span></code>), and lightly shade a few groups of variables (<code class="docutils literal notranslate"><span class="pre">row_groups</span></code>), which also puts a wider gap between groups.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_trajectory</span>
+
+<span class="n">plot_trajectory</span><span class="p">(</span>
+    <span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+    <span class="n">row_groups</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"social"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SON/DAUGHTER"</span><span class="p">,</span> <span class="s2">"SIBLING"</span><span class="p">,</span> <span class="s2">"FATHER/MOTHER"</span><span class="p">,</span> <span class="s2">"SPOUSE"</span><span class="p">,</span> <span class="s2">"FRIEND USER"</span><span class="p">,</span> <span class="s2">"FRIEND NON USER"</span><span class="p">],</span>
+        <span class="s2">"opioids"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"NOT AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"HEROIN"</span><span class="p">,</span> <span class="s2">"OTHER OPIOID"</span><span class="p">,</span> <span class="s2">"INJECTED"</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">row_colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"HEROIN"</span><span class="p">:</span> <span class="s2">"#c0392b"</span><span class="p">,</span> <span class="s2">"INJECTED"</span><span class="p">:</span> <span class="s2">"#8e44ad"</span><span class="p">,</span> <span class="s2">"IN TREATMENT"</span><span class="p">:</span> <span class="s2">"#27ae60"</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="_images/trajectory_styled.png" /></p>
+<p>To color variables as the source spreadsheet does, read the colors from it with <code class="docutils literal notranslate"><span class="pre">row_colors_of_xls(xls_filepath)</span></code> and pass them as <code class="docutils literal notranslate"><span class="pre">row_colors</span></code>. <code class="docutils literal notranslate"><span class="pre">life_plots</span></code> takes the same keyword arguments, and <code class="docutils literal notranslate"><span class="pre">write_trajectories_to_file</span></code> takes them as <code class="docutils literal notranslate"><span class="pre">plot_kwargs</span></code>.</p>
+</section>
+<section id="flip-over-all-or-some-trajectories">
+<h3>Flip over all (or some) trajectories<a class="headerlink" href="#flip-over-all-or-some-trajectories" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gen</span> <span class="o">=</span> <span class="n">life_plots</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>  <span class="c1"># launch to get the next trajectory</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x12b21f070&gt;
+</pre></div>
+</div>
+<p><img alt="png" src="_images/output_30_1.png" /></p>
+<p>Get three trajectories, but only over two fields.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># fields = [s.in_treatment, s.injected]</span>
+<span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">physical_illness</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">as_prescribed_opioid</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">heroin</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">other_opioid</span><span class="p">]</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_store</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="c1"># print(f"keys={keys}")</span>
+<span class="n">axs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">life_plots</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p><img alt="png" src="_images/output_32_0.png" /></p>
+<p><img alt="png" src="_images/output_32_1.png" /></p>
+<p><img alt="png" src="_images/output_32_2.png" /></p>
+<p><img alt="png" src="_images/output_32_3.png" /></p>
+<p><img alt="png" src="_images/output_32_4.png" /></p>
+<p><img alt="png" src="_images/output_32_5.png" /></p>
+<p><img alt="png" src="_images/output_32_6.png" /></p>
+<p><img alt="png" src="_images/output_32_7.png" /></p>
+<p><img alt="png" src="_images/output_32_8.png" /></p>
+<p><img alt="png" src="_images/output_32_9.png" /></p>
+</section>
+</section>
+<section id="making-a-pdf-of-trajectories">
+<h2>Making a pdf of trajectories<a class="headerlink" href="#making-a-pdf-of-trajectories" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">write_trajectories_to_file</span><span class="p">(</span>
+    <span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="s2">"three_respondents_two_fields.pdf"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">write_trajectories_to_file</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="s2">"all_respondents_all_fields.pdf"</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+<section id="demo-s-and-v">
+<h2>Demo s and v<a class="headerlink" href="#demo-s-and-v" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"__"</span><span class="p">),</span> <span class="nb">dir</span><span class="p">(</span><span class="n">s</span><span class="p">))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>['alcohol', 'as_prescribed_opioid', 'cocaine_crack', 'father_mother', 'hal_lsd_xtc_clubdrug', 'heroin', 'homeless', 'in_treatment', 'incarceration', 'injected', 'loss_of_loved_one', 'marijuana', 'mental_illness', 'methamphetamine', 'not_as_prescribed_opioid', 'other_opioid', 'physical_illness', 'rural', 'sibling', 'son_daughter', 'suburban', 'tobacco', 'urban_city', 'work']
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">heroin</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'HEROIN'
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span><span class="o">.</span><span class="n">heroin</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PVar('HEROIN', 0)
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span><span class="o">.</span><span class="n">heroin</span> <span class="o">-</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>PVar('HEROIN', -1)
+</pre></div>
+</div>
+</section>
+<section id="cstore">
+<h2>cstore<a class="headerlink" href="#cstore" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># cstore[v.alcohol, v.tobacco]</span>
+<span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">as_prescribed_opioid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">heroin</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 0): 1026, (1, 0): 264, (0, 1): 1108, (1, 1): 148})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">as_prescribed_opioid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">heroin</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0  0    1026
+1  0     264
+0  1    1108
+1  1     148
+dtype: int64
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">tobacco</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">heroin</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 0, 1): 427,
+         (1, 0, 1): 656,
+         (1, 1, 1): 687,
+         (0, 0, 0): 189,
+         (0, 1, 1): 476,
+         (0, 1, 0): 51,
+         (1, 0, 0): 133,
+         (1, 1, 0): 46})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">alcohol</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 0): 994, (1, 1): 1375, (1, 0): 90, (0, 1): 87})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">alcohol</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">tobacco</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Counter({(0, 0, 1): 807,
+         (1, 1, 1): 1220,
+         (1, 0, 0): 26,
+         (0, 1, 1): 76,
+         (0, 0, 0): 187,
+         (1, 1, 0): 155,
+         (0, 1, 0): 11,
+         (1, 0, 1): 64})
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">cstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">alcohol</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">tobacco</span><span class="p">])</span>
+<span class="n">t</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;pandas.core.indexing._LocIndexer at 0x130955db0&gt;
+</pre></div>
+</div>
+</section>
+<section id="pstore">
+<h2>pstore<a class="headerlink" href="#pstore" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">alcohol</span><span class="p">]</span>
+<span class="n">t</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                   pval
+ALCOHOL-1 ALCOHOL      
+0         0         994
+          1          87
+1         0          90
+          1        1375
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span><span class="o">.</span><span class="n">tb</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ALCOHOL-1</th>
+      <th>ALCOHOL</th>
+      <th>pval</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>0</td>
+      <td>994</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>1</td>
+      <td>87</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>0</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>1</td>
+      <td>1375</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                       pval
+ALCOHOL-1 ALCOHOL          
+0         0        0.390416
+          1        0.034171
+1         0        0.035350
+          1        0.540063
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>           pval
+ALCOHOL-1      
+0          1081
+1          1465
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">/</span> <span class="n">t</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># cond prob!</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                       pval
+ALCOHOL-1 ALCOHOL          
+0         0        0.919519
+          1        0.080481
+1         0        0.061433
+          1        0.938567
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tt</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">tobacco</span><span class="p">]</span>
+<span class="n">tt</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                 pval
+ALCOHOL TOBACCO      
+0       0         240
+        1         903
+1       0         179
+        1        1343
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tt</span> <span class="o">/</span> <span class="n">tt</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                     pval
+ALCOHOL TOBACCO          
+0       0        0.209974
+        1        0.790026
+1       0        0.117608
+        1        0.882392
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tt</span> <span class="o">/</span> <span class="n">tt</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">tobacco</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                     pval
+ALCOHOL TOBACCO          
+0       0        0.572792
+1       0        0.427208
+0       1        0.402048
+1       1        0.597952
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+<section id="scrap-place">
+<h2>Scrap place<a class="headerlink" href="#scrap-place" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">as_prescribed_opioid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">heroin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">heroin</span><span class="p">]</span>
+<span class="n">t</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                                        pval
+AS PRESCRIBED OPIOID-1 HEROIN-1 HEROIN      
+0                      0        0        927
+                                1        172
+                       1        0         99
+                                1        936
+1                      0        0        249
+                                1         33
+                       1        0         15
+                                1        115
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tt</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">t</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">as_prescribed_opioid</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">heroin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># cond prob!</span>
+<span class="n">tt</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                                            pval
+AS PRESCRIBED OPIOID-1 HEROIN-1 HEROIN          
+0                      0        0       0.843494
+                                1       0.156506
+                       1        0       0.095652
+                                1       0.904348
+1                      0        0       0.882979
+                                1       0.117021
+                       1        0       0.115385
+                                1       0.884615
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tt</span><span class="o">.</span><span class="n">tb</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AS PRESCRIBED OPIOID-1</th>
+      <th>HEROIN-1</th>
+      <th>HEROIN</th>
+      <th>pval</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.843494</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.156506</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0.095652</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0.904348</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.882979</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.117021</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0.115385</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0.884615</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AS</span> <span class="n">PRESCRIBED</span> <span class="n">OPIOID</span><span class="o">-</span><span class="mi">1</span>	<span class="n">HEROIN</span><span class="o">-</span><span class="mi">1</span>	<span class="n">HEROIN</span>	
+<span class="mi">0</span>	<span class="mi">0</span>	<span class="mi">0</span>	<span class="mf">0.843494</span>
+<span class="mi">0</span>	<span class="mi">0</span>	<span class="mi">1</span>	<span class="mf">0.156506</span>
+<span class="mi">1</span>	<span class="mi">0</span>	<span class="mi">0</span>	<span class="mf">0.882979</span>
+<span class="mi">1</span>	<span class="mi">0</span>	<span class="mi">1</span>	<span class="mf">0.117021</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mf">0.117021</span> <span class="o">/</span> <span class="mf">0.156506</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0.7477093529960512
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob_of_heroin_given_presc_op</span> <span class="o">=</span> <span class="mf">0.359223</span>
+<span class="n">prob_of_heroin_given_not_presc_op</span> <span class="o">=</span> <span class="mf">0.519213</span>
+
+<span class="n">prob_of_heroin_given_presc_op</span> <span class="o">/</span> <span class="n">prob_of_heroin_given_not_presc_op</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>0.6918605658949217
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob_of_heroin_given_not_presc_op</span> <span class="o">/</span> <span class="n">prob_of_heroin_given_presc_op</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1.4453779407220584
+</pre></div>
+</div>
+</section>
+</section>
+<section id="potential-calculus-experimentations">
+<h1>Potential Calculus Experimentations<a class="headerlink" href="#potential-calculus-experimentations" title="Link to this heading">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'</span>
+<span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>119
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cstore</span> <span class="o">=</span> <span class="n">VarSetCountsStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">mk_pvar_str_struct</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">cstore</span><span class="o">.</span><span class="n">df_store</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>category</th>
+      <th>RURAL</th>
+      <th>SUBURBAN</th>
+      <th>URBAN/CITY</th>
+      <th>HOMELESS</th>
+      <th>INCARCERATION</th>
+      <th>WORK</th>
+      <th>SON/DAUGHTER</th>
+      <th>SIBLING</th>
+      <th>FATHER/MOTHER</th>
+      <th>SPOUSE</th>
+      <th>...</th>
+      <th>HAL/LSD/XTC/CLUBDRUG</th>
+      <th>COCAINE/CRACK</th>
+      <th>METHAMPHETAMINE</th>
+      <th>AS PRESCRIBED OPIOID</th>
+      <th>NOT AS PRESCRIBED OPIOID</th>
+      <th>HEROIN</th>
+      <th>OTHER OPIOID</th>
+      <th>INJECTED</th>
+      <th>IN TREATMENT</th>
+      <th>Massachusetts</th>
+    </tr>
+    <tr>
+      <th>age</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>16</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 29 columns</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cstore</span> <span class="o">=</span> <span class="n">VarSetCountsStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+<span class="n">cstore</span><span class="o">.</span><span class="n">mk_pvar_attrs</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.dacc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DfStore</span><span class="p">,</span>
+    <span class="n">counts_of_kps</span><span class="p">,</span>
+    <span class="n">Dacc</span><span class="p">,</span>
+    <span class="n">plot_life_course</span><span class="p">,</span>
+    <span class="n">VarSetCountsStore</span><span class="p">,</span>
+    <span class="n">mk_pvar_struct</span><span class="p">,</span>
+    <span class="n">PotStore</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">pstore</span> <span class="o">=</span> <span class="n">PotStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
+<span class="n">pstore</span><span class="o">.</span><span class="n">mk_pvar_attrs</span><span class="p">()</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">homeless</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">incarceration</span><span class="p">]</span>
+<span class="n">p</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                          pval
+HOMELESS-1 INCARCERATION      
+0          0              1690
+           1               577
+1          0               192
+           1                87
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                              pval
+HOMELESS-1 INCARCERATION          
+0          0              0.663786
+           1              0.226630
+1          0              0.075412
+           1              0.034171
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">incarceration</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>               pval
+INCARCERATION      
+0              1989
+1               676
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">loss_of_loved_one</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                             pval
+ALCOHOL-1 LOSS OF LOVED ONE      
+0         0                   990
+          1                    91
+1         0                  1321
+          1                   144
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tw</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">tobacco</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">work</span><span class="p">]</span>
+<span class="n">mw</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">marijuana</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">work</span><span class="p">]</span>
+<span class="n">aw</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">alcohol</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">work</span><span class="p">]</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">pstore</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">work</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">evid_t</span> <span class="o">=</span> <span class="n">Pot</span><span class="o">.</span><span class="n">from_hard_evidence</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">tobacco</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">evid_m</span> <span class="o">=</span> <span class="n">Pot</span><span class="o">.</span><span class="n">from_hard_evidence</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">marijuana</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">evid_a</span> <span class="o">=</span> <span class="n">Pot</span><span class="o">.</span><span class="n">from_hard_evidence</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">alcohol</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">evid_a</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>         pval
+ALCOHOL      
+1           1
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aw</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>              pval
+ALCOHOL WORK      
+0       0      431
+        1      712
+1       0      448
+        1     1074
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>          pval
+WORK          
+0     0.329831
+1     0.670169
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">evid_m</span> <span class="o">*</span> <span class="n">mw</span><span class="p">)</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                    pval
+MARIJUANA WORK          
+1         0     0.350603
+          1     0.649397
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">evid_t</span> <span class="o">*</span> <span class="n">tw</span><span class="p">)</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                  pval
+TOBACCO WORK          
+1       0     0.313001
+        1     0.686999
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">evid_a</span> <span class="o">*</span> <span class="n">aw</span><span class="p">)</span> <span class="o">/</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                 pval
+ALCOHOL WORK         
+1       0     0.29435
+        1     0.70565
+</pre></div>
+</div>
+</section>
+<section id="extra-scrap">
+<h1>Extra scrap<a class="headerlink" href="#extra-scrap" title="Link to this heading">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># from graphviz import Digraph</span>
+<span class="c1"># Digraph(body="""</span>
+<span class="c1"># raw -&gt; data -&gt; count -&gt; prob</span>
+<span class="c1"># raw [label="excel files (one per respondent)" shape=folder]</span>
+<span class="c1"># data [label="dataframes" shape=folder]</span>
+<span class="c1"># count [label="counts for any combinations of the variables in the data" shape=box3d]</span>
+<span class="c1"># prob [label="probabilities for any combinations of the variables in the data" shape=box3d]</span>
+<span class="c1"># """.split('\n'))</span>
+</pre></div>
+</div>
+</section>
+<section id="acknowledgements">
+<h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Link to this heading">¶</a></h1>
+<p>This study was supported by the National Institutes of Drug Abuse R15DA041657 and R21DA025298, and .
+The content is solely the responsibility of the authors and does not necessarily represent
+the official views of the National Institute on Drug Abuse or the National Institutes of Health.</p>
+<p>Here are the grant numbers you worked on I think there are only two plus the one you got as PI from NAHDAP</p>
+<section id="national-institutes-of-health-national-institute-on-drug-abuse">
+<h2>National Institutes of Health, National Institute on Drug Abuse<a class="headerlink" href="#national-institutes-of-health-national-institute-on-drug-abuse" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2017-2020        
+    1 R15 DA041657 
+    Miriam Boeri, Aukje Lamonica, MPIs
+    Award: $341,565
+    “Suburban Opioid Study” (SOS) 
+
+</pre></div>
+</div>
+</section>
+<section id="national-institutes-of-health-national-institute-on-drug-abuse-american-recovery-and-reinvestment-act">
+<h2>National Institutes of Health, National Institute on Drug Abuse,     American Recovery and Reinvestment Act<a class="headerlink" href="#national-institutes-of-health-national-institute-on-drug-abuse-american-recovery-and-reinvestment-act" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2009-2011        
+    R21DA025298   
+    Miriam Boeri, PI          
+    Thor Whalen, Co-investigator
+    Award: $367,820
+    “Older Drug Users: A Life Course Study of Turning Points in Drug Use and Injection.”
+</pre></div>
+</div>
+</section>
+<section id="national-addiction-hiv-data-archive-program-nahdap">
+<h2>National Addiction &amp; HIV Data Archive Program (NAHDAP)<a class="headerlink" href="#national-addiction-hiv-data-archive-program-nahdap" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2010-2011        
+    University of Michigan’s Inter-university Consortium for Political and Social                              
+    Research (ICPSR) 
+    Thor Whalen, PI
+    Data archived at http://dx.doi.org/10.3886/ICPSR34296.v1
+</pre></div>
+</div>
+<p class="epythet-aggregates">This documentation as a single file: <a href="odus.md">odus.md</a> (Markdown, for agents).</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 10:59 UTC from <a href="https://github.com/thorwhalen/odus/commit/dcafd52e54cb32709a575d2baebba053c36a88cd">dcafd52</a> (master) · odus 0.0.10 · <a href="about-this-build.html">about this build</a></p>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="api.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">API reference</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=4bb83394"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    </body>
 </html>

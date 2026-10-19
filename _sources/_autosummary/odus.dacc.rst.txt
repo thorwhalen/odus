@@ -1,0 +1,29 @@
+odus.dacc
+=========
+
+.. automodule:: odus.dacc
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      counts_of_kps
+      ensure_slash_suffix
+      mk_pvar_str_struct
+      mk_pvar_struct
+      two_way_map
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Dacc
+      DelegMap
+      DfStore
+      HashableMixin
+      PotStore
+      Struct
+      VarSetCountsStore
+      VarStr
+   

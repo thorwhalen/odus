@@ -1,0 +1,28 @@
+odus.analysis\_utils
+====================
+
+.. automodule:: odus.analysis_utils
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      diagonal_rr
+      format_for_influencer_plot
+      get_cstores_v_and_s
+      get_markov_rel_risk
+      get_markov_remission_rel_risk
+      get_stores_v_and_s
+      get_tick_and_labels
+      plot_diagonal
+      plot_influenced
+      plot_influencers
+      plot_remission_influenced
+      plot_remission_influencers
+      print_counts
+      print_relrisk_and_table
+      print_relrisk_and_table_from_pot
+      print_remission_influence_supporting_info
+      remission_relative_risk
+   

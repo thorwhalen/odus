@@ -1,0 +1,26 @@
+﻿odus
+====
+
+.. automodule:: odus
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      data_path_of
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   analysis_utils
+   dacc
+   nothing
+   plot_utils
+   pobj
+   raw_data_diagnosis
+   sequential_var_sets
+   util

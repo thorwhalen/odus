@@ -1,0 +1,27 @@
+odus.raw\_data\_diagnosis
+=========================
+
+.. automodule:: odus.raw_data_diagnosis
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      coord_val_and_bgcolor_of_cell
+      crop
+      dfof
+      diagnosis_items
+      diagnosis_lidx
+      diagnosis_lidx_of_xls_file
+      last_true_idx
+      lidx_of_empty_non_white_or_non_empty_white
+      matmask
+      mk_dotpath_getter
+      mk_known_exceptions_lidx
+      pra
+      print_diagnosis
+      row_lidx_to_mat_lidx
+      sheet_to_format_prepped_df
+      valid_vals_int_coords
+   

@@ -1,4 +1,0 @@
-odus
-====
-.. automodule:: odus
-   :members:

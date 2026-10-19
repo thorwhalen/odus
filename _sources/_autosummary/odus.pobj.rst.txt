@@ -1,0 +1,13 @@
+odus.pobj
+=========
+
+.. automodule:: odus.pobj
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      add_method
+      inject_method
+   

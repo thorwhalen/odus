@@ -1,0 +1,20 @@
+# odus
+
+> Tools to provide easy access to prepared data to data scientists that cannot be asked.
+
+
+## Pages in this subsection
+
+- [odus](odus.html.md): ODUS (Older Drug User Study): data and tools to study drug-use trajectories.
+- [odus.analysis_utils](odus.analysis_utils.html.md): High-level analyses of drug-use trajectories.
+- [odus.dacc](odus.dacc.html.md): Data access: stores and accessors over the survey data.
+- [odus.nothing](odus.nothing.html.md): Universal neutral (identity) elements for accumulation.
+- [odus.plot_utils](odus.plot_utils.html.md): Plotting helpers for trajectories and matrices.
+- [odus.pobj](odus.pobj.html.md): Dynamic method injection on objects and classes.
+- [odus.raw_data_diagnosis](odus.raw_data_diagnosis.html.md): Diagnosis of the raw survey spreadsheets.
+- [odus.sequential_var_sets](odus.sequential_var_sets.html.md): Variables and variable sets over sequential (time-indexed) data.
+- [odus.util](odus.util.html.md): General utilities: image conversion and multi-image file writing.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

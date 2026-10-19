@@ -1,0 +1,21 @@
+odus.sequential\_var\_sets
+==========================
+
+.. automodule:: odus.sequential_var_sets
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      extract_kps
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DfData
+      PVar
+      VarSet
+      VarSetFactory
+   
