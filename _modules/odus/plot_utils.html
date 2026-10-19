@@ -204,6 +204,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../_autosummary/odus.html">odus</a><input aria-label="Toggle navigation of odus" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.analysis_utils.html">odus.analysis_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.dacc.html">odus.dacc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.interactive.html">odus.interactive</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.nothing.html">odus.nothing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.pobj.html">odus.pobj</a></li>
@@ -524,6 +525,40 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">xs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ticks</span><span class="p">],</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ticks</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="trajectory_colors">
+<a class="viewcode-back" href="../../_autosummary/odus.plot_utils.html#odus.plot_utils.trajectory_colors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">trajectory_colors</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">row_colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_color</span><span class="o">=</span><span class="n">DFLT_FG_COLOR</span><span class="p">,</span>
+    <span class="n">row_backgrounds</span><span class="o">=</span><span class="n">DFLT_ROW_BACKGROUNDS</span><span class="p">,</span>
+    <span class="n">row_groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_tint</span><span class="o">=</span><span class="n">DFLT_GROUP_TINT</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The colors of the cells of a trajectory: the styling every renderer shares.</span>
+
+<span class="sd">    Returns ``(img, group_of_row)``: an ``(n_variables, n_ages, 3)`` RGB array (in</span>
+<span class="sd">    [0, 1]), and the group (or None) of each variable. See ``plot_trajectory``</span>
+<span class="sd">    for the arguments.</span>
+<span class="sd">    """</span>
+    <span class="n">varnames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nothing to plot: the trajectory has shape </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">_normalized_values</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">fg</span> <span class="o">=</span> <span class="n">_row_foregrounds</span><span class="p">(</span><span class="n">varnames</span><span class="p">,</span> <span class="n">row_colors</span><span class="p">,</span> <span class="n">default_color</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">bg</span><span class="p">,</span> <span class="n">group_of_row</span> <span class="o">=</span> <span class="n">_row_backgrounds</span><span class="p">(</span>
+        <span class="n">varnames</span><span class="p">,</span>
+        <span class="n">row_backgrounds</span><span class="o">=</span><span class="n">row_backgrounds</span><span class="p">,</span>
+        <span class="n">row_groups</span><span class="o">=</span><span class="n">row_groups</span><span class="p">,</span>
+        <span class="n">group_colors</span><span class="o">=</span><span class="n">group_colors</span><span class="p">,</span>
+        <span class="n">group_tint</span><span class="o">=</span><span class="n">group_tint</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">bg</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fg</span><span class="p">,</span> <span class="n">group_of_row</span></div>
+
+
+
 <div class="viewcode-block" id="plot_trajectory">
 <a class="viewcode-back" href="../../_autosummary/odus.plot_utils.html#odus.plot_utils.plot_trajectory">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_trajectory</span><span class="p">(</span>
@@ -592,21 +627,17 @@
 <span class="sd">        The matplotlib axes drawn on.</span>
 <span class="sd">    """</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">_select_fields</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
-    <span class="n">varnames</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-    <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">n_rows</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n_cols</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nothing to plot: the trajectory has shape </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-    <span class="n">v</span> <span class="o">=</span> <span class="n">_normalized_values</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-    <span class="n">fg</span> <span class="o">=</span> <span class="n">_row_foregrounds</span><span class="p">(</span><span class="n">varnames</span><span class="p">,</span> <span class="n">row_colors</span><span class="p">,</span> <span class="n">default_color</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">bg</span><span class="p">,</span> <span class="n">group_of_row</span> <span class="o">=</span> <span class="n">_row_backgrounds</span><span class="p">(</span>
-        <span class="n">varnames</span><span class="p">,</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">group_of_row</span> <span class="o">=</span> <span class="n">trajectory_colors</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">row_colors</span><span class="o">=</span><span class="n">row_colors</span><span class="p">,</span>
+        <span class="n">default_color</span><span class="o">=</span><span class="n">default_color</span><span class="p">,</span>
         <span class="n">row_backgrounds</span><span class="o">=</span><span class="n">row_backgrounds</span><span class="p">,</span>
         <span class="n">row_groups</span><span class="o">=</span><span class="n">row_groups</span><span class="p">,</span>
         <span class="n">group_colors</span><span class="o">=</span><span class="n">group_colors</span><span class="p">,</span>
         <span class="n">group_tint</span><span class="o">=</span><span class="n">group_tint</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">bg</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">fg</span>
+    <span class="n">varnames</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">xs</span><span class="p">,</span> <span class="n">tick_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_cols</span><span class="p">),</span> <span class="n">times</span>
@@ -988,7 +1019,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=832ae8cf"></script>
+</div><script src="../../_static/documentation_options.js?v=2a6a9ca9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

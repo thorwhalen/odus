@@ -207,6 +207,7 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="odus.html">odus</a><input aria-label="Toggle navigation of odus" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="odus.analysis_utils.html">odus.analysis_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.dacc.html">odus.dacc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odus.interactive.html">odus.interactive</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.nothing.html">odus.nothing</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.pobj.html">odus.pobj</a></li>
@@ -295,7 +296,10 @@ spreadsheet with <code class="docutils literal notranslate"><span class="pre">ro
 <tr class="row-even"><td><p><a class="reference internal" href="#odus.plot_utils.stacked_trajectories" title="odus.plot_utils.stacked_trajectories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stacked_trajectories</span></code></a>(df_store[, fields, ...])</p></td>
 <td><p>Plot several trajectories one above the other, aligned on a common x axis.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file" title="odus.plot_utils.write_trajectories_to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_trajectories_to_file</span></code></a>(df_store[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#odus.plot_utils.trajectory_colors" title="odus.plot_utils.trajectory_colors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trajectory_colors</span></code></a>(df, *[, row_colors, ...])</p></td>
+<td><p>The colors of the cells of a trajectory: the styling every renderer shares.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file" title="odus.plot_utils.write_trajectories_to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_trajectories_to_file</span></code></a>(df_store[, ...])</p></td>
 <td><p>Write the trajectory plots of (selected) keys of <code class="docutils literal notranslate"><span class="pre">df_store</span></code>, one per page.</p></td>
 </tr>
 </tbody>
@@ -425,6 +429,15 @@ each age to the next), or None to leave the trajectory out.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="odus.plot_utils.trajectory_colors">
+<span class="sig-prename descclassname"><span class="pre">odus.plot_utils.</span></span><span class="sig-name descname"><span class="pre">trajectory_colors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1b2a49'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_backgrounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('#ffffff',</span> <span class="pre">'#ebebeb')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_tint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/plot_utils.html#trajectory_colors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.plot_utils.trajectory_colors" title="Link to this definition">¶</a></dt>
+<dd><p>The colors of the cells of a trajectory: the styling every renderer shares.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(img,</span> <span class="pre">group_of_row)</span></code>: an <code class="docutils literal notranslate"><span class="pre">(n_variables,</span> <span class="pre">n_ages,</span> <span class="pre">3)</span></code> RGB array (in
+[0, 1]), and the group (or None) of each variable. See <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code>
+for the arguments.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="odus.plot_utils.write_trajectories_to_file">
 <span class="sig-prename descclassname"><span class="pre">odus.plot_utils.</span></span><span class="sig-name descname"><span class="pre">write_trajectories_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test.pdf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pil_write_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_pil_image_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_df_to_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_title_of_key&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**pil_save_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/plot_utils.html#write_trajectories_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.plot_utils.write_trajectories_to_file" title="Link to this definition">¶</a></dt>
 <dd><p>Write the trajectory plots of (selected) keys of <code class="docutils literal notranslate"><span class="pre">df_store</span></code>, one per page.</p>
@@ -490,6 +503,7 @@ each age to the next), or None to leave the trajectory out.</p></li>
 <li><a class="reference internal" href="#odus.plot_utils.plot_trajectory"><code class="docutils literal notranslate"><span class="pre">plot_trajectory()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.row_colors_of_xls"><code class="docutils literal notranslate"><span class="pre">row_colors_of_xls()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.stacked_trajectories"><code class="docutils literal notranslate"><span class="pre">stacked_trajectories()</span></code></a></li>
+<li><a class="reference internal" href="#odus.plot_utils.trajectory_colors"><code class="docutils literal notranslate"><span class="pre">trajectory_colors()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file"><code class="docutils literal notranslate"><span class="pre">write_trajectories_to_file()</span></code></a></li>
 </ul>
 </li>
@@ -502,7 +516,7 @@ each age to the next), or None to leave the trajectory out.</p></li>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=832ae8cf"></script>
+</div><script src="../_static/documentation_options.js?v=2a6a9ca9"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

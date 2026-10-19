@@ -8,6 +8,7 @@
 - [odus](odus.html.md): ODUS (Older Drug User Study): data and tools to study drug-use trajectories.
 - [odus.analysis_utils](odus.analysis_utils.html.md): High-level analyses of drug-use trajectories.
 - [odus.dacc](odus.dacc.html.md): Data access: stores and accessors over the survey data.
+- [odus.interactive](odus.interactive.html.md): Interactive trajectory plots: hover a cell to see its variable, age, year and value.
 - [odus.nothing](odus.nothing.html.md): Universal neutral (identity) elements for accumulation.
 - [odus.plot_utils](odus.plot_utils.html.md): Plotting helpers for trajectories and matrices.
 - [odus.pobj](odus.pobj.html.md): Dynamic method injection on objects and classes.

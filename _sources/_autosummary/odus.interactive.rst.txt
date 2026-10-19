@@ -1,0 +1,12 @@
+odus.interactive
+================
+
+.. automodule:: odus.interactive
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      plot_trajectory_interactive
+   

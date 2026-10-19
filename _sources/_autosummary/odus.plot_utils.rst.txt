@@ -16,5 +16,6 @@ odus.plot\_utils
       plot_trajectory
       row_colors_of_xls
       stacked_trajectories
+      trajectory_colors
       write_trajectories_to_file
    

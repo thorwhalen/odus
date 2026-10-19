@@ -18,6 +18,7 @@
 
    analysis_utils
    dacc
+   interactive
    nothing
    plot_utils
    pobj

@@ -2,16 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-10-19 11:54 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85"><code>c72c8a2</code></a> on branch <code>master</code>, for **odus 0.0.14** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:10 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e</code></a> on branch <code>master</code>, for **odus 0.0.15** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.15) is behind the latest release on PyPI (0.0.16): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85"><code>c72c8a21140d35af54ddf72a5277c673f5596c85</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39247785959">39247785959</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39249774653">39249774653</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>c72c8a21140d35af54ddf72a5277c673f5596c85</code> (in the history of the built commit) |
+| Event commit | <code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.14/">0.0.14</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/odus/0.0.16/">0.0.16</a>, newer than the documented version (0.0.15).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout c72c8a21140d35af54ddf72a5277c673f5596c85
+git checkout 70e537e07a4d9e03e83b0f17d9582ff04287d19a
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -25,6 +25,7 @@ spreadsheet with `row_colors_of_xls`).
 | [`plot_trajectory`](#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...]) | Plot one trajectory (index: ages or years, columns: variables) readably.    |
 | [`row_colors_of_xls`](#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])    | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.    |
 | [`stacked_trajectories`](#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...]) | Plot several trajectories one above the other, aligned on a common x axis.  |
+| [`trajectory_colors`](#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])  | The colors of the cells of a trajectory: the styling every renderer shares. |
 | [`write_trajectories_to_file`](#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])   | Write the trajectory plots of (selected) keys of `df_store`, one per page.  |
 
 ### odus.plot_utils.life_plots(df_store, fields=None, keys=None, k_df_to_title=<function \_title_of_key>, \*\*plot_kwargs)
@@ -126,6 +127,14 @@ Plot several trajectories one above the other, aligned on a common x axis.
     `plot_trajectory` (see there).
 * **Returns:**
   The matplotlib figure.
+
+### odus.plot_utils.trajectory_colors(df, , row_colors=None, default_color='#1b2a49', row_backgrounds=('#ffffff', '#ebebeb'), row_groups=None, group_colors=None, group_tint=0.35)
+
+The colors of the cells of a trajectory: the styling every renderer shares.
+
+Returns `(img, group_of_row)`: an `(n_variables, n_ages, 3)` RGB array (in
+[0, 1]), and the group (or None) of each variable. See `plot_trajectory`
+for the arguments.
 
 ### odus.plot_utils.write_trajectories_to_file(df_store, fields=None, keys=None, fp='test.pdf', pil_write_format=None, to_pil_image_kwargs=None, \*, k_df_to_title=<function \_title_of_key>, plot_kwargs=None, \*\*pil_save_kwargs)
 

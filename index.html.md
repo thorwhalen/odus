@@ -533,6 +533,17 @@ stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
 
 Trajectories where the variable is never non-zero are left out (with a warning). `x_align` can also be a function of a trajectory returning the x of each of its ages, for any other alignment.
 
+### Interactive trajectories
+
+With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors.
+
+```python
+from odus.interactive import plot_trajectory_interactive
+
+fig = plot_trajectory_interactive(df_store[k], row_colors={"HEROIN": "#c0392b"})
+fig.show()  # or fig.write_html("trajectory.html")
+```
+
 ## Making a pdf of trajectories
 
 ```python

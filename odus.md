@@ -1,4 +1,4 @@
-> built 2026-10-19 11:54 UTC from c72c8a2 (master) · odus 0.0.14. Details: build_info.json
+> built 2026-10-19 12:10 UTC from 70e537e (master) · odus 0.0.15. Details: build_info.json
 
 # index.html.md
 
@@ -536,6 +536,17 @@ stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
 ![png](../img/stacked_trajectories.png)
 
 Trajectories where the variable is never non-zero are left out (with a warning). `x_align` can also be a function of a trajectory returning the x of each of its ages, for any other alignment.
+
+### Interactive trajectories
+
+With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors.
+
+```python
+from odus.interactive import plot_trajectory_interactive
+
+fig = plot_trajectory_interactive(df_store[k], row_colors={"HEROIN": "#c0392b"})
+fig.show()  # or fig.write_html("trajectory.html")
+```
 
 ## Making a pdf of trajectories
 
@@ -1552,15 +1563,59 @@ used by the rest of the package to reach the bundled survey files.
 
 ### Modules
 
-| [`analysis_utils`](_autosummary/odus.analysis_utils.html.md#module-odus.analysis_utils)           | High-level analyses of drug-use trajectories.                     |
-|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| [`dacc`](_autosummary/odus.dacc.html.md#module-odus.dacc)                               | Data access: stores and accessors over the survey data.           |
-| [`nothing`](_autosummary/odus.nothing.html.md#module-odus.nothing)                         | Universal neutral (identity) elements for accumulation.           |
-| [`plot_utils`](_autosummary/odus.plot_utils.html.md#module-odus.plot_utils)                   | Plotting helpers for trajectories and matrices.                   |
-| [`pobj`](_autosummary/odus.pobj.html.md#module-odus.pobj)                               | Dynamic method injection on objects and classes.                  |
-| [`raw_data_diagnosis`](_autosummary/odus.raw_data_diagnosis.html.md#module-odus.raw_data_diagnosis)   | Diagnosis of the raw survey spreadsheets.                         |
-| [`sequential_var_sets`](_autosummary/odus.sequential_var_sets.html.md#module-odus.sequential_var_sets) | Variables and variable sets over sequential (time-indexed) data.  |
-| [`util`](_autosummary/odus.util.html.md#module-odus.util)                               | General utilities: image conversion and multi-image file writing. |
+| [`analysis_utils`](_autosummary/odus.analysis_utils.html.md#module-odus.analysis_utils)           | High-level analyses of drug-use trajectories.                                        |
+|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| [`dacc`](_autosummary/odus.dacc.html.md#module-odus.dacc)                               | Data access: stores and accessors over the survey data.                              |
+| [`interactive`](_autosummary/odus.interactive.html.md#module-odus.interactive)                 | Interactive trajectory plots: hover a cell to see its variable, age, year and value. |
+| [`nothing`](_autosummary/odus.nothing.html.md#module-odus.nothing)                         | Universal neutral (identity) elements for accumulation.                              |
+| [`plot_utils`](_autosummary/odus.plot_utils.html.md#module-odus.plot_utils)                   | Plotting helpers for trajectories and matrices.                                      |
+| [`pobj`](_autosummary/odus.pobj.html.md#module-odus.pobj)                               | Dynamic method injection on objects and classes.                                     |
+| [`raw_data_diagnosis`](_autosummary/odus.raw_data_diagnosis.html.md#module-odus.raw_data_diagnosis)   | Diagnosis of the raw survey spreadsheets.                                            |
+| [`sequential_var_sets`](_autosummary/odus.sequential_var_sets.html.md#module-odus.sequential_var_sets) | Variables and variable sets over sequential (time-indexed) data.                     |
+| [`util`](_autosummary/odus.util.html.md#module-odus.util)                               | General utilities: image conversion and multi-image file writing.                    |
+
+
+# _autosummary/odus.interactive.html.md
+
+# odus.interactive
+
+Interactive trajectory plots: hover a cell to see its variable, age, year and value.
+
+`plot_trajectory_interactive` draws a trajectory with plotly, styled like
+`odus.plot_utils.plot_trajectory`: the cell colors come from the same
+`trajectory_colors` (row colors, alternating backgrounds, group tints), with
+gaps between cells, wider every `major_every` years and between groups.
+
+plotly is optional: `pip install "odus[interactive]"`. Importing this module
+doesn’t need it; calling the function does.
+
+### Functions
+
+| [`plot_trajectory_interactive`](_autosummary/odus.interactive.html.md#odus.interactive.plot_trajectory_interactive)(df[, fields, ...])   | Plot a trajectory with plotly; hovering a cell shows what it is.   |
+|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+
+### odus.interactive.plot_trajectory_interactive(df, fields=None, , title=None, x=None, gap_color='white', minor_gap=1, major_gap=4, major_every=5, cell_px=18, \*\*style)
+
+Plot a trajectory with plotly; hovering a cell shows what it is.
+
+* **Parameters:**
+  * **df** – A trajectory DataFrame: one row per age, one column per variable.
+  * **fields** – The variables to show, in order (default: all).
+  * **title** – Optional title.
+  * **x** – Where to put the ages on the x axis (one number per age, each one more
+    than the previous), as in `plot_trajectory`. Default: the ages.
+  * **gap_color** – Color of the gaps between cells.
+  * **minor_gap** – Gap between cells, in pixels.
+  * **major_gap** – Wider gap (pixels) before every age multiple of
+    `major_every`, and between row groups.
+  * **major_every** – See `major_gap`.
+  * **cell_px** – Size of a cell, in pixels.
+  * **style** – The cell colors, as in `plot_trajectory` (and only those):
+    `row_colors`, `default_color`, `row_backgrounds`,
+    `row_groups`, `group_colors`, `group_tint`.
+* **Returns:**
+  A `plotly.graph_objects.Figure` (show it with `fig.show()`, or save
+  it with `fig.write_html(path)`).
 
 
 # _autosummary/odus.nothing.html.md
@@ -1769,6 +1824,7 @@ spreadsheet with `row_colors_of_xls`).
 | [`plot_trajectory`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...]) | Plot one trajectory (index: ages or years, columns: variables) readably.    |
 | [`row_colors_of_xls`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])    | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.    |
 | [`stacked_trajectories`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...]) | Plot several trajectories one above the other, aligned on a common x axis.  |
+| [`trajectory_colors`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])  | The colors of the cells of a trajectory: the styling every renderer shares. |
 | [`write_trajectories_to_file`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])   | Write the trajectory plots of (selected) keys of `df_store`, one per page.  |
 
 ### odus.plot_utils.life_plots(df_store, fields=None, keys=None, k_df_to_title=<function \_title_of_key>, \*\*plot_kwargs)
@@ -1870,6 +1926,14 @@ Plot several trajectories one above the other, aligned on a common x axis.
     `plot_trajectory` (see there).
 * **Returns:**
   The matplotlib figure.
+
+### odus.plot_utils.trajectory_colors(df, , row_colors=None, default_color='#1b2a49', row_backgrounds=('#ffffff', '#ebebeb'), row_groups=None, group_colors=None, group_tint=0.35)
+
+The colors of the cells of a trajectory: the styling every renderer shares.
+
+Returns `(img, group_of_row)`: an `(n_variables, n_ages, 3)` RGB array (in
+[0, 1]), and the group (or None) of each variable. See `plot_trajectory`
+for the arguments.
 
 ### odus.plot_utils.write_trajectories_to_file(df_store, fields=None, keys=None, fp='test.pdf', pil_write_format=None, to_pil_image_kwargs=None, \*, k_df_to_title=<function \_title_of_key>, plot_kwargs=None, \*\*pil_save_kwargs)
 
@@ -2200,16 +2264,18 @@ Write images or figs into pdf pages (one image per page)
 
 # About this build
 
-This documentation was built on **2026-10-19 11:54 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85"><code>c72c8a2</code></a> on branch <code>master</code>, for **odus 0.0.14** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:10 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e</code></a> on branch <code>master</code>, for **odus 0.0.15** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.15) is behind the latest release on PyPI (0.0.16): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85"><code>c72c8a21140d35af54ddf72a5277c673f5596c85</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2220,9 +2286,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39247785959">39247785959</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39249774653">39249774653</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>c72c8a21140d35af54ddf72a5277c673f5596c85</code> (in the history of the built commit) |
+| Event commit | <code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2247,13 +2313,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.14/">0.0.14</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/odus/0.0.16/">0.0.16</a>, newer than the documented version (0.0.15).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout c72c8a21140d35af54ddf72a5277c673f5596c85
+git checkout 70e537e07a4d9e03e83b0f17d9582ff04287d19a
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -207,6 +207,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/odus.html">odus</a><input aria-label="Toggle navigation of odus" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.analysis_utils.html">odus.analysis_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.dacc.html">odus.dacc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.interactive.html">odus.interactive</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.nothing.html">odus.nothing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.pobj.html">odus.pobj</a></li>
@@ -744,6 +745,16 @@ dtype: int64
 </div>
 <p><img alt="png" src="_images/stacked_trajectories.png" /></p>
 <p>Trajectories where the variable is never non-zero are left out (with a warning). <code class="docutils literal notranslate"><span class="pre">x_align</span></code> can also be a function of a trajectory returning the x of each of its ages, for any other alignment.</p>
+</section>
+<section id="interactive-trajectories">
+<h3>Interactive trajectories<a class="headerlink" href="#interactive-trajectories" title="Link to this heading">¶</a></h3>
+<p>With plotly installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;odus[interactive]&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">plot_trajectory_interactive</span></code> draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (<code class="docutils literal notranslate"><span class="pre">row_colors</span></code>, <code class="docutils literal notranslate"><span class="pre">row_groups</span></code>, …) and computes the same colors.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.interactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_trajectory_interactive</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_trajectory_interactive</span><span class="p">(</span><span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">row_colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"HEROIN"</span><span class="p">:</span> <span class="s2">"#c0392b"</span><span class="p">})</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># or fig.write_html("trajectory.html")</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="making-a-pdf-of-trajectories">
@@ -1543,7 +1554,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:54 UTC from <a href="https://github.com/thorwhalen/odus/commit/c72c8a21140d35af54ddf72a5277c673f5596c85">c72c8a2</a> (master) · odus 0.0.14 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:10 UTC from <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a">70e537e</a> (master) · odus 0.0.15 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1579,7 +1590,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=832ae8cf"></script>
+</div><script src="_static/documentation_options.js?v=2a6a9ca9"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
