@@ -491,8 +491,21 @@ from odus.plot_utils import plot_trajectory
 plot_trajectory(
     df_store[k],
     row_groups={
-        "social": ["SON/DAUGHTER", "SIBLING", "FATHER/MOTHER", "SPOUSE", "FRIEND USER", "FRIEND NON USER"],
-        "opioids": ["AS PRESCRIBED OPIOID", "NOT AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID", "INJECTED"],
+        "social": [
+            "SON/DAUGHTER",
+            "SIBLING",
+            "FATHER/MOTHER",
+            "SPOUSE",
+            "FRIEND USER",
+            "FRIEND NON USER",
+        ],
+        "opioids": [
+            "AS PRESCRIBED OPIOID",
+            "NOT AS PRESCRIBED OPIOID",
+            "HEROIN",
+            "OTHER OPIOID",
+            "INJECTED",
+        ],
     },
     row_colors={"HEROIN": "#c0392b", "INJECTED": "#8e44ad", "IN TREATMENT": "#27ae60"},
 )
