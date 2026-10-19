@@ -246,7 +246,7 @@ def _consecutive_numbers(x, n):
     if len(xs) != n:
         raise ValueError(f"x has {len(xs)} values, but there are {n} ages")
     if n > 1 and not np.allclose(np.diff(xs), 1):
-        raise ValueError(f"x should go up by 1 from one age to the next: {list(xs)}")
+        raise ValueError(f"x should go up by 1 from one age to the next: {xs.tolist()}")
     if np.allclose(xs, np.round(xs)):
         xs = np.round(xs).astype(int)
     return xs
@@ -266,8 +266,10 @@ def _set_xticks(
         if fits or not major_every or not majors:
             xtick_every = 1 if fits or not major_every else major_every
             ticks = list(range(0, len(xs), xtick_every))
-        else:
-            ticks = [j for j in range(len(xs)) if j == 0 or j in majors]
+        else:  # the majors, and the first column if its label doesn't overlap
+            label_cols = max(map(len, labels)) * fontsize * 0.6 / 72 / cell_size
+            first_fits = min(majors) > label_cols + 0.5
+            ticks = ([0] if first_fits else []) + sorted(majors)
     else:
         ticks = list(range(0, len(xs), xtick_every))
     ax.set_xticks([xs[j] for j in ticks], [labels[j] for j in ticks], fontsize=fontsize)
@@ -503,6 +505,14 @@ def life_plots(
         yield plot_life(df, fields, title=k_df_to_title(k, df), **plot_kwargs)
 
 
+def _name_of(x_align):
+    return (
+        getattr(x_align, "__name__", "a function")
+        if callable(x_align)
+        else repr(x_align)
+    )
+
+
 def _x_of_trajectory(df, x_align):
     """The x positions of the ages of ``df`` aligned by ``x_align``, or None."""
     if callable(x_align):
@@ -519,9 +529,10 @@ def _x_of_trajectory(df, x_align):
                 f"df.attrs[{YEAR_OF_AGE!r}] (an {{age: year}} dict, as DfStore makes)"
             )
         return [year_of_age[age] for age in df.index]
-    if x_align not in df.columns:
+    is_the_variable = (df.columns == x_align).astype(bool)
+    if not is_the_variable.any():
         return None  # this respondent doesn't have that variable
-    is_on = df[x_align].to_numpy() != 0
+    is_on = (df.loc[:, is_the_variable].to_numpy() != 0).any(axis=1)
     if not is_on.any():
         return None  # ... or never had it
     first_age = df.index[is_on.argmax()]
@@ -565,22 +576,37 @@ def stacked_trajectories(
     Returns:
         The matplotlib figure.
     """
-    plotted, left_out = [], []
+    align_name = _name_of(x_align)
+    plotted, not_aligned, missing_fields = [], [], {}
     for k in _get_keys(df_store, keys):
-        df = _select_fields(df_store[k], fields)
-        x = _x_of_trajectory(df, x_align)
+        df = df_store[k]
+        x = _x_of_trajectory(df, x_align)  # on all variables, not only the fields
         if x is None:
-            left_out.append(k)
-        else:
-            plotted.append((k, df, _consecutive_numbers(x, len(df))))
-    if left_out:
+            not_aligned.append(k)
+            continue
+        if fields is not None and not isinstance(fields, slice):
+            wanted = [fields] if isinstance(fields, str) else list(fields)
+            if missing := [f for f in wanted if f not in df.columns]:
+                missing_fields[k] = missing
+                continue
+        df_fields = _select_fields(df, fields)
+        if df_fields.shape[1] == 0:
+            raise ValueError(f"No variables to plot for {k!r} (fields={fields!r})")
+        plotted.append((k, df_fields, _consecutive_numbers(x, len(df))))
+    if not_aligned:
         warnings.warn(
-            f"Left out {len(left_out)} trajectories that can't be aligned on "
-            f"{x_align!r}: {left_out}",
+            f"Left out {len(not_aligned)} trajectories that can't be aligned on "
+            f"{align_name}: {not_aligned}",
+            stacklevel=2,
+        )
+    if missing_fields:
+        warnings.warn(
+            f"Left out {len(missing_fields)} trajectories lacking some of the "
+            f"fields: {missing_fields}",
             stacklevel=2,
         )
     if not plotted:
-        raise ValueError(f"No trajectory to plot (aligned on {x_align!r})")
+        raise ValueError(f"No trajectory to plot (aligned on {align_name})")
 
     lo = min(x[0] for _, _, x in plotted)
     hi = max(x[-1] for _, _, x in plotted)
@@ -630,7 +656,7 @@ def stacked_trajectories(
         )
     if x_label is None:
         if callable(x_align):
-            x_label = getattr(x_align, "__name__", "")
+            x_label = "" if align_name == "<lambda>" else align_name
         elif x_align in ("age", "year"):
             x_label = x_align
         else:

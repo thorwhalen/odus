@@ -289,3 +289,32 @@ def test_df_store_trajectories_stack_by_year():
     a01 = store["A01.xlsx"]
     first_year = a01.attrs["year_of_age"][a01.index[0]]
     assert fig.axes[0].get_images()[0].get_extent()[0] == first_year - 0.5
+
+
+def test_align_on_a_variable_that_is_not_shown(two_trajectories):
+    fig = stacked_trajectories(two_trajectories, ["WORK"], x_align="HEROIN")
+    assert _extents(fig) == [(-6.5, 5.5), (-3.5, 8.5)]
+
+
+def test_align_on_a_duplicated_variable():
+    df = pd.DataFrame(
+        [[0, 0], [1, 0], [0, 1], [0, 1]],
+        columns=["X", "X"],
+        index=pd.Index([20, 21, 22, 23], name="age"),
+    )
+    fig = stacked_trajectories({"k": df}, x_align="X")
+    assert _extents(fig) == [(-1.5, 2.5)]  # first non-zero at 21, in either column
+
+
+def test_trajectories_missing_a_field_are_left_out(two_trajectories):
+    del two_trajectories["s/A.xlsx"]["SPOUSE"]
+    with pytest.warns(UserWarning, match=r"lacking some of the fields.*'SPOUSE'"):
+        fig = stacked_trajectories(two_trajectories, ["SPOUSE", "WORK"])
+    assert [ax.get_title() for ax in fig.axes] == ["B.xlsx"]
+
+
+def test_first_tick_label_dropped_when_it_would_overlap_a_major(traj):
+    traj.index = range(1969, 1981)  # 1970 (a major) is right after 1969
+    ax = plot_trajectory(traj)
+    labels = [t.get_text() for t in ax.get_xticklabels()]
+    assert labels == ["1970", "1975", "1980"]
