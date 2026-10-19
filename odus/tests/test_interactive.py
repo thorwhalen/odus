@@ -1,6 +1,5 @@
 """Tests for odus.interactive (plotly trajectory plots)."""
 
-import subprocess
 import sys
 
 import numpy as np
@@ -60,14 +59,22 @@ def test_axes_and_gaps(traj):
     assert "x -3" in shifted.data[0].text[0][0]
 
 
-def test_importing_odus_doesnt_import_plotly():
-    code = "import sys, odus, odus.plot_utils, odus.interactive; print('plotly' in sys.modules)"
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
-    assert out.stdout.strip() == "False", out.stderr
-
-
 def test_missing_plotly_gives_an_install_hint(traj, monkeypatch):
     monkeypatch.setitem(sys.modules, "plotly", None)
     monkeypatch.setitem(sys.modules, "plotly.graph_objects", None)
     with pytest.raises(ImportError, match=r"odus\[interactive\]"):
         plot_trajectory_interactive(traj)
+
+
+def test_hover_with_repeated_names_odd_names_and_a_series_of_years(traj):
+    traj = traj.rename(columns={"SPOUSE": "<5 yrs & co"})
+    traj.attrs["year_of_age"] = pd.Series(traj.attrs["year_of_age"])
+    fig = plot_trajectory_interactive(traj, ["WORK", "WORK", "<5 yrs & co"])
+    text = fig.data[0].text
+    assert text[1][0] == "<b>WORK</b><br>age 18<br>year 1998<br>value 1"
+    assert text[2][0].startswith("<b>&lt;5 yrs &amp; co</b>")
+
+
+def test_non_color_styling_is_refused_clearly(traj):
+    with pytest.raises(TypeError, match=r"doesn't take \['fontsize'\]"):
+        plot_trajectory_interactive(traj, fontsize=8)

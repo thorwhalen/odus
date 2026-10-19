@@ -9,6 +9,8 @@ plotly is optional: ``pip install "odus[interactive]"``. Importing this module
 doesn't need it; calling the function does.
 """
 
+import html
+
 import numpy as np
 
 from odus.plot_utils import (
@@ -20,8 +22,17 @@ from odus.plot_utils import (
 )
 
 YEAR_OF_AGE = "year_of_age"  # same attrs key as odus.dacc.YEAR_OF_AGE
+_STYLE_ARGS = (  # the keyword arguments of trajectory_colors
+    "row_colors",
+    "default_color",
+    "row_backgrounds",
+    "row_groups",
+    "group_colors",
+    "group_tint",
+)
 DFLT_CELL_PX = 18  # size of a cell, in pixels
-DFLT_LABEL_PX_PER_CHAR = 7  # room for the variable names, per character
+DFLT_LABEL_PX_PER_CHAR = 8  # room for the variable names, per character
+MIN_PLOT_WIDTH_PX = 200  # so that a short trajectory still has room for its title
 
 
 def _graph_objects():
@@ -51,12 +62,14 @@ def _discrete_colorscale(img):
 
 
 def _hover_texts(df, x):
-    year_of_age = df.attrs.get(YEAR_OF_AGE) or {}
+    year_of_age = df.attrs.get(YEAR_OF_AGE)
+    year_of_age = {} if year_of_age is None else dict(year_of_age)
+    values = df.to_numpy()
     texts = []
-    for var in df.columns:
+    for i, var in enumerate(df.columns):  # by position: names may repeat
         row = []
-        for j, (age, value) in enumerate(zip(df.index, df[var].to_numpy())):
-            lines = [f"<b>{var}</b>", f"age {age}"]
+        for j, (age, value) in enumerate(zip(df.index, values[:, i])):
+            lines = [f"<b>{html.escape(str(var))}</b>", f"age {age}"]
             if age in year_of_age:
                 lines.append(f"year {year_of_age[age]}")
             if x is not None:
@@ -94,15 +107,20 @@ def plot_trajectory_interactive(
             ``major_every``, and between row groups.
         major_every: See ``major_gap``.
         cell_px: Size of a cell, in pixels.
-        style: The cell colors, as in ``plot_trajectory``: ``row_colors``,
-            ``default_color``, ``row_backgrounds``, ``row_groups``,
-            ``group_colors``, ``group_tint``.
+        style: The cell colors, as in ``plot_trajectory`` (and only those):
+            ``row_colors``, ``default_color``, ``row_backgrounds``,
+            ``row_groups``, ``group_colors``, ``group_tint``.
 
     Returns:
         A ``plotly.graph_objects.Figure`` (show it with ``fig.show()``, or save
         it with ``fig.write_html(path)``).
     """
     go = _graph_objects()
+    if not_colors := set(style) - set(_STYLE_ARGS):
+        raise TypeError(
+            f"plot_trajectory_interactive doesn't take {sorted(not_colors)}: of "
+            f"plot_trajectory's styling, it takes the colors {list(_STYLE_ARGS)}"
+        )
     df = _select_fields(df, fields)
     img, group_of_row = trajectory_colors(df, **style)
     varnames, ages = list(df.columns), list(df.index)
@@ -151,12 +169,13 @@ def plot_trajectory_interactive(
     ]
 
     label_px = max(len(str(v)) for v in varnames) * DFLT_LABEL_PX_PER_CHAR
+    top, bottom = (60 if title else 30), 50
     fig.update_layout(
         title=title,
         shapes=shapes,
-        width=n_cols * cell_px + label_px + 60,
-        height=n_rows * cell_px + 120,
-        margin=dict(l=label_px + 10, r=20, t=60 if title else 30, b=50),
+        width=max(n_cols * cell_px, MIN_PLOT_WIDTH_PX) + label_px + 40,
+        height=n_rows * cell_px + top + bottom,
+        margin=dict(l=label_px + 20, r=20, t=top, b=bottom),
         plot_bgcolor=gap_color,
         paper_bgcolor="white",
     )

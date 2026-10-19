@@ -615,7 +615,7 @@ Trajectories where the variable is never non-zero are left out (with a warning).
 
 ### Interactive trajectories
 
-With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the same styling arguments as `plot_trajectory` (`row_colors`, `row_groups`, ...) and computes the same colors.
+With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, ...) and computes the same colors.
 
 
 ```python
