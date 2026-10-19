@@ -315,11 +315,13 @@ class Dacc:
         self.counts_of = defaultdict(Counter)
 
     def mk_counts_of_kps(self, kps_list):
-        for f in self.s.keys():
-            df = self.s[f][self.categories]
-            dd = DfData(df)
-            for k, v in dd.extract_with_key_pattern_sets(kps_list):
-                self.counts_of[k].update([v])
+        """Count the key patterns of ``kps_list``, anew.
+
+        ``self.counts_of`` is replaced by these counts (it used to accumulate them,
+        so that calling twice doubled them).
+        """
+        self.counts_of = counts_of_kps(self.s, self.categories, kps_list)
+        return self.counts_of
 
     # def counts_of(self):
 
