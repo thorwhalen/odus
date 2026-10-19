@@ -3,6 +3,9 @@
 Heatmaps, life-course plots, iteration over a store's trajectory plots, and
 writing a selection of trajectories out to a (multi-page) file.
 
+``stacked_trajectories`` puts several of them one above the other, aligned on
+age, year, or the years since some variable was first non-zero.
+
 ``plot_trajectory`` is the readable rendering of a single trajectory: a gap
 between cells (wider every ``major_every`` years), alternating grey rows so the
 eye can follow a row back to its variable, optional light shading of variable
@@ -13,6 +16,7 @@ spreadsheet with ``row_colors_of_xls``).
 import matplotlib.pylab as plt
 from matplotlib.colors import to_rgb, is_color_like
 from itertools import islice, cycle
+import warnings
 from collections.abc import Iterable, Mapping
 import numpy as np
 import pandas as pd
@@ -228,6 +232,49 @@ def _major_boundaries(labels, major_every):
     return [j for j in range(1, len(labels)) if j % major_every == 0]
 
 
+def _select_fields(df, fields):
+    if isinstance(fields, slice):
+        return df.loc[:, fields]
+    if fields is not None:
+        return df[[fields] if isinstance(fields, str) else list(fields)]
+    return df
+
+
+def _consecutive_numbers(x, n):
+    """Check that ``x`` holds ``n`` numbers, each one more than the previous."""
+    xs = np.asarray(list(x), dtype=float)
+    if len(xs) != n:
+        raise ValueError(f"x has {len(xs)} values, but there are {n} ages")
+    if n > 1 and not np.allclose(np.diff(xs), 1):
+        raise ValueError(f"x should go up by 1 from one age to the next: {xs.tolist()}")
+    if np.allclose(xs, np.round(xs)):
+        xs = np.round(xs).astype(int)
+    return xs
+
+
+def _set_xticks(
+    ax, xs, tick_values, majors, *, xtick_every, major_every, cell_size, fontsize
+):
+    """Label every column if labels fit (or every ``xtick_every``-th), else majors."""
+    labels = [str(t) for t in tick_values]
+    if xtick_every is not None and not (
+        isinstance(xtick_every, (int, np.integer)) and xtick_every >= 1
+    ):
+        raise ValueError(f"xtick_every should be a positive int, not {xtick_every!r}")
+    if xtick_every is None:
+        fits = max(map(len, labels)) * fontsize * 0.6 / 72 <= cell_size
+        if fits or not major_every or not majors:
+            xtick_every = 1 if fits or not major_every else major_every
+            ticks = list(range(0, len(xs), xtick_every))
+        else:  # the majors, and the first column if its label doesn't overlap
+            label_cols = max(map(len, labels)) * fontsize * 0.6 / 72 / cell_size
+            first_fits = min(majors) > label_cols + 0.5
+            ticks = ([0] if first_fits else []) + sorted(majors)
+    else:
+        ticks = list(range(0, len(xs), xtick_every))
+    ax.set_xticks([xs[j] for j in ticks], [labels[j] for j in ticks], fontsize=fontsize)
+
+
 def plot_trajectory(
     df,
     fields=None,
@@ -248,6 +295,7 @@ def plot_trajectory(
     cell_size=DFLT_CELL_SIZE,
     fontsize=8,
     ylabel_right=False,
+    x=None,
 ):
     """Plot one trajectory (index: ages or years, columns: variables) readably.
 
@@ -284,14 +332,15 @@ def plot_trajectory(
         cell_size: Size (inches) of a cell, used when ``ax`` is None.
         fontsize: Font size of the tick labels.
         ylabel_right: Whether to also label the variables on the right.
+        x: Where to draw the columns on the x axis: one number per age, each one
+            more than the previous (e.g. the years, or the years since some event).
+            Default: column positions, labeled with the index (the ages). Plots
+            drawn with comparable ``x`` line up (see ``stacked_trajectories``).
 
     Returns:
         The matplotlib axes drawn on.
     """
-    if isinstance(fields, slice):
-        df = df.loc[:, fields]
-    elif fields is not None:
-        df = df[[fields] if isinstance(fields, str) else list(fields)]
+    df = _select_fields(df, fields)
     varnames, times = list(df.columns), list(df.index)
     n_rows, n_cols = len(varnames), len(times)
     if n_rows == 0 or n_cols == 0:
@@ -308,16 +357,11 @@ def plot_trajectory(
     )
     img = (1 - v) * bg[:, None, :] + v * fg
 
-    time_labels = [str(t) for t in times]
-    if xtick_every is not None and not (
-        isinstance(xtick_every, (int, np.integer)) and xtick_every >= 1
-    ):
-        raise ValueError(f"xtick_every should be a positive int, not {xtick_every!r}")
-    auto_xticks = xtick_every is None
-    if auto_xticks:
-        longest = max(map(len, time_labels))
-        fits = longest * fontsize * 0.6 / 72 <= cell_size
-        xtick_every = 1 if fits or not major_every else major_every
+    if x is None:
+        xs, tick_values = np.arange(n_cols), times
+    else:
+        xs = _consecutive_numbers(x, n_cols)
+        tick_values = list(xs)
 
     if ax is None:
         label_inches = max(map(len, map(str, varnames))) * fontsize * 0.6 / 72
@@ -325,13 +369,19 @@ def plot_trajectory(
         height = n_rows * cell_size + 1.0
         _, ax = plt.subplots(figsize=(width, height), layout="constrained")
 
-    ax.imshow(img, interpolation="nearest", aspect="auto")
+    x_lo, x_hi = xs[0] - 0.5, xs[-1] + 0.5
+    ax.imshow(
+        img,
+        interpolation="nearest",
+        aspect="auto",
+        extent=(x_lo, x_hi, n_rows - 0.5, -0.5),
+    )
 
-    majors = set(_major_boundaries(times, major_every))
-    xs = [j - 0.5 for j in range(1, n_cols) if j not in majors]
-    ax.vlines(xs, -0.5, n_rows - 0.5, colors=gap_color, linewidth=minor_gap)
+    majors = set(_major_boundaries(tick_values, major_every))
+    minors = [xs[j] - 0.5 for j in range(1, n_cols) if j not in majors]
+    ax.vlines(minors, -0.5, n_rows - 0.5, colors=gap_color, linewidth=minor_gap)
     ax.vlines(
-        [j - 0.5 for j in sorted(majors)],
+        [xs[j] - 0.5 for j in sorted(majors)],
         -0.5,
         n_rows - 0.5,
         colors=gap_color,
@@ -341,23 +391,28 @@ def plot_trajectory(
         i for i in range(1, n_rows) if group_of_row[i] != group_of_row[i - 1]
     }
     ys = [i - 0.5 for i in range(1, n_rows) if i not in group_breaks]
-    ax.hlines(ys, -0.5, n_cols - 0.5, colors=gap_color, linewidth=minor_gap)
+    ax.hlines(ys, x_lo, x_hi, colors=gap_color, linewidth=minor_gap)
     ax.hlines(
         [i - 0.5 for i in sorted(group_breaks)],
-        -0.5,
-        n_cols - 0.5,
+        x_lo,
+        x_hi,
         colors=gap_color,
         linewidth=major_gap,
     )
 
-    if auto_xticks and xtick_every > 1 and majors:
-        xticks = [j for j in range(n_cols) if j == 0 or j in majors]
-    else:
-        xticks = list(range(0, n_cols, xtick_every))
-    ax.set_xticks(xticks, [time_labels[j] for j in xticks], fontsize=fontsize)
+    _set_xticks(
+        ax,
+        xs,
+        tick_values,
+        majors,
+        xtick_every=xtick_every,
+        major_every=major_every,
+        cell_size=cell_size,
+        fontsize=fontsize,
+    )
     ax.set_yticks(range(n_rows), [str(v) for v in varnames], fontsize=fontsize)
     ax.tick_params(length=0, labelright=ylabel_right)
-    ax.set_xlim(-0.5, n_cols - 0.5)
+    ax.set_xlim(x_lo, x_hi)
     ax.set_ylim(n_rows - 0.5, -0.5)
     for spine in ax.spines.values():
         spine.set_visible(False)
@@ -448,6 +503,166 @@ def life_plots(
     for k in keys:
         df = df_store[k]
         yield plot_life(df, fields, title=k_df_to_title(k, df), **plot_kwargs)
+
+
+def _name_of(x_align):
+    return (
+        getattr(x_align, "__name__", "a function")
+        if callable(x_align)
+        else repr(x_align)
+    )
+
+
+def _x_of_trajectory(df, x_align):
+    """The x positions of the ages of ``df`` aligned by ``x_align``, or None."""
+    if callable(x_align):
+        return x_align(df)
+    if x_align == "age":
+        return list(df.index)
+    if x_align == "year":
+        from odus.dacc import YEAR_OF_AGE
+
+        year_of_age = df.attrs.get(YEAR_OF_AGE)
+        if year_of_age is None:
+            raise ValueError(
+                f"x_align='year' needs the years of the trajectory, in "
+                f"df.attrs[{YEAR_OF_AGE!r}] (an {{age: year}} dict, as DfStore makes)"
+            )
+        return [year_of_age[age] for age in df.index]
+    is_the_variable = (df.columns == x_align).astype(bool)
+    if not is_the_variable.any():
+        return None  # this respondent doesn't have that variable
+    is_on = (df.loc[:, is_the_variable].to_numpy() != 0).any(axis=1)
+    if not is_on.any():
+        return None  # ... or never had it
+    first_age = df.index[is_on.argmax()]
+    return [age - first_age for age in df.index]
+
+
+def stacked_trajectories(
+    df_store,
+    fields=None,
+    keys=None,
+    *,
+    x_align="age",
+    x_label=None,
+    k_df_to_title=_title_of_key,
+    cell_size=DFLT_CELL_SIZE,
+    fontsize=8,
+    major_every=DFLT_MAJOR_EVERY,
+    xtick_every=None,
+    **plot_kwargs,
+):
+    """Plot several trajectories one above the other, aligned on a common x axis.
+
+    Args:
+        df_store: A mapping of trajectories (like a ``DfStore``).
+        fields: The variables to show (default: all, per trajectory).
+        keys: The keys of ``df_store`` to plot, or a filter function of the keys.
+        x_align: What to align the trajectories on:
+
+            - ``"age"`` (default) or ``"year"`` (needs ``df.attrs["year_of_age"]``,
+              which ``DfStore`` provides);
+            - a variable name: the years since that variable was first non-zero
+              (e.g. ``"HEROIN"``: years since first heroin use). Trajectories
+              where it never is are left out, with a warning;
+            - a function ``x_align(df)`` returning the x of each age (one more from
+              each age to the next), or None to leave the trajectory out.
+        x_label: Label of the x axis (default: from ``x_align``).
+        k_df_to_title: ``k_df_to_title(key, df)`` gives the title of each plot.
+        cell_size, fontsize, major_every, xtick_every, plot_kwargs: Passed on to
+            ``plot_trajectory`` (see there).
+
+    Returns:
+        The matplotlib figure.
+    """
+    align_name = _name_of(x_align)
+    plotted, not_aligned, missing_fields = [], [], {}
+    for k in _get_keys(df_store, keys):
+        df = df_store[k]
+        x = _x_of_trajectory(df, x_align)  # on all variables, not only the fields
+        if x is None:
+            not_aligned.append(k)
+            continue
+        if fields is not None and not isinstance(fields, slice):
+            wanted = [fields] if isinstance(fields, str) else list(fields)
+            if missing := [f for f in wanted if f not in df.columns]:
+                missing_fields[k] = missing
+                continue
+        df_fields = _select_fields(df, fields)
+        if df_fields.shape[1] == 0:
+            raise ValueError(f"No variables to plot for {k!r} (fields={fields!r})")
+        plotted.append((k, df_fields, _consecutive_numbers(x, len(df))))
+    if not_aligned:
+        warnings.warn(
+            f"Left out {len(not_aligned)} trajectories that can't be aligned on "
+            f"{align_name}: {not_aligned}",
+            stacklevel=2,
+        )
+    if missing_fields:
+        warnings.warn(
+            f"Left out {len(missing_fields)} trajectories lacking some of the "
+            f"fields: {missing_fields}",
+            stacklevel=2,
+        )
+    if not plotted:
+        raise ValueError(f"No trajectory to plot (aligned on {align_name})")
+
+    lo = min(x[0] for _, _, x in plotted)
+    hi = max(x[-1] for _, _, x in plotted)
+    n_rows = [df.shape[1] for _, df, _ in plotted]
+    label_inches = (
+        max(len(str(c)) for _, df, _ in plotted for c in df.columns)
+        * fontsize
+        * 0.6
+        / 72
+    )
+    plot_heights = [n * cell_size + 0.6 for n in n_rows]  # 0.6: title and ticks
+    fig, axes = plt.subplots(
+        len(plotted),
+        1,
+        figsize=(
+            (hi - lo + 1) * cell_size + label_inches + 0.5,
+            sum(plot_heights) + 0.4,
+        ),
+        layout="constrained",
+        gridspec_kw={"height_ratios": plot_heights},
+        squeeze=False,
+    )
+    full_x = np.arange(lo, hi + 1)
+    majors = set(_major_boundaries(list(full_x), major_every))
+    for ax, (k, df, x) in zip(axes[:, 0], plotted):
+        plot_trajectory(
+            df,
+            ax=ax,
+            x=x,
+            title=k_df_to_title(k, df),
+            cell_size=cell_size,
+            fontsize=fontsize,
+            major_every=major_every,
+            xtick_every=xtick_every,
+            **plot_kwargs,
+        )
+        ax.set_xlim(lo - 0.5, hi + 0.5)
+        _set_xticks(
+            ax,
+            full_x,
+            full_x,
+            majors,
+            xtick_every=xtick_every,
+            major_every=major_every,
+            cell_size=cell_size,
+            fontsize=fontsize,
+        )
+    if x_label is None:
+        if callable(x_align):
+            x_label = "" if align_name == "<lambda>" else align_name
+        elif x_align in ("age", "year"):
+            x_label = x_align
+        else:
+            x_label = f"years since first {x_align}"
+    axes[-1, 0].set_xlabel(x_label, fontsize=fontsize)
+    return fig
 
 
 def write_trajectories_to_file(

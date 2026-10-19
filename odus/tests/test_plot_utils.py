@@ -14,6 +14,7 @@ from odus.plot_utils import (
     plot_life,
     plot_trajectory,
     row_colors_of_xls,
+    stacked_trajectories,
     write_trajectories_to_file,
 )
 
@@ -211,3 +212,109 @@ def test_store_keys_without_a_folder_make_titles(traj):
 
     (ax,) = life_plots({"B24.xlsx": traj})
     assert ax.get_title() == "B24.xlsx"
+
+
+@pytest.fixture
+def two_trajectories(traj):
+    late = traj.copy()
+    late.index = late.index + 10  # ages 28..39
+    late["HEROIN"] = [0] * 3 + [1] * 9  # first use at 31 (first use at 24 in traj)
+    traj = traj.copy()
+    traj.attrs["year_of_age"] = {a: a + 1980 for a in traj.index}
+    late.attrs["year_of_age"] = {a: a + 1960 for a in late.index}
+    return {"s/A.xlsx": traj, "s/B.xlsx": late}
+
+
+def _extents(fig):
+    return [tuple(map(float, ax.get_images()[0].get_extent()[:2])) for ax in fig.axes]
+
+
+@pytest.mark.parametrize(
+    "x_align, expected_extents, xlim",
+    [
+        ("age", [(17.5, 29.5), (27.5, 39.5)], (17.5, 39.5)),
+        ("year", [(1997.5, 2009.5), (1987.5, 1999.5)], (1987.5, 2009.5)),
+        ("HEROIN", [(-6.5, 5.5), (-3.5, 8.5)], (-6.5, 8.5)),
+    ],
+)
+def test_stacked_trajectories_align(two_trajectories, x_align, expected_extents, xlim):
+    fig = stacked_trajectories(two_trajectories, x_align=x_align)
+    assert [ax.get_title() for ax in fig.axes] == ["A.xlsx", "B.xlsx"]
+    assert _extents(fig) == expected_extents
+    assert all(ax.get_xlim() == xlim for ax in fig.axes)  # one common x axis
+    assert fig.axes[-1].get_xlabel() == (
+        x_align if x_align in ("age", "year") else "years since first HEROIN"
+    )
+
+
+def test_stacked_trajectories_leave_out_what_cant_be_aligned(two_trajectories):
+    with pytest.warns(UserWarning, match=r"Left out 1 .*'SPOUSE'.*\['s/A.xlsx'\]"):
+        two_trajectories["s/B.xlsx"]["SPOUSE"] = 1
+        fig = stacked_trajectories(
+            two_trajectories, ["SPOUSE", "WORK"], x_align="SPOUSE"
+        )
+    assert [ax.get_title() for ax in fig.axes] == ["B.xlsx"]
+    with (
+        pytest.raises(ValueError, match="No trajectory to plot"),
+        pytest.warns(UserWarning),
+    ):
+        stacked_trajectories(two_trajectories, x_align="NOT A VARIABLE")
+
+
+def test_stacked_trajectories_with_a_function_and_bad_alignments(two_trajectories):
+    fig = stacked_trajectories(
+        two_trajectories, keys=["s/A.xlsx"], x_align=lambda df: df.index - 18
+    )
+    assert _extents(fig) == [(-0.5, 11.5)]
+    with pytest.raises(ValueError, match="go up by 1"):
+        stacked_trajectories(two_trajectories, x_align=lambda df: df.index * 2)
+    del two_trajectories["s/A.xlsx"].attrs["year_of_age"]
+    with pytest.raises(ValueError, match="needs the years"):
+        stacked_trajectories(two_trajectories, x_align="year")
+
+
+def test_df_store_trajectories_stack_by_year():
+    import os
+    import warnings
+
+    from odus import data_dir
+    from odus.dacc import DfStore
+
+    store = DfStore(os.path.join(data_dir, "surveys") + os.sep)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        fig = stacked_trajectories(
+            store, ["HEROIN"], keys=["A01.xlsx", "A60.xlsx"], x_align="year"
+        )
+    a01 = store["A01.xlsx"]
+    first_year = a01.attrs["year_of_age"][a01.index[0]]
+    assert fig.axes[0].get_images()[0].get_extent()[0] == first_year - 0.5
+
+
+def test_align_on_a_variable_that_is_not_shown(two_trajectories):
+    fig = stacked_trajectories(two_trajectories, ["WORK"], x_align="HEROIN")
+    assert _extents(fig) == [(-6.5, 5.5), (-3.5, 8.5)]
+
+
+def test_align_on_a_duplicated_variable():
+    df = pd.DataFrame(
+        [[0, 0], [1, 0], [0, 1], [0, 1]],
+        columns=["X", "X"],
+        index=pd.Index([20, 21, 22, 23], name="age"),
+    )
+    fig = stacked_trajectories({"k": df}, x_align="X")
+    assert _extents(fig) == [(-1.5, 2.5)]  # first non-zero at 21, in either column
+
+
+def test_trajectories_missing_a_field_are_left_out(two_trajectories):
+    del two_trajectories["s/A.xlsx"]["SPOUSE"]
+    with pytest.warns(UserWarning, match=r"lacking some of the fields.*'SPOUSE'"):
+        fig = stacked_trajectories(two_trajectories, ["SPOUSE", "WORK"])
+    assert [ax.get_title() for ax in fig.axes] == ["B.xlsx"]
+
+
+def test_first_tick_label_dropped_when_it_would_overlap_a_major(traj):
+    traj.index = range(1969, 1981)  # 1970 (a major) is right after 1969
+    ax = plot_trajectory(traj)
+    labels = [t.get_text() for t in ax.get_xticklabels()]
+    assert labels == ["1970", "1975", "1980"]
