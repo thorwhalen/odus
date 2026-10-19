@@ -1,0 +1,21 @@
+odus.explore
+============
+
+.. automodule:: odus.explore
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      bundled_store
+      respondents
+      trajectory
+      variables
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NotFound
+   

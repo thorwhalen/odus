@@ -207,6 +207,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/odus.html">odus</a><input aria-label="Toggle navigation of odus" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.analysis_utils.html">odus.analysis_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.dacc.html">odus.dacc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.explore.html">odus.explore</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.interactive.html">odus.interactive</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.nothing.html">odus.nothing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
@@ -215,6 +216,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.util.html">odus.util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.webui.html">odus.webui</a></li>
 </ul>
 </li>
 </ul>
@@ -772,6 +774,15 @@ dtype: int64
 <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># or fig.write_html("trajectory.html")</span>
 </pre></div>
 </div>
+</section>
+<section id="a-web-ui-to-explore-the-trajectories">
+<h3>A web UI to explore the trajectories<a class="headerlink" href="#a-web-ui-to-explore-the-trajectories" title="Link to this heading">¶</a></h3>
+<p>With plotly installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;odus[interactive]&quot;</span></code>), run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">odus</span><span class="o">.</span><span class="n">webui</span> <span class="o">--</span><span class="nb">open</span>
+</pre></div>
+</div>
+<p>and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. The URL keeps the view, so the Back button and links work. <code class="docutils literal notranslate"><span class="pre">--data</span> <span class="pre">FOLDER</span> <span class="pre">--ext</span> <span class="pre">.csv</span></code> explores your own files instead.</p>
+<p>The page is served by a small WSGI app (<code class="docutils literal notranslate"><span class="pre">odus.webui.make_app(store=...)</span></code>, which any WSGI server can run) over a JSON API made of the functions in <code class="docutils literal notranslate"><span class="pre">odus.explore</span></code> (<code class="docutils literal notranslate"><span class="pre">respondents</span></code>, <code class="docutils literal notranslate"><span class="pre">variables</span></code>, <code class="docutils literal notranslate"><span class="pre">trajectory</span></code>). Those are plain Python functions too.</p>
 </section>
 </section>
 <section id="making-a-pdf-of-trajectories">
@@ -1570,7 +1581,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:55 UTC from <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2">36216d1</a> (master) · odus 0.0.17 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 13:13 UTC from <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2">37d92b7</a> (master) · odus 0.0.18 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1606,7 +1617,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=a39b7224"></script>
+</div><script src="_static/documentation_options.js?v=01ec8363"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

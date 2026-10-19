@@ -1,0 +1,14 @@
+odus.webui
+==========
+
+.. automodule:: odus.webui
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      main
+      make_app
+      serve
+   

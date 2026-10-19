@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-19T12:55:46Z",
+  "built_at": "2026-10-19T13:13:45Z",
   "package": {
     "name": "odus",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "display_name": "odus",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "36216d1289dec6dd47b9fcb7cb8282da4ca44ed2",
-    "short_commit": "36216d1",
+    "commit": "37d92b74d2c1d796b767e10d99b2fa29d348bbf2",
+    "short_commit": "37d92b7",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/odus",
-    "commit_url": "https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2",
+    "commit_url": "https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/odus",
-    "sha": "36216d1289dec6dd47b9fcb7cb8282da4ca44ed2",
+    "sha": "37d92b74d2c1d796b767e10d99b2fa29d348bbf2",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "39255588059",
-    "run_url": "https://github.com/thorwhalen/odus/actions/runs/39255588059",
+    "run_id": "39258015571",
+    "run_url": "https://github.com/thorwhalen/odus/actions/runs/39258015571",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,21 +55,19 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 11,
-    "objects_documented": 42
+    "modules_documented": 13,
+    "objects_documented": 49
   },
   "pypi": {
     "checked": true,
     "latest": "0.0.18",
-    "relation": "behind",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/odus && cd odus\ngit checkout 36216d1289dec6dd47b9fcb7cb8282da4ca44ed2\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/odus && cd odus\ngit checkout 37d92b74d2c1d796b767e10d99b2fa29d348bbf2\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.17) is behind the latest release on PyPI (0.0.18): `pip install odus` gives newer code than these docs describe."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

@@ -18,6 +18,7 @@
 
    analysis_utils
    dacc
+   explore
    interactive
    nothing
    plot_utils
@@ -26,3 +27,4 @@
    raw_formats
    sequential_var_sets
    util
+   webui

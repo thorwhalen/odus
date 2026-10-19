@@ -1,4 +1,4 @@
-> built 2026-10-19 12:55 UTC from 36216d1 (master) · odus 0.0.17. Details: build_info.json
+> built 2026-10-19 13:13 UTC from 37d92b7 (master) · odus 0.0.18. Details: build_info.json
 
 # index.html.md
 
@@ -562,6 +562,18 @@ from odus.interactive import plot_trajectory_interactive
 fig = plot_trajectory_interactive(df_store[k], row_colors={"HEROIN": "#c0392b"})
 fig.show()  # or fig.write_html("trajectory.html")
 ```
+
+### A web UI to explore the trajectories
+
+With plotly installed (`pip install "odus[interactive]"`), run
+
+```default
+python -m odus.webui --open
+```
+
+and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. The URL keeps the view, so the Back button and links work. `--data FOLDER --ext .csv` explores your own files instead.
+
+The page is served by a small WSGI app (`odus.webui.make_app(store=...)`, which any WSGI server can run) over a JSON API made of the functions in `odus.explore` (`respondents`, `variables`, `trajectory`). Those are plain Python functions too.
 
 ## Making a pdf of trajectories
 
@@ -1563,6 +1575,73 @@ Clean a trajectory DataFrame (index: ages, columns: variables).
 ```
 
 
+# _autosummary/odus.explore.html.md
+
+# odus.explore
+
+Explore the survey trajectories: plain functions returning JSON-ready dicts.
+
+This is the single source of truth of the web explorer (`odus.webui`), and
+knows nothing about HTTP: `odus.webui` exposes exactly the functions of
+`EXPLORE_FUNCS`, so any other surface (a CLI, an MCP server…) can reuse them.
+
+Every function takes a `store` (a mapping of respondent keys to trajectories,
+like a `DfStore`), defaulting to the surveys bundled with odus.
+
+```pycon
+>>> 'A01.xlsx' in respondents()['respondents']
+True
+```
+
+### Functions
+
+| [`bundled_store`](_autosummary/odus.explore.html.md#odus.explore.bundled_store)()                         | A `DfStore` of the surveys bundled with odus.                                  |
+|------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [`respondents`](_autosummary/odus.explore.html.md#odus.explore.respondents)(\*[, store])                | The keys of the respondents, sorted.                                           |
+| [`trajectory`](_autosummary/odus.explore.html.md#odus.explore.trajectory)(respondent[, fields, store]) | The interactive (plotly) figure of a respondent's trajectory, as JSON data.    |
+| [`variables`](_autosummary/odus.explore.html.md#odus.explore.variables)(\*[, store])                  | The variables, with the number of respondents having each (most common first). |
+
+### Exceptions
+
+| [`NotFound`](_autosummary/odus.explore.html.md#odus.explore.NotFound)   | What was asked for doesn't exist (a surface may map it to "404").   |
+|-------------------------------------------------------------|---------------------------------------------------------------------|
+
+### *exception* odus.explore.NotFound
+
+Bases: [`KeyError`](https://docs.python.org/3/builtins/exceptions.html#KeyError)
+
+What was asked for doesn’t exist (a surface may map it to “404”).
+
+### odus.explore.bundled_store()
+
+A `DfStore` of the surveys bundled with odus.
+
+### odus.explore.respondents(, store=None)
+
+The keys of the respondents, sorted.
+
+### odus.explore.trajectory(respondent, fields=None, , store=None)
+
+The interactive (plotly) figure of a respondent’s trajectory, as JSON data.
+
+* **Parameters:**
+  * **respondent** – The key of the respondent.
+  * **fields** – The variables to show: a list of names, or one name. Default:
+    all. Those the respondent doesn’t have are listed in
+    `missing_fields` rather than plotted.
+  * **store** – The trajectories (default: the bundled surveys).
+* **Returns:**
+  `{"respondent", "fields", "missing_fields", "figure"}`, where `figure`
+  is a plotly figure as a dict (`Plotly.react(div, figure.data,
+  figure.layout)` draws it).
+
+### odus.explore.variables(, store=None)
+
+The variables, with the number of respondents having each (most common first).
+
+Respondents whose data can’t be read are listed in `unreadable`, with why.
+
+
 # _autosummary/odus.html.md
 
 # odus
@@ -1582,6 +1661,7 @@ used by the rest of the package to reach the bundled survey files.
 | [`analysis_utils`](_autosummary/odus.analysis_utils.html.md#module-odus.analysis_utils)           | High-level analyses of drug-use trajectories.                                        |
 |------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 | [`dacc`](_autosummary/odus.dacc.html.md#module-odus.dacc)                               | Data access: stores and accessors over the survey data.                              |
+| [`explore`](_autosummary/odus.explore.html.md#module-odus.explore)                         | Explore the survey trajectories: plain functions returning JSON-ready dicts.         |
 | [`interactive`](_autosummary/odus.interactive.html.md#module-odus.interactive)                 | Interactive trajectory plots: hover a cell to see its variable, age, year and value. |
 | [`nothing`](_autosummary/odus.nothing.html.md#module-odus.nothing)                         | Universal neutral (identity) elements for accumulation.                              |
 | [`plot_utils`](_autosummary/odus.plot_utils.html.md#module-odus.plot_utils)                   | Plotting helpers for trajectories and matrices.                                      |
@@ -1590,6 +1670,7 @@ used by the rest of the package to reach the bundled survey files.
 | [`raw_formats`](_autosummary/odus.raw_formats.html.md#module-odus.raw_formats)                 | Reading raw survey data, of several formats, into trajectories.                      |
 | [`sequential_var_sets`](_autosummary/odus.sequential_var_sets.html.md#module-odus.sequential_var_sets) | Variables and variable sets over sequential (time-indexed) data.                     |
 | [`util`](_autosummary/odus.util.html.md#module-odus.util)                               | General utilities: image conversion and multi-image file writing.                    |
+| [`webui`](_autosummary/odus.webui.html.md#module-odus.webui)                             | A web UI to explore the survey trajectories: pick a respondent, and some variables.  |
 
 
 # _autosummary/odus.interactive.html.md
@@ -2395,24 +2476,61 @@ Write images or figs into pdf pages (one image per page)
 ### Returns
 
 
+# _autosummary/odus.webui.html.md
+
+# odus.webui
+
+A web UI to explore the survey trajectories: pick a respondent, and some variables.
+
+`make_app()` is a WSGI application serving a page (`odus/webui_static`) and a
+JSON API that is exactly `odus.explore.EXPLORE_FUNCS`: `/api/<function name>`
+with the function’s arguments as query parameters. `serve()` runs it with the
+standard library’s server; any WSGI server can run `make_app()` too.
+
+From a shell (needs plotly: `pip install "odus[interactive]"`):
+
+```default
+python -m odus.webui                      # the surveys bundled with odus
+python -m odus.webui --data FOLDER --ext .csv --port 8050 --open
+```
+
+### Functions
+
+| `main`([argv])                                                                                |                                                             |
+|-----------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| [`make_app`](_autosummary/odus.webui.html.md#odus.webui.make_app)(\*[, store, funcs])                 | Make the WSGI app of the explorer.                          |
+| [`serve`](_autosummary/odus.webui.html.md#odus.webui.serve)(\*[, store, host, port, open_browser]) | Serve the explorer at `http://host:port` until interrupted. |
+
+### odus.webui.make_app(\*, store=None, funcs=(<function respondents>, <function variables>, <function trajectory>))
+
+Make the WSGI app of the explorer.
+
+* **Parameters:**
+  * **store** – The trajectories to explore (a mapping of respondent keys to
+    trajectories, like a `DfStore`). Default: the bundled surveys.
+  * **funcs** – The functions of the JSON API, served at `/api/<name>`.
+
+### odus.webui.serve(, store=None, host='127.0.0.1', port=8050, open_browser=False)
+
+Serve the explorer at `http://host:port` until interrupted.
+
+
 # about-this-build.html.md
 
 <!-- generated by epythet -->
 
 # About this build
 
-This documentation was built on **2026-10-19 12:55 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1</code></a> on branch <code>master</code>, for **odus 0.0.17** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 13:13 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2"><code>37d92b7</code></a> on branch <code>master</code>, for **odus 0.0.18** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.17) is behind the latest release on PyPI (0.0.18): `pip install odus` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2"><code>37d92b74d2c1d796b767e10d99b2fa29d348bbf2</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2423,9 +2541,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39255588059">39255588059</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39258015571">39258015571</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code> (in the history of the built commit) |
+| Event commit | <code>37d92b74d2c1d796b767e10d99b2fa29d348bbf2</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2450,13 +2568,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.18/">0.0.18</a>, newer than the documented version (0.0.17).
+Latest release: <a href="https://pypi.org/project/odus/0.0.18/">0.0.18</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 36216d1289dec6dd47b9fcb7cb8282da4ca44ed2
+git checkout 37d92b74d2c1d796b767e10d99b2fa29d348bbf2
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
