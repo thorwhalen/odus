@@ -89,7 +89,8 @@ def test_merge_keeps_odd_values_and_names_visible():
         index=[20, 21],
     )
     merged = prep_trajectory_df(df, non_binary="keep")
-    assert list(merged.columns) == ["NJ", None, "GA"]  # merged ignoring case/space
+    names = list(merged.columns)  # merged ignoring case/space; None kept, not dropped
+    assert names[0] == "NJ" and pd.isna(names[1]) and names[2] == "GA"
     assert merged["NJ"].tolist() == [-1, 0]  # not hidden by a max
     with pytest.warns(UserWarning, match=r"'NJ' at ages \[20\] \(\[-1\]\)"):
         prep_trajectory_df(df)
