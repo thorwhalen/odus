@@ -35,7 +35,7 @@ authors = [
 ]
 dependencies = [
     "py2store",
-    "pandas",
+    "pandas>=2.1",
     "numpy",
     "Pillow",
     "spyn",
