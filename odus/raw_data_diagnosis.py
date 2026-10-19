@@ -18,6 +18,7 @@ passing any ``{name: Rule}`` mapping as ``rules``:
 ``diagnosis_table`` puts them in a DataFrame, and ``print_diagnosis`` prints them.
 """
 
+from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from functools import partial
@@ -165,11 +166,22 @@ YEAR_ROW = 1  # row holding the years (0-based, in the sheet)
 AGE_ROW = 2  # row holding the ages
 DATA_START_ROW = 3  # first row of variables
 NON_VARIABLE_LABELS = ("List of States", "Select States below")  # section titles
+UNREADABLE_SHEET = "unreadable_sheet"  # rule name of a sheet that can't be read
 
 
 def _is_colored(cell):
+    """Whether the cell has a fill (a solid white fill doesn't count)."""
     fill = cell.fill
-    return fill is not None and fill.fill_type is not None
+    if fill is None or fill.fill_type is None:
+        return False
+    color = getattr(fill, "fgColor", None)
+    is_white = (
+        fill.fill_type == "solid"
+        and getattr(color, "type", None) == "rgb"
+        and isinstance(color.rgb, str)
+        and color.rgb[-6:].upper() == "FFFFFF"
+    )
+    return not is_white
 
 
 def _is_empty(x):
@@ -216,15 +228,17 @@ class SheetView:
 
 
 def _label_col(vals, *, data_start_row):
-    """The first column whose first variable row holds text (the variable names)."""
-    row = vals.iloc[data_start_row]
-    for j, x in enumerate(row):
-        if isinstance(x, str) and x.strip():
-            return j
-    raise ValueError(
-        f"Couldn't find the column of variable names: no text in row "
-        f"{data_start_row + 1} of the sheet"
+    """The column with the most text from ``data_start_row`` on (the variable names)."""
+    is_text = vals.iloc[data_start_row:].map(
+        lambda x: isinstance(x, str) and bool(x.strip())
     )
+    n_texts = is_text.sum(axis=0).to_numpy()
+    if not n_texts.any():
+        raise ValueError(
+            f"Couldn't find the column of variable names: no text from row "
+            f"{data_start_row + 1} of the sheet on"
+        )
+    return int(np.argmax(n_texts))
 
 
 def sheet_view(
@@ -309,9 +323,10 @@ def _empty_but_colored(view):
 
 
 def _filled_but_uncolored(view):
-    if not view.colored.to_numpy().any():
-        return view.false_mask()  # the sheet uses no colors: nothing to compare with
-    return view.data_mask & ~view.empty() & ~view.colored.to_numpy()
+    colored = view.colored.to_numpy()
+    if not (colored & view.data_mask).any():
+        return view.false_mask()  # the data uses no colors: nothing to compare with
+    return view.data_mask & ~view.empty() & ~colored
 
 
 def _not_binary(view):
@@ -355,7 +370,7 @@ def _year_not_consecutive(view):
 
 
 def _age_year_mismatch(view):
-    """Flag ages for which ``year - age`` differs from that of the first column."""
+    """Flag ages for which ``year - age`` differs from that of most columns."""
     mask = view.false_mask()
     diffs = {
         j: view.vals.iat[view.year_row, j] - view.vals.iat[view.age_row, j]
@@ -364,7 +379,7 @@ def _age_year_mismatch(view):
         and _is_number(view.vals.iat[view.age_row, j])
     }
     if diffs:
-        expected = next(iter(diffs.values()))
+        expected = Counter(diffs.values()).most_common(1)[0][0]  # ties: leftmost
         for j, d in diffs.items():
             mask[view.age_row, j] = d != expected
     return mask
@@ -373,7 +388,7 @@ def _age_year_mismatch(view):
 def _duplicate_variable(view):
     mask = view.false_mask()
     rows = np.flatnonzero(view.data_mask.any(axis=1))
-    labels = view.labels.iloc[rows]
+    labels = view.labels.iloc[rows].map(lambda x: str(x).strip().casefold())
     mask[rows[labels.duplicated(keep="first").to_numpy()], view.label_col] = True
     return mask
 
@@ -438,6 +453,8 @@ def select_rules(include=None, exclude=(), *, extra=None, rules=None):
     True
     """
     rules = dict(DFLT_RULES if rules is None else rules)
+    include = [include] if isinstance(include, str) else include
+    exclude = [exclude] if isinstance(exclude, str) else exclude
     unknown = (set(include or ()) | set(exclude)) - set(rules)
     if unknown:
         raise KeyError(
@@ -455,6 +472,8 @@ def select_rules(include=None, exclude=(), *, extra=None, rules=None):
 
 
 def _iter_rules(rules):
+    if isinstance(rules, Rule):
+        return [rules]
     if isinstance(rules, Mapping):
         return rules.values()
     return list(rules)
@@ -473,7 +492,7 @@ def diagnose_view(view, *, rules=DFLT_RULES, filename=""):
             value = view.vals.iat[i, j]
             coordinate = view.coordinate.iat[i, j]
             label = view.vals.iat[i, view.label_col]
-            message = rule.message.format(
+            message = (rule.message or "{coordinate} ({label}): {value!r}").format(
                 value=value, coordinate=coordinate, label=label
             )
             yield Problem(filename, rule.name, coordinate, value, message)
@@ -482,12 +501,18 @@ def diagnose_view(view, *, rules=DFLT_RULES, filename=""):
 def diagnose_file(xls_filepath, sheetname=None, *, rules=DFLT_RULES, **view_kwargs):
     """Yield the ``Problem``s that ``rules`` find in a spreadsheet.
 
-    ``view_kwargs`` (``year_row``, ``age_row``...) go to ``sheet_view``.
+    ``view_kwargs`` (``year_row``, ``age_row``...) go to ``sheet_view``. A sheet
+    that doesn't have the expected layout gives one ``Problem`` whose rule is
+    ``UNREADABLE_SHEET``.
     """
+    filename = os.path.basename(xls_filepath)
     wb = load_workbook(xls_filepath, data_only=True)
     sheet = wb[sheetname] if sheetname is not None else wb[wb.sheetnames[0]]
-    view = sheet_view(sheet, **view_kwargs)
-    filename = os.path.basename(xls_filepath)
+    try:
+        view = sheet_view(sheet, **view_kwargs)
+    except ValueError as e:  # the sheet doesn't have the expected layout
+        yield Problem(filename, UNREADABLE_SHEET, "", None, str(e))
+        return
     yield from diagnose_view(view, rules=rules, filename=filename)
 
 
@@ -512,7 +537,7 @@ def diagnosis_table(problems: Iterable[Problem]) -> pd.DataFrame:
     )
 
 
-def print_diagnosis(source_dir=".", sheetname=None, *, rules=DFLT_RULES):
+def print_diagnosis(source_dir=".", sheetname=None, *, rules=DFLT_RULES, **view_kwargs):
     """Print the diagnosis of the raw xls files in `source_dir`.
 
     For every file that has a problem, print its name, then for each rule that
@@ -525,7 +550,7 @@ def print_diagnosis(source_dir=".", sheetname=None, *, rules=DFLT_RULES):
     source_dir = os.path.abspath(os.path.expanduser(source_dir))
     print(f'Diagnosing xls files of "{source_dir}" ...\n\n')
 
-    problems = diagnose_dir(source_dir, sheetname, rules=rules)
+    problems = diagnose_dir(source_dir, sheetname, rules=rules, **view_kwargs)
     n_files = 0
     for filename, file_problems in groupby(problems, key=lambda p: p.filename):
         n_files += 1

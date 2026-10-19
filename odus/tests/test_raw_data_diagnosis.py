@@ -144,3 +144,64 @@ def test_dir_table_and_print(tmp_path, clean_rows, capsys):
     os.remove(tmp_path / "bad.xlsx")
     print_diagnosis(str(tmp_path))
     assert "No problems found." in capsys.readouterr().out
+
+
+def test_labels_in_column_a_with_a_blank_first_variable_row(tmp_path):
+    rows = [
+        ["INTERVIEW ID NUMBER", "X01", None, None],
+        ["YEAR", 2000, 2001, 2002],
+        ["AGE", 20, 21, 22],
+        [None, None, None, None],
+        ["HEROIN", 0, 7, 1],
+    ]
+    problems = _problems(_write_sheet(tmp_path / "x.xlsx", rows))
+    assert problems == {("not_binary", "C5")}
+
+
+def test_a_bad_first_column_is_the_one_flagged(tmp_path, clean_rows):
+    clean_rows[2][2] = 19  # ages 19, 21, 22 for years 2000, 2001, 2002
+    problems = _problems(_write_sheet(tmp_path / "x.xlsx", clean_rows))
+    assert ("age_year_mismatch", "C3") in problems
+    assert ("age_year_mismatch", "D3") not in problems
+
+
+def test_unreadable_sheet_is_reported_and_the_dir_run_goes_on(tmp_path, clean_rows):
+    _write_sheet(tmp_path / "a_short.xlsx", clean_rows[:2])
+    clean_rows[3][3] = 16
+    _write_sheet(tmp_path / "b_bad.xlsx", clean_rows)
+    table = diagnosis_table(diagnose_dir(tmp_path))
+    assert table[["filename", "rule"]].values.tolist() == [
+        ["a_short.xlsx", "unreadable_sheet"],
+        ["b_bad.xlsx", "not_binary"],
+    ]
+
+
+def test_header_colors_or_white_fills_dont_count_as_colored_data(tmp_path, clean_rows):
+    white = PatternFill("solid", fgColor="FFFFFFFF")
+    fp = tmp_path / "x.xlsx"
+    _write_sheet(fp, clean_rows, colored=["A1"])
+    assert _problems(fp) == set()  # only a header cell is colored
+    clean_rows[3][2] = None
+    wb = Workbook()
+    sh = wb.active
+    for row in clean_rows:
+        sh.append(row)
+    sh["C4"].fill = white
+    wb.save(fp)
+    assert _problems(fp) == set()  # an empty, white-filled cell
+
+
+def test_duplicates_ignore_case_and_spaces(tmp_path, clean_rows):
+    clean_rows.append([5, "heroin ", 0, 0, 0])
+    problems = _problems(_write_sheet(tmp_path / "x.xlsx", clean_rows))
+    assert problems == {("duplicate_variable", "B6")}
+
+
+def test_rules_conveniences(tmp_path, clean_rows):
+    clean_rows[3][3] = 16
+    fp = tmp_path / "x.xlsx"
+    _write_sheet(fp, clean_rows)
+    assert list(select_rules(include="not_binary")) == ["not_binary"]
+    bare = Rule("bare", lambda view: view.vals.map(lambda x: x == 16).to_numpy())
+    (p,) = diagnose_file(fp, rules=bare)  # a single rule, no message
+    assert p.message == "D4 (HEROIN): 16"

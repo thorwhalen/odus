@@ -627,8 +627,10 @@ Each check is a rule; `DFLT_RULES` holds the default ones:
 | `filled_but_uncolored` | a data cell with a value but no color (only on sheets that use colors) |
 | `not_binary` | a value that isn't 0 or 1 |
 | `age_not_consecutive`, `year_not_consecutive` | an age (year) that doesn't follow the previous one |
-| `age_year_mismatch` | an age whose `year - age` differs from the first column's |
+| `age_year_mismatch` | an age whose `year - age` differs from most columns' |
 | `duplicate_variable` | a variable listed more than once |
+
+A file that doesn't have the expected layout is reported (rule `unreadable_sheet`) and the others are still checked.
 
 Turn rules on or off, or add your own, with `select_rules`. A rule is a name, a function that takes a `SheetView` (the sheet's values, colors and cell coordinates) and returns a boolean array marking the cells to flag, and a message:
 
