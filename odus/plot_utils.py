@@ -134,13 +134,26 @@ def _rgb_array(colors):
 
 def _normalized_values(vals):
     """Map values to [0, 1]: 0 is "off" (background), 1 is "on" (row color)."""
+    if np.isnan(vals).all():
+        return np.zeros_like(vals)
     lo, hi = min(0.0, np.nanmin(vals)), np.nanmax(vals)
     if not hi > lo:
         return np.zeros_like(vals)
     return np.nan_to_num(np.clip((vals - lo) / (hi - lo), 0, 1), nan=0.0)
 
 
+def _as_mapping_if_keyed(x):
+    """A ``pd.Series`` (colors keyed by name) is used as a mapping, not a sequence."""
+    return x.to_dict() if isinstance(x, pd.Series) else x
+
+
+def _as_color_sequence(x):
+    """A single color (``"red"``, ``(1, 0, 0)``) is a sequence of one color."""
+    return (x,) if is_color_like(x) else tuple(x)
+
+
 def _row_foregrounds(varnames, row_colors, default_color):
+    row_colors = _as_mapping_if_keyed(row_colors)
     if row_colors is None or (
         not isinstance(row_colors, Mapping) and is_color_like(row_colors)
     ):  # a single color (a name, a hex string, or an RGB(A) tuple)
@@ -177,15 +190,17 @@ def _row_backgrounds(
     varnames, *, row_backgrounds, row_groups, group_colors, group_tint
 ):
     n = len(varnames)
-    bgs = _rgb_array(
-        [c for c, _ in zip(cycle(row_backgrounds or ("#ffffff",)), range(n))]
-    )
+    row_backgrounds = _as_color_sequence(row_backgrounds or ("#ffffff",))
+    bgs = _rgb_array([c for c, _ in zip(cycle(row_backgrounds), range(n))])
     group_of_row, groups = _group_of_var(varnames, row_groups)
     if groups:
+        group_colors = _as_mapping_if_keyed(group_colors)
         if group_colors is None:
             group_colors = DFLT_GROUP_COLORS
         if not isinstance(group_colors, Mapping):
-            group_colors = dict(zip(groups, cycle(group_colors)))
+            group_colors = dict(zip(groups, cycle(_as_color_sequence(group_colors))))
+        if missing := [g for g in groups if g not in group_colors]:
+            raise ValueError(f"group_colors has no color for the groups: {missing}")
         for i, g in enumerate(group_of_row):
             if g is not None:
                 tint = np.array(to_rgb(group_colors[g]))
@@ -273,8 +288,10 @@ def plot_trajectory(
     Returns:
         The matplotlib axes drawn on.
     """
-    if fields is not None:
-        df = df[list(fields)]
+    if isinstance(fields, slice):
+        df = df.loc[:, fields]
+    elif fields is not None:
+        df = df[[fields] if isinstance(fields, str) else list(fields)]
     varnames, times = list(df.columns), list(df.index)
     n_rows, n_cols = len(varnames), len(times)
     if n_rows == 0 or n_cols == 0:
@@ -292,7 +309,12 @@ def plot_trajectory(
     img = (1 - v) * bg[:, None, :] + v * fg
 
     time_labels = [str(t) for t in times]
-    if xtick_every is None:
+    if xtick_every is not None and not (
+        isinstance(xtick_every, (int, np.integer)) and xtick_every >= 1
+    ):
+        raise ValueError(f"xtick_every should be a positive int, not {xtick_every!r}")
+    auto_xticks = xtick_every is None
+    if auto_xticks:
         longest = max(map(len, time_labels))
         fits = longest * fontsize * 0.6 / 72 <= cell_size
         xtick_every = 1 if fits or not major_every else major_every
@@ -328,12 +350,10 @@ def plot_trajectory(
         linewidth=major_gap,
     )
 
-    if xtick_every == 1:
-        xticks = list(range(n_cols))
-    else:
+    if auto_xticks and xtick_every > 1 and majors:
         xticks = [j for j in range(n_cols) if j == 0 or j in majors]
-        if not majors:
-            xticks = list(range(0, n_cols, xtick_every))
+    else:
+        xticks = list(range(0, n_cols, xtick_every))
     ax.set_xticks(xticks, [time_labels[j] for j in xticks], fontsize=fontsize)
     ax.set_yticks(range(n_rows), [str(v) for v in varnames], fontsize=fontsize)
     ax.tick_params(length=0, labelright=ylabel_right)
@@ -353,7 +373,7 @@ def row_colors_of_xls(xls_filepath, *, sheetname=None, label_col=2, data_col=3):
     Use it as the ``row_colors`` of ``plot_trajectory`` to color variables as the
     source spreadsheet does. A variable's color is the fill of its label cell, or
     if that has none, the most common fill of its data cells. Variables with no
-    (solid, explicit RGB) fill are left out.
+    solid RGB or indexed (palette) fill are left out, as are theme colors.
 
     Args:
         xls_filepath: Path to the ``.xlsx`` file.
@@ -363,15 +383,22 @@ def row_colors_of_xls(xls_filepath, *, sheetname=None, label_col=2, data_col=3):
     """
     from collections import Counter
     from openpyxl import load_workbook
+    from openpyxl.styles.colors import COLOR_INDEX
 
     def rgb_of(cell):
         fill = cell.fill
         if fill is None or fill.fill_type != "solid":
             return None
-        rgb = fill.fgColor.rgb
-        if not isinstance(rgb, str) or len(rgb) != 8 or rgb[:2] == "00":
-            return None  # theme/indexed colors, or transparent
-        return "#" + rgb[2:].lower()
+        color = fill.fgColor
+        if color.type == "indexed" and color.indexed < len(COLOR_INDEX):
+            argb = COLOR_INDEX[color.indexed]
+        elif color.type == "rgb" and isinstance(color.rgb, str):
+            argb = color.rgb
+        else:
+            return None  # theme colors (would need the workbook's theme)
+        if len(argb) != 8 or argb == "00000000":  # openpyxl's "no color"
+            return None
+        return "#" + argb[2:].lower()  # Excel ignores the alpha byte
 
     wb = load_workbook(xls_filepath)
     sheet = wb[sheetname] if sheetname is not None else wb.active
@@ -404,11 +431,16 @@ def _get_keys(df_store, keys) -> Iterable:
     return keys
 
 
+def _title_of_key(k, df):
+    """The last segment of a store key (``'surveys/B24.xlsx'`` -> ``'B24.xlsx'``)."""
+    return str(k).rsplit("/", 1)[-1]
+
+
 def life_plots(
     df_store,
     fields=None,
     keys=None,
-    k_df_to_title=lambda k, df: k.split("/")[1],
+    k_df_to_title=_title_of_key,
     **plot_kwargs,
 ):
     """Yield the axes of the trajectory plot of each (selected) key of ``df_store``."""
@@ -426,6 +458,7 @@ def write_trajectories_to_file(
     pil_write_format=None,
     to_pil_image_kwargs=None,
     *,
+    k_df_to_title=_title_of_key,
     plot_kwargs=None,
     **pil_save_kwargs,
 ):
@@ -438,9 +471,9 @@ def write_trajectories_to_file(
 
     def figs():
         for k in keys:
-            fig = plot_life(
-                df_store[k], fields, title=k.split("/")[1], **plot_kwargs
-            ).figure
+            df = df_store[k]
+            ax = plot_life(df, fields, title=k_df_to_title(k, df), **plot_kwargs)
+            fig = ax.figure
             yield fig
             plt.close(fig)
 

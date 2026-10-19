@@ -144,3 +144,70 @@ def test_write_trajectories_to_file(traj, tmp_path):
     write_trajectories_to_file(store, fp=str(fp), plot_kwargs={"row_backgrounds": None})
     assert fp.stat().st_size > 0
     assert len(plt.get_fignums()) == n_figs  # figures are closed after writing
+
+
+def test_explicit_xtick_every_is_honored(traj):
+    ax = plot_trajectory(traj, xtick_every=2)  # major gaps at 20 and 25
+    assert [t.get_text() for t in ax.get_xticklabels()] == [
+        "18", "20", "22", "24", "26", "28"
+    ]  # fmt: skip
+    with pytest.raises(ValueError, match="positive int"):
+        plot_trajectory(traj, xtick_every=0)
+
+
+def test_series_row_colors_are_keyed_by_variable(traj):
+    colors = pd.Series({"SPOUSE": "green", "WORK": "red", "HEROIN": "blue"})
+    img = _img(plot_trajectory(traj, ["HEROIN", "WORK"], row_colors=colors))
+    assert np.allclose(img[0, -1], to_rgb("blue"))
+    assert np.allclose(img[1, -1], to_rgb("red"))
+
+
+def test_fields_as_a_slice_or_a_single_name(traj):
+    names = lambda ax: [t.get_text() for t in ax.get_yticklabels()]
+    assert names(plot_life(traj, slice(None))) == list(traj.columns)
+    assert names(plot_life(traj, "WORK")) == ["WORK"]
+
+
+def test_single_colors_and_missing_group_colors(traj):
+    img = _img(
+        plot_trajectory(
+            traj,
+            ["SPOUSE"],
+            row_backgrounds="red",
+            row_groups={"g": ["SPOUSE"]},
+            group_colors="blue",
+            group_tint=0.5,
+        )
+    )
+    assert np.allclose(img[0, 0], [0.5, 0.0, 0.5])
+    with pytest.raises(ValueError, match="no color for the groups"):
+        plot_trajectory(
+            traj,
+            row_groups={"g1": ["WORK"], "g2": ["SPOUSE"]},
+            group_colors={"g1": "b"},
+        )
+
+
+def test_row_colors_of_xls_reads_six_hex_and_indexed_fills(tmp_path):
+    from openpyxl import Workbook
+    from openpyxl.styles import PatternFill
+    from openpyxl.styles.colors import Color
+
+    wb = Workbook()
+    sh = wb.active
+    sh.append([None, "SIXHEX", 1])
+    sh.append([None, "INDEXED", 1])
+    sh.append([None, "THEME", 1])
+    sh["B1"].fill = PatternFill("solid", fgColor="FF0000")  # stored as 00FF0000
+    sh["B2"].fill = PatternFill("solid", fgColor=Color(indexed=13))  # yellow
+    sh["B3"].fill = PatternFill("solid", fgColor=Color(theme=4))
+    fp = tmp_path / "t.xlsx"
+    wb.save(fp)
+    assert row_colors_of_xls(fp) == {"SIXHEX": "#ff0000", "INDEXED": "#ffff00"}
+
+
+def test_store_keys_without_a_folder_make_titles(traj):
+    from odus.plot_utils import life_plots
+
+    (ax,) = life_plots({"B24.xlsx": traj})
+    assert ax.get_title() == "B24.xlsx"
