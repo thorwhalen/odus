@@ -1,4 +1,4 @@
-> built 2026-10-19 12:31 UTC from 4e56f9d (master) · odus 0.0.16. Details: build_info.json
+> built 2026-10-19 12:55 UTC from 36216d1 (master) · odus 0.0.17. Details: build_info.json
 
 # index.html.md
 
@@ -108,16 +108,11 @@ from odus.plot_utils import plot_life_course
 ```python
 from odus import data_dir, data_path_of
 
-survey_dir = data_dir
-data_dir
-```
-
-```none
-'/D/Dropbox/dev/p3/proj/odus/odus/data'
+survey_dir = data_path_of("surveys")  # the surveys bundled with odus
 ```
 
 ```python
-df_store = DfStore(data_dir + "/{}.xlsx")
+df_store = DfStore(survey_dir + "/{}.xlsx")  # keys like "A01.xlsx"
 len(df_store)
 cstore = VarSetCountsStore(df_store)
 v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -139,7 +134,9 @@ Where the data is read from is configuration, in `odus.raw_formats`:
 from odus.raw_formats import SurveyLayout
 
 df_store = DfStore(my_folder + "/{}.csv")
-df_store.layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1, empty_value=0)
+df_store.layout = SurveyLayout(
+    year_row=None, age_row=0, data_start_row=1, empty_value=0
+)
 ```
 
 The diagnosis tools take the same `layout` (`diagnose_file(path, layout=...)`).
@@ -448,7 +445,7 @@ plot_life(df_store[k])  # plot the trajectory
 ```
 
 ```none
-k: surveys/B24.xlsx
+k: B24.xlsx
 ```
 
 ![png](../img/output_26_1.png)
@@ -547,7 +544,7 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)]
 from odus.plot_utils import stacked_trajectories
 
 fields = ["PHYSICAL ILLNESS", "AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID"]
-keys = ["surveys/A60.xlsx", "surveys/B32.xlsx", "surveys/B49.xlsx", "surveys/A01.xlsx"]
+keys = ["A60.xlsx", "B32.xlsx", "B49.xlsx", "A01.xlsx"]
 stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
 ```
 
@@ -589,7 +586,7 @@ Before preparing the data, check the raw spreadsheets for data-entry problems. `
 ```python
 from odus.raw_data_diagnosis import print_diagnosis
 
-print_diagnosis(survey_dir + "/surveys")
+print_diagnosis(survey_dir)
 ```
 
 ```none
@@ -628,8 +625,8 @@ not_too_old = Rule(
 )
 rules = select_rules(exclude=["filled_but_uncolored"], extra=[not_too_old])
 
-print_diagnosis(survey_dir + "/surveys", rules=rules)
-diagnosis_table(diagnose_dir(survey_dir + "/surveys", rules=rules))  # as a DataFrame
+print_diagnosis(survey_dir, rules=rules)
+diagnosis_table(diagnose_dir(survey_dir, rules=rules))  # as a DataFrame
 ```
 
 ## Demo s and v
@@ -1060,7 +1057,6 @@ prob_of_heroin_given_not_presc_op / prob_of_heroin_given_presc_op
 # Potential Calculus Experimentations
 
 ```python
-# survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'
 df_store = DfStore(survey_dir + "/{}.xlsx")
 len(df_store)
 ```
@@ -2405,18 +2401,18 @@ Write images or figs into pdf pages (one image per page)
 
 # About this build
 
-This documentation was built on **2026-10-19 12:31 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9d</code></a> on branch <code>master</code>, for **odus 0.0.16** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:55 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1</code></a> on branch <code>master</code>, for **odus 0.0.17** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.16) is behind the latest release on PyPI (0.0.17): `pip install odus` gives newer code than these docs describe.
+- The documented version (0.0.17) is behind the latest release on PyPI (0.0.18): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2427,9 +2423,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39252446723">39252446723</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39255588059">39255588059</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code> (in the history of the built commit) |
+| Event commit | <code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2454,13 +2450,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.17/">0.0.17</a>, newer than the documented version (0.0.16).
+Latest release: <a href="https://pypi.org/project/odus/0.0.18/">0.0.18</a>, newer than the documented version (0.0.17).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d
+git checkout 36216d1289dec6dd47b9fcb7cb8282da4ca44ed2
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

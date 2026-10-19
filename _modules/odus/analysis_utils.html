@@ -471,7 +471,8 @@
         <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">exposure</span> <span class="o">=</span> <span class="n">var</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"-1"</span><span class="p">)</span> <span class="k">else</span> <span class="n">VarStr</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># rows: var-1</span>
+    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">exposure</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">format_for_influencer_plot</span><span class="p">()</span>
 
 
@@ -521,7 +522,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=0adb0642"></script>
+</div><script src="../../_static/documentation_options.js?v=a39b7224"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

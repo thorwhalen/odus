@@ -581,11 +581,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Counter</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">mk_counts_of_kps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kps_list</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="n">f</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">]</span>
-            <span class="n">dd</span> <span class="o">=</span> <span class="n">DfData</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dd</span><span class="o">.</span><span class="n">extract_with_key_pattern_sets</span><span class="p">(</span><span class="n">kps_list</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">v</span><span class="p">])</span>
+<span class="w">        </span><span class="sd">"""Count the key patterns of ``kps_list``, anew.</span>
+
+<span class="sd">        ``self.counts_of`` is replaced by these counts (it used to accumulate them,</span>
+<span class="sd">        so that calling twice doubled them).</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span> <span class="o">=</span> <span class="n">counts_of_kps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="n">kps_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">counts_of</span>
 
     <span class="c1"># def counts_of(self):</span>
 
@@ -653,7 +655,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=0adb0642"></script>
+</div><script src="../../_static/documentation_options.js?v=a39b7224"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

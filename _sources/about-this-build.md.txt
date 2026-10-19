@@ -5,19 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-19 12:31 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9d</code></a> on branch <code>master</code>, for **odus 0.0.16** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:55 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1</code></a> on branch <code>master</code>, for **odus 0.0.17** (from <code>pyproject.toml</code>).
 
 :::{warning}
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.16) is behind the latest release on PyPI (0.0.17): `pip install odus` gives newer code than these docs describe.
+- The documented version (0.0.17) is behind the latest release on PyPI (0.0.18): `pip install odus` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2"><code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code></a> |
 | Branch | <code>master</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -28,9 +28,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>thorwhalen/odus</code> |
-| Run | <a href="https://github.com/thorwhalen/odus/actions/runs/39252446723">39252446723</a> |
+| Run | <a href="https://github.com/thorwhalen/odus/actions/runs/39255588059">39255588059</a> |
 | Ref | <code>refs/heads/master</code> |
-| Event commit | <code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code> (in the history of the built commit) |
+| Event commit | <code>36216d1289dec6dd47b9fcb7cb8282da4ca44ed2</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,13 +55,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.17/">0.0.17</a>, newer than the documented version (0.0.16).
+Latest release: <a href="https://pypi.org/project/odus/0.0.18/">0.0.18</a>, newer than the documented version (0.0.17).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d
+git checkout 36216d1289dec6dd47b9fcb7cb8282da4ca44ed2
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

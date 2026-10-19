@@ -104,16 +104,11 @@ from odus.plot_utils import plot_life_course
 ```python
 from odus import data_dir, data_path_of
 
-survey_dir = data_dir
-data_dir
-```
-
-```none
-'/D/Dropbox/dev/p3/proj/odus/odus/data'
+survey_dir = data_path_of("surveys")  # the surveys bundled with odus
 ```
 
 ```python
-df_store = DfStore(data_dir + "/{}.xlsx")
+df_store = DfStore(survey_dir + "/{}.xlsx")  # keys like "A01.xlsx"
 len(df_store)
 cstore = VarSetCountsStore(df_store)
 v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -135,7 +130,9 @@ Where the data is read from is configuration, in `odus.raw_formats`:
 from odus.raw_formats import SurveyLayout
 
 df_store = DfStore(my_folder + "/{}.csv")
-df_store.layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1, empty_value=0)
+df_store.layout = SurveyLayout(
+    year_row=None, age_row=0, data_start_row=1, empty_value=0
+)
 ```
 
 The diagnosis tools take the same `layout` (`diagnose_file(path, layout=...)`).
@@ -444,7 +441,7 @@ plot_life(df_store[k])  # plot the trajectory
 ```
 
 ```none
-k: surveys/B24.xlsx
+k: B24.xlsx
 ```
 
 ![png](../img/output_26_1.png)
@@ -543,7 +540,7 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)]
 from odus.plot_utils import stacked_trajectories
 
 fields = ["PHYSICAL ILLNESS", "AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID"]
-keys = ["surveys/A60.xlsx", "surveys/B32.xlsx", "surveys/B49.xlsx", "surveys/A01.xlsx"]
+keys = ["A60.xlsx", "B32.xlsx", "B49.xlsx", "A01.xlsx"]
 stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
 ```
 
@@ -585,7 +582,7 @@ Before preparing the data, check the raw spreadsheets for data-entry problems. `
 ```python
 from odus.raw_data_diagnosis import print_diagnosis
 
-print_diagnosis(survey_dir + "/surveys")
+print_diagnosis(survey_dir)
 ```
 
 ```none
@@ -624,8 +621,8 @@ not_too_old = Rule(
 )
 rules = select_rules(exclude=["filled_but_uncolored"], extra=[not_too_old])
 
-print_diagnosis(survey_dir + "/surveys", rules=rules)
-diagnosis_table(diagnose_dir(survey_dir + "/surveys", rules=rules))  # as a DataFrame
+print_diagnosis(survey_dir, rules=rules)
+diagnosis_table(diagnose_dir(survey_dir, rules=rules))  # as a DataFrame
 ```
 
 ## Demo s and v
@@ -1056,7 +1053,6 @@ prob_of_heroin_given_not_presc_op / prob_of_heroin_given_presc_op
 # Potential Calculus Experimentations
 
 ```python
-# survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'
 df_store = DfStore(survey_dir + "/{}.xlsx")
 len(df_store)
 ```

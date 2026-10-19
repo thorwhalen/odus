@@ -362,14 +362,10 @@
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_dir</span><span class="p">,</span> <span class="n">data_path_of</span>
 
-<span class="n">survey_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
-<span class="n">data_dir</span>
+<span class="n">survey_dir</span> <span class="o">=</span> <span class="n">data_path_of</span><span class="p">(</span><span class="s2">"surveys"</span><span class="p">)</span>  <span class="c1"># the surveys bundled with odus</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'/D/Dropbox/dev/p3/proj/odus/odus/data'
-</pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>  <span class="c1"># keys like "A01.xlsx"</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
 <span class="n">cstore</span> <span class="o">=</span> <span class="n">VarSetCountsStore</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
 <span class="n">v</span> <span class="o">=</span> <span class="n">mk_pvar_struct</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">only_for_cols_in_all_dfs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -389,7 +385,9 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">SurveyLayout</span>
 
 <span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">my_folder</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.csv"</span><span class="p">)</span>
-<span class="n">df_store</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">SurveyLayout</span><span class="p">(</span><span class="n">year_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">age_row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">empty_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">df_store</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">SurveyLayout</span><span class="p">(</span>
+    <span class="n">year_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">age_row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">empty_value</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>The diagnosis tools take the same <code class="docutils literal notranslate"><span class="pre">layout</span></code> (<code class="docutils literal notranslate"><span class="pre">diagnose_file(path,</span> <span class="pre">layout=...)</span></code>).</p>
@@ -681,7 +679,7 @@ dtype: int64
 <span class="n">plot_life</span><span class="p">(</span><span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>  <span class="c1"># plot the trajectory</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>k: surveys/B24.xlsx
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>k: B24.xlsx
 </pre></div>
 </div>
 <p><img alt="png" src="_images/output_26_1.png" /></p>
@@ -758,7 +756,7 @@ dtype: int64
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">stacked_trajectories</span>
 
 <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"PHYSICAL ILLNESS"</span><span class="p">,</span> <span class="s2">"AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"HEROIN"</span><span class="p">,</span> <span class="s2">"OTHER OPIOID"</span><span class="p">]</span>
-<span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"surveys/A60.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/B32.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/B49.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/A01.xlsx"</span><span class="p">]</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"A60.xlsx"</span><span class="p">,</span> <span class="s2">"B32.xlsx"</span><span class="p">,</span> <span class="s2">"B49.xlsx"</span><span class="p">,</span> <span class="s2">"A01.xlsx"</span><span class="p">]</span>
 <span class="n">stacked_trajectories</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">x_align</span><span class="o">=</span><span class="s2">"HEROIN"</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -795,7 +793,7 @@ dtype: int64
 <p>Before preparing the data, check the raw spreadsheets for data-entry problems. <code class="docutils literal notranslate"><span class="pre">print_diagnosis</span></code> lists, file by file and rule by rule, the cells to check, with an explanation for each:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_data_diagnosis</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_diagnosis</span>
 
-<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">)</span>
+<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>The possibly problematic cells for A03.xlsx:
@@ -849,8 +847,8 @@ The possibly problematic cells for A13.xlsx:
 <span class="p">)</span>
 <span class="n">rules</span> <span class="o">=</span> <span class="n">select_rules</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">"filled_but_uncolored"</span><span class="p">],</span> <span class="n">extra</span><span class="o">=</span><span class="p">[</span><span class="n">not_too_old</span><span class="p">])</span>
 
-<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">)</span>
-<span class="n">diagnosis_table</span><span class="p">(</span><span class="n">diagnose_dir</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">))</span>  <span class="c1"># as a DataFrame</span>
+<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">)</span>
+<span class="n">diagnosis_table</span><span class="p">(</span><span class="n">diagnose_dir</span><span class="p">(</span><span class="n">survey_dir</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">))</span>  <span class="c1"># as a DataFrame</span>
 </pre></div>
 </div>
 </section>
@@ -1235,8 +1233,7 @@ AS PRESCRIBED OPIOID-1 HEROIN-1 HEROIN
 </section>
 <section id="potential-calculus-experimentations">
 <h1>Potential Calculus Experimentations<a class="headerlink" href="#potential-calculus-experimentations" title="Link to this heading">¶</a></h1>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'</span>
-<span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.xlsx"</span><span class="p">)</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">df_store</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1573,7 +1570,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:31 UTC from <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d">4e56f9d</a> (master) · odus 0.0.16 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:55 UTC from <a href="https://github.com/thorwhalen/odus/commit/36216d1289dec6dd47b9fcb7cb8282da4ca44ed2">36216d1</a> (master) · odus 0.0.17 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1609,7 +1606,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0adb0642"></script>
+</div><script src="_static/documentation_options.js?v=a39b7224"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
