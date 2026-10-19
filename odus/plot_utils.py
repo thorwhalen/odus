@@ -547,7 +547,7 @@ def _x_of_trajectory(df, x_align):
     if x_align == "age":
         return list(df.index)
     if x_align == "year":
-        from odus.dacc import YEAR_OF_AGE
+        from odus.raw_formats import YEAR_OF_AGE
 
         year_of_age = df.attrs.get(YEAR_OF_AGE)
         if year_of_age is None:

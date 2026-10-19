@@ -13,7 +13,6 @@ import os
 import re
 import warnings
 from functools import wraps
-from io import BytesIO
 
 # get py2store here: https://github.com/i2mint/py2store
 from py2store.base import Store
@@ -25,6 +24,15 @@ from spyn.ppi.pot import Pot
 
 from odus.sequential_var_sets import PVar, VarSet, DfData, extract_kps
 from odus.plot_utils import heatmap
+from odus.raw_formats import (
+    DFLT_LAYOUT,
+    TABLE_READERS,
+    YEAR_OF_AGE,  # noqa: F401  (re-exported: it used to be defined here)
+    is_section_title,
+    normalized_label,
+    read_raw_table,
+    trajectory_from_table,
+)
 
 # from ut.pplot.matrix import heatmap
 
@@ -117,7 +125,6 @@ class HashableMixin:
         return hash(self) == hash(other)
 
 
-YEAR_OF_AGE = "year_of_age"  # attrs key of a trajectory's {age: year} mapping
 NON_BINARY_POLICIES = ("warn", "binarize", "keep", "raise")
 
 
@@ -135,8 +142,8 @@ DUPLICATES_POLICIES = ("merge", "keep", "raise")
 def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"):
     """Clean a trajectory DataFrame (index: ages, columns: variables).
 
-    - Columns named like a section title of the survey sheet (``NON_VARIABLE_LABELS``
-      of ``odus.raw_data_diagnosis``, e.g. "Select States below") are dropped.
+    - Columns named like a section title of the survey sheet (``SECTION_TITLES``
+      of ``odus.raw_formats``, e.g. "Select States below") are dropped.
     - ``duplicates``: what to do with variables appearing more than once (e.g. a
       state lived in during two periods, entered as two rows), names compared
       ignoring case and extra spaces. ``"merge"``: one column (with the first
@@ -157,8 +164,6 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
     >>> out.columns.tolist(), out.values.tolist()
     (['GA', 'NJ'], [[1, 0], [0, 1]])
     """
-    from odus.raw_data_diagnosis import is_section_title, normalized_label
-
     if non_binary not in NON_BINARY_POLICIES:
         raise ValueError(f"non_binary should be one of {NON_BINARY_POLICIES}")
     if duplicates not in DUPLICATES_POLICIES:
@@ -203,41 +208,36 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
 
 
 class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
-    """The trajectory DataFrames of a folder of survey spreadsheets.
+    """The trajectory DataFrames of a folder of survey tables.
 
-    Values are cleaned by ``prep_trajectory_df``, with the ``non_binary`` and
-    ``duplicates`` policies set as attributes (``store.non_binary = "raise"``, or
-    in a subclass).
+    ``DfStore(folder + "{}.xlsx")`` (or ``"{}.csv"``, ``"{}.tsv"``...) gives the
+    trajectory of each file, read by ``odus.raw_formats`` with the reader of its
+    extension (``readers``) and the ``layout`` of the tables. Values are then
+    cleaned by ``prep_trajectory_df`` with the ``non_binary`` and ``duplicates``
+    policies. All four are attributes: set them on a store, or in a subclass.
     """
 
+    layout = DFLT_LAYOUT
+    readers = TABLE_READERS
     non_binary = "warn"
     duplicates = "merge"
 
     def __getitem__(self, k):
         cache = self.__dict__.setdefault("_df_cache", {})
-        policies = (self.non_binary, self.duplicates)
-        if (k, policies) not in cache:
-            cache[k, policies] = prep_trajectory_df(
+        settings = (self.layout, id(self.readers), self.non_binary, self.duplicates)
+        if (k, settings) not in cache:
+            raw = read_raw_table(
                 super().__getitem__(k),
+                ext=os.path.splitext(str(k))[1],
+                readers=self.readers,
+            )
+            cache[k, settings] = prep_trajectory_df(
+                trajectory_from_table(raw, layout=self.layout),
                 source=k,
                 non_binary=self.non_binary,
                 duplicates=self.duplicates,
             )
-        return cache[k, policies]
-
-    def _obj_of_data(self, data):
-        df = pd.read_excel(BytesIO(data), header=0)
-        df = df.iloc[:, 1:]
-        df.iloc[0, 0] = "year"
-        df.iloc[1, 0] = "age"
-        df = df.rename(columns={"INTERVIEW ID NUMBER (enter in red)": "category"})
-        df = df.T
-        df.columns = df.iloc[0, :]
-        year_of_age = dict(zip(df.iloc[1:, 1].astype(int), df.iloc[1:, 0].astype(int)))
-        df = df.iloc[1:, 1:]  # the year is kept in attrs, since it isn't a variable
-        df = df.set_index("age").astype(int)
-        df.attrs[YEAR_OF_AGE] = year_of_age
-        return df
+        return cache[k, settings]
 
 
 def _cached_per_instance(getter):
