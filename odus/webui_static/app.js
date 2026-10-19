@@ -4,7 +4,10 @@
 // since variable names may contain commas). Each respondent is a record, so
 // choosing one, prev/next included, is going somewhere: a new history entry, and
 // Back returns to the previous respondent. Choosing variables refines the current
-// view: the entry is replaced. The figures are made in Python (odus.explore).
+// view: the entry is replaced. With &a=<variable>, the view is every respondent
+// lined up on the first year of that variable (clicking a cell of a respondent
+// goes there; clicking a row of that view goes back to its respondent). The
+// figures are made in Python (odus.explore).
 "use strict";
 
 const $ = (id) => document.getElementById(id);
@@ -23,11 +26,16 @@ const api = async (name, params = {}) => {
 // --- route: the one place that reads and writes the URL ---------------------
 function readRoute() {
   const params = new URLSearchParams(location.search);
-  return { respondent: params.get("r"), fields: params.getAll("f").filter(Boolean) };
+  return {
+    respondent: params.get("r"),
+    fields: params.getAll("f").filter(Boolean),
+    align: params.get("a"),
+  };
 }
-function formatRoute({ respondent, fields }) {
+function formatRoute({ respondent, fields, align }) {
   const params = new URLSearchParams();
   if (respondent) params.set("r", respondent);
+  if (align) params.set("a", align);
   for (const field of fields) params.append("f", field);
   const query = params.toString();
   return location.pathname + (query ? "?" + query : "");
@@ -97,7 +105,7 @@ function fillVariables(variables) {
 // --- controls ---------------------------------------------------------------
 function wireControls() {
   $("respondent").addEventListener("change", (e) =>
-    navigate({ ...readRoute(), respondent: e.target.value })
+    navigate({ ...readRoute(), respondent: e.target.value, align: null })
   );
   $("prev").addEventListener("click", () => step(-1));
   $("next").addEventListener("click", () => step(+1));
@@ -122,18 +130,18 @@ function wireControls() {
 }
 
 function step(delta) {
-  const i = respondents.indexOf(readRoute().respondent);
-  const next = respondents[i + delta];
-  if (next) navigate({ ...readRoute(), respondent: next });
+  const route = readRoute();
+  const next = respondents[respondents.indexOf(route.respondent) + delta];
+  if (next) navigate({ ...route, respondent: next, align: null });
 }
 
 // --- the view ---------------------------------------------------------------
 async function render() {
-  const { respondent, fields } = readRoute();
-  if (!respondent) return;
+  const route = readRoute();
+  const { respondent, fields, align } = route;
+  if (!respondent && !align) return;
   const request = ++latestRequest;
-  document.title = `${respondent} · odus explorer`;
-  $("respondent").value = respondent;
+  $("respondent").value = respondent || "";
   const i = respondents.indexOf(respondent);
   $("prev").disabled = i <= 0;
   $("next").disabled = i < 0 || i >= respondents.length - 1;
@@ -143,7 +151,9 @@ async function render() {
   $("variables-summary").textContent = fields.length ? `${fields.length} selected` : "all";
 
   const plot = $("plot");
-  if (window.Plotly) Plotly.purge(plot); // never leave the previous respondent up
+  if (window.Plotly) Plotly.purge(plot); // never leave the previous view up
+  if (align) return renderStack(route, request);
+  document.title = `${respondent} · odus explorer`;
   if (i < 0) {
     plot.replaceChildren();
     plot.removeAttribute("aria-busy");
@@ -158,16 +168,55 @@ async function render() {
     plot.removeAttribute("aria-busy");
     await Plotly.react(plot, result.figure.data, result.figure.layout, { responsive: true });
     plot.setAttribute("aria-label", `Trajectory of ${respondent}`);
-    setStatus(
-      result.missing_fields.length
-        ? `${respondent} has no ${result.missing_fields.join(", ")}.`
-        : ""
-    );
+    onCellClick(plot, ([, variable]) => navigate({ ...route, align: variable }));
+    const missing = result.missing_fields.length
+      ? `${respondent} has no ${result.missing_fields.join(", ")}. `
+      : "";
+    setStatus(`${missing}Click a cell to line every respondent up on that variable.`);
   } catch (error) {
     if (request !== latestRequest) return;
     plot.removeAttribute("aria-busy");
     showError(`Couldn't show ${respondent}: ${error.message}`, render);
   }
+}
+
+async function renderStack(route, request) {
+  const { fields, align } = route;
+  const plot = $("plot");
+  document.title = `First ${align} · odus explorer`;
+  plot.replaceChildren();
+  plot.setAttribute("aria-busy", "true");
+  setStatus(`Lining everyone up on the first year of ${align}…`);
+  try {
+    const result = await api("stack", { align, fields });
+    if (request !== latestRequest) return;
+    plot.removeAttribute("aria-busy");
+    await Plotly.react(plot, result.figure.data, result.figure.layout, { responsive: true });
+    plot.setAttribute("aria-label", `Everyone aligned on the first year of ${align}`);
+    onCellClick(plot, ([key]) => navigate({ respondent: key, fields, align: null }));
+    const { not_aligned, missing_fields } = result.left_out;
+    const out = [
+      not_aligned && `${not_aligned} never had ${align}`,
+      missing_fields && `${missing_fields} lack some of the variables`,
+    ].filter(Boolean);
+    setStatus(
+      `${result.respondents.length} respondents lined up on the first year of ${align}` +
+        (out.length ? ` (left out: ${out.join(", ")})` : "") +
+        ". Click a row to open that respondent."
+    );
+  } catch (error) {
+    if (request !== latestRequest) return;
+    plot.removeAttribute("aria-busy");
+    showError(`Couldn't line up on ${align}: ${error.message}`, render);
+  }
+}
+
+// A click on a cell calls handle(customdata), i.e. [respondent, variable, age].
+function onCellClick(plot, handle) {
+  plot.on("plotly_click", (event) => {
+    const data = event.points && event.points[0] && event.points[0].customdata;
+    if (data) handle(data);
+  });
 }
 
 function setStatus(text) {

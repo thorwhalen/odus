@@ -78,3 +78,29 @@ def test_hover_with_repeated_names_odd_names_and_a_series_of_years(traj):
 def test_non_color_styling_is_refused_clearly(traj):
     with pytest.raises(TypeError, match=r"doesn't take \['fontsize'\]"):
         plot_trajectory_interactive(traj, fontsize=8)
+
+
+def test_cells_carry_what_a_click_is_about(traj):
+    fig = plot_trajectory_interactive(traj, ["WORK", "HEROIN"], key="R1")
+    assert fig.data[0].customdata[1][2] == ["R1", "HEROIN", 20]
+
+
+def test_stacked_interactive_aligns_blocks_of_rows(traj):
+    from odus.interactive import stacked_trajectories_interactive
+
+    late = traj.copy()
+    late.index = late.index + 10  # ages 28..34, first HEROIN at 31 (21 in traj)
+    store = {"s/A.xlsx": traj, "s/B.xlsx": late, "s/C.xlsx": traj[["WORK"]]}
+    fig, left_out = stacked_trajectories_interactive(
+        store, ["HEROIN", "WORK"], x_align="HEROIN"
+    )
+    assert left_out == {"not_aligned": ["s/C.xlsx"], "missing_fields": {}}
+    (heatmap,) = fig.data
+    assert list(heatmap.x) == list(range(-3, 4))  # both span -3..3 around first use
+    labels = ["A.xlsx · HEROIN", "WORK", "B.xlsx · HEROIN", "WORK"]
+    assert list(fig.layout.yaxis.ticktext) == labels
+    assert heatmap.customdata[2][3] == ["s/B.xlsx", "HEROIN", 31]
+    assert "<b>B.xlsx</b>" in heatmap.text[2][3]
+    assert fig.layout.xaxis.title.text == "years since first HEROIN"
+    breaks = [s.y0 for s in fig.layout.shapes if s.y0 == s.y1]
+    assert breaks == [1.5]  # a wider gap between the two respondents

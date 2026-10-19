@@ -566,6 +566,57 @@ def _x_of_trajectory(df, x_align):
     return [age - first_age for age in df.index]
 
 
+def aligned_trajectories(df_store, fields=None, keys=None, *, x_align="age"):
+    """The trajectories of ``df_store``, with their x positions aligned by ``x_align``.
+
+    See ``stacked_trajectories`` for the arguments. Returns ``(aligned, left_out)``:
+    ``aligned`` is a list of ``(key, trajectory_of_the_fields, x)``, and
+    ``left_out`` says which trajectories were left out: ``{"not_aligned": [keys],
+    "missing_fields": {key: [fields]}}``.
+    """
+    aligned, not_aligned, missing_fields = [], [], {}
+    for k in _get_keys(df_store, keys):
+        df = df_store[k]
+        x = _x_of_trajectory(df, x_align)  # on all variables, not only the fields
+        if x is None:
+            not_aligned.append(k)
+            continue
+        if fields is not None and not isinstance(fields, slice):
+            wanted = [fields] if isinstance(fields, str) else list(fields)
+            if missing := [f for f in wanted if f not in df.columns]:
+                missing_fields[k] = missing
+                continue
+        df_fields = _select_fields(df, fields)
+        if df_fields.shape[1] == 0:
+            raise ValueError(f"No variables to plot for {k!r} (fields={fields!r})")
+        aligned.append((k, df_fields, _consecutive_numbers(x, len(df))))
+    return aligned, {"not_aligned": not_aligned, "missing_fields": missing_fields}
+
+
+def _warn_left_out(left_out, x_align):
+    if not_aligned := left_out["not_aligned"]:
+        warnings.warn(
+            f"Left out {len(not_aligned)} trajectories that can't be aligned on "
+            f"{_name_of(x_align)}: {not_aligned}",
+            stacklevel=3,
+        )
+    if missing_fields := left_out["missing_fields"]:
+        warnings.warn(
+            f"Left out {len(missing_fields)} trajectories lacking some of the "
+            f"fields: {missing_fields}",
+            stacklevel=3,
+        )
+
+
+def _x_label(x_align):
+    if callable(x_align):
+        name = _name_of(x_align)
+        return "" if name == "<lambda>" else name
+    if x_align in ("age", "year"):
+        return x_align
+    return f"years since first {x_align}"
+
+
 def stacked_trajectories(
     df_store,
     fields=None,
@@ -603,35 +654,9 @@ def stacked_trajectories(
     Returns:
         The matplotlib figure.
     """
+    plotted, left_out = aligned_trajectories(df_store, fields, keys, x_align=x_align)
+    _warn_left_out(left_out, x_align)
     align_name = _name_of(x_align)
-    plotted, not_aligned, missing_fields = [], [], {}
-    for k in _get_keys(df_store, keys):
-        df = df_store[k]
-        x = _x_of_trajectory(df, x_align)  # on all variables, not only the fields
-        if x is None:
-            not_aligned.append(k)
-            continue
-        if fields is not None and not isinstance(fields, slice):
-            wanted = [fields] if isinstance(fields, str) else list(fields)
-            if missing := [f for f in wanted if f not in df.columns]:
-                missing_fields[k] = missing
-                continue
-        df_fields = _select_fields(df, fields)
-        if df_fields.shape[1] == 0:
-            raise ValueError(f"No variables to plot for {k!r} (fields={fields!r})")
-        plotted.append((k, df_fields, _consecutive_numbers(x, len(df))))
-    if not_aligned:
-        warnings.warn(
-            f"Left out {len(not_aligned)} trajectories that can't be aligned on "
-            f"{align_name}: {not_aligned}",
-            stacklevel=2,
-        )
-    if missing_fields:
-        warnings.warn(
-            f"Left out {len(missing_fields)} trajectories lacking some of the "
-            f"fields: {missing_fields}",
-            stacklevel=2,
-        )
     if not plotted:
         raise ValueError(f"No trajectory to plot (aligned on {align_name})")
 
@@ -682,12 +707,7 @@ def stacked_trajectories(
             fontsize=fontsize,
         )
     if x_label is None:
-        if callable(x_align):
-            x_label = "" if align_name == "<lambda>" else align_name
-        elif x_align in ("age", "year"):
-            x_label = x_align
-        else:
-            x_label = f"years since first {x_align}"
+        x_label = _x_label(x_align)
     axes[-1, 0].set_xlabel(x_label, fontsize=fontsize)
     return fig
 
