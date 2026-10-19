@@ -23,5 +23,6 @@
    plot_utils
    pobj
    raw_data_diagnosis
+   raw_formats
    sequential_var_sets
    util

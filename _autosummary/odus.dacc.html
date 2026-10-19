@@ -212,6 +212,7 @@
 <li class="toctree-l3"><a class="reference internal" href="odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.pobj.html">odus.pobj</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.util.html">odus.util</a></li>
 </ul>
@@ -298,7 +299,7 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#odus.dacc.DfStore" title="odus.dacc.DfStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DfStore</span></code></a>(path_format[, max_levels])</p></td>
-<td><p>The trajectory DataFrames of a folder of survey spreadsheets.</p></td>
+<td><p>The trajectory DataFrames of a folder of survey tables.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">HashableMixin</span></code>()</p></td>
 <td><p></p></td>
@@ -322,10 +323,12 @@ trajectory dataframes, their count tables, and the corresponding potentials.</p>
 <dt class="sig sig-object py" id="odus.dacc.DfStore">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">odus.dacc.</span></span><span class="sig-name descname"><span class="pre">DfStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/dacc.html#DfStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.dacc.DfStore" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">HashableMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LocalBinaryStore</span></code></p>
-<p>The trajectory DataFrames of a folder of survey spreadsheets.</p>
-<p>Values are cleaned by <code class="docutils literal notranslate"><span class="pre">prep_trajectory_df</span></code>, with the <code class="docutils literal notranslate"><span class="pre">non_binary</span></code> and
-<code class="docutils literal notranslate"><span class="pre">duplicates</span></code> policies set as attributes (<code class="docutils literal notranslate"><span class="pre">store.non_binary</span> <span class="pre">=</span> <span class="pre">&quot;raise&quot;</span></code>, or
-in a subclass).</p>
+<p>The trajectory DataFrames of a folder of survey tables.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DfStore(folder</span> <span class="pre">+</span> <span class="pre">&quot;{}.xlsx&quot;)</span></code> (or <code class="docutils literal notranslate"><span class="pre">&quot;{}.csv&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;{}.tsv&quot;</span></code>…) gives the
+trajectory of each file, read by <code class="docutils literal notranslate"><span class="pre">odus.raw_formats</span></code> with the reader of its
+extension (<code class="docutils literal notranslate"><span class="pre">readers</span></code>) and the <code class="docutils literal notranslate"><span class="pre">layout</span></code> of the tables. Values are then
+cleaned by <code class="docutils literal notranslate"><span class="pre">prep_trajectory_df</span></code> with the <code class="docutils literal notranslate"><span class="pre">non_binary</span></code> and <code class="docutils literal notranslate"><span class="pre">duplicates</span></code>
+policies. All four are attributes: set them on a store, or in a subclass.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -351,8 +354,8 @@ in a subclass).</p>
 <span class="sig-prename descclassname"><span class="pre">odus.dacc.</span></span><span class="sig-name descname"><span class="pre">prep_trajectory_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'merge'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/dacc.html#prep_trajectory_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.dacc.prep_trajectory_df" title="Link to this definition">¶</a></dt>
 <dd><p>Clean a trajectory DataFrame (index: ages, columns: variables).</p>
 <ul class="simple">
-<li><p>Columns named like a section title of the survey sheet (<code class="docutils literal notranslate"><span class="pre">NON_VARIABLE_LABELS</span></code>
-of <code class="docutils literal notranslate"><span class="pre">odus.raw_data_diagnosis</span></code>, e.g. “Select States below”) are dropped.</p></li>
+<li><p>Columns named like a section title of the survey sheet (<code class="docutils literal notranslate"><span class="pre">SECTION_TITLES</span></code>
+of <code class="docutils literal notranslate"><span class="pre">odus.raw_formats</span></code>, e.g. “Select States below”) are dropped.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">duplicates</span></code>: what to do with variables appearing more than once (e.g. a
 state lived in during two periods, entered as two rows), names compared
 ignoring case and extra spaces. <code class="docutils literal notranslate"><span class="pre">&quot;merge&quot;</span></code>: one column (with the first
@@ -445,7 +448,7 @@ them to 1 and say which (variable, ages, values); <code class="docutils literal 
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=2a6a9ca9"></script>
+</div><script src="../_static/documentation_options.js?v=0adb0642"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

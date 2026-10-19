@@ -1,0 +1,24 @@
+odus.raw\_formats
+=================
+
+.. automodule:: odus.raw_formats
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      find_label_col
+      is_empty
+      is_section_title
+      normalized_label
+      read_raw_table
+      trajectory_from_long
+      trajectory_from_table
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SurveyLayout
+   

@@ -13,6 +13,7 @@
 - [odus.plot_utils](odus.plot_utils.html.md): Plotting helpers for trajectories and matrices.
 - [odus.pobj](odus.pobj.html.md): Dynamic method injection on objects and classes.
 - [odus.raw_data_diagnosis](odus.raw_data_diagnosis.html.md): Diagnosis of the raw survey spreadsheets.
+- [odus.raw_formats](odus.raw_formats.html.md): Reading raw survey data, of several formats, into trajectories.
 - [odus.sequential_var_sets](odus.sequential_var_sets.html.md): Variables and variable sets over sequential (time-indexed) data.
 - [odus.util](odus.util.html.md): General utilities: image conversion and multi-image file writing.
 

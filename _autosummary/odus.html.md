@@ -20,5 +20,6 @@ used by the rest of the package to reach the bundled survey files.
 | [`plot_utils`](odus.plot_utils.html.md#module-odus.plot_utils)                   | Plotting helpers for trajectories and matrices.                                      |
 | [`pobj`](odus.pobj.html.md#module-odus.pobj)                               | Dynamic method injection on objects and classes.                                     |
 | [`raw_data_diagnosis`](odus.raw_data_diagnosis.html.md#module-odus.raw_data_diagnosis)   | Diagnosis of the raw survey spreadsheets.                                            |
+| [`raw_formats`](odus.raw_formats.html.md#module-odus.raw_formats)                 | Reading raw survey data, of several formats, into trajectories.                      |
 | [`sequential_var_sets`](odus.sequential_var_sets.html.md#module-odus.sequential_var_sets) | Variables and variable sets over sequential (time-indexed) data.                     |
 | [`util`](odus.util.html.md#module-odus.util)                               | General utilities: image conversion and multi-image file writing.                    |

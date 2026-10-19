@@ -7,7 +7,7 @@
 <link rel="alternate" type="text/markdown" href="odus.raw_data_diagnosis.html.md">
 <link rel="describedby" href="../llms.txt" type="text/markdown">
 <link rel="alternate" type="text/markdown" href="odus.raw_data_diagnosis.html.md">
-<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="odus.sequential_var_sets" href="odus.sequential_var_sets.html"><link rel="prev" title="odus.pobj" href="odus.pobj.html">
+<link rel="describedby" href="llms.txt"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="odus.raw_formats" href="odus.raw_formats.html"><link rel="prev" title="odus.pobj" href="odus.pobj.html">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>odus.raw_data_diagnosis - odus</title>
@@ -212,6 +212,7 @@
 <li class="toctree-l3"><a class="reference internal" href="odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.pobj.html">odus.pobj</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="odus.util.html">odus.util</a></li>
 </ul>
@@ -308,26 +309,20 @@ passing any <code class="docutils literal notranslate"><span class="pre">{name:<
 <tr class="row-even"><td><p><a class="reference internal" href="#odus.raw_data_diagnosis.diagnosis_table" title="odus.raw_data_diagnosis.diagnosis_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnosis_table</span></code></a>(problems)</p></td>
 <td><p>A DataFrame with one row per problem (columns: the <code class="docutils literal notranslate"><span class="pre">Problem</span></code> fields).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#odus.raw_data_diagnosis.is_section_title" title="odus.raw_data_diagnosis.is_section_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_section_title</span></code></a>(label, *[, section_titles])</p></td>
-<td><p>Whether a row label is a section title (like &quot;Select States below&quot;).</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_true_idx</span></code>(series)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_true_idx</span></code>(series)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lidx_of_empty_non_white_or_non_empty_white</span></code>(df)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lidx_of_empty_non_white_or_non_empty_white</span></code>(df)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matmask</span></code>(df, mask)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matmask</span></code>(df, mask)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_dotpath_getter</span></code>(dotpath)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_dotpath_getter</span></code>(dotpath)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_known_exceptions_lidx</span></code>(vals_df)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_known_exceptions_lidx</span></code>(vals_df)</p></td>
 <td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#odus.raw_data_diagnosis.normalized_label" title="odus.raw_data_diagnosis.normalized_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalized_label</span></code></a>(label)</p></td>
-<td><p>A label with case and extra whitespace ignored, to compare labels.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pra</span></code>(obj)</p></td>
 <td><p></p></td>
@@ -344,7 +339,7 @@ passing any <code class="docutils literal notranslate"><span class="pre">{name:<
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sheet_to_format_prepped_df</span></code>(sheet)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#odus.raw_data_diagnosis.sheet_view" title="odus.raw_data_diagnosis.sheet_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sheet_view</span></code></a>(sheet, *[, year_row, age_row, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#odus.raw_data_diagnosis.sheet_view" title="odus.raw_data_diagnosis.sheet_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sheet_view</span></code></a>(sheet, *[, layout, year_row, ...])</p></td>
 <td><p>Make a <code class="docutils literal notranslate"><span class="pre">SheetView</span></code> of an <code class="docutils literal notranslate"><span class="pre">openpyxl</span></code> worksheet.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">valid_vals_int_coords</span></code>(vals_df)</p></td>
@@ -453,26 +448,6 @@ that doesn’t have the expected layout gives one <code class="docutils literal 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="odus.raw_data_diagnosis.is_section_title">
-<span class="sig-prename descclassname"><span class="pre">odus.raw_data_diagnosis.</span></span><span class="sig-name descname"><span class="pre">is_section_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('List</span> <span class="pre">of</span> <span class="pre">States',</span> <span class="pre">'Select</span> <span class="pre">States</span> <span class="pre">below',</span> <span class="pre">'Selects</span> <span class="pre">States</span> <span class="pre">below')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/raw_data_diagnosis.html#is_section_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.raw_data_diagnosis.is_section_title" title="Link to this definition">¶</a></dt>
-<dd><p>Whether a row label is a section title (like “Select States below”).</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_section_title</span><span class="p">(</span><span class="s1">' select states BELOW'</span><span class="p">),</span> <span class="n">is_section_title</span><span class="p">(</span><span class="s1">'HEROIN'</span><span class="p">)</span>
-<span class="go">(True, False)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="odus.raw_data_diagnosis.normalized_label">
-<span class="sig-prename descclassname"><span class="pre">odus.raw_data_diagnosis.</span></span><span class="sig-name descname"><span class="pre">normalized_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/raw_data_diagnosis.html#normalized_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.raw_data_diagnosis.normalized_label" title="Link to this definition">¶</a></dt>
-<dd><p>A label with case and extra whitespace ignored, to compare labels.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_label</span><span class="p">(</span><span class="s1">'  New   York '</span><span class="p">)</span> <span class="o">==</span> <span class="n">normalized_label</span><span class="p">(</span><span class="s1">'new york'</span><span class="p">)</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="odus.raw_data_diagnosis.print_diagnosis">
 <span class="sig-prename descclassname"><span class="pre">odus.raw_data_diagnosis.</span></span><span class="sig-name descname"><span class="pre">print_diagnosis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheetname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'age_not_consecutive':</span> <span class="pre">Rule(name='age_not_consecutive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_age_not_consecutive&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&quot;age</span> <span class="pre">{value!r}</span> <span class="pre">in</span> <span class="pre">{coordinate}</span> <span class="pre">doesn't</span> <span class="pre">follow</span> <span class="pre">the</span> <span class="pre">previous</span> <span class="pre">age&quot;)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'age_year_mismatch'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'age_year_mismatch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_age_year_mismatch&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&quot;age</span> <span class="pre">{value!r}</span> <span class="pre">in</span> <span class="pre">{coordinate}</span> <span class="pre">doesn't</span> <span class="pre">match</span> <span class="pre">its</span> <span class="pre">year</span> <span class="pre">(year</span> <span class="pre">-</span> <span class="pre">age</span> <span class="pre">differs</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">column's)&quot;)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'duplicate_variable'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'duplicate_variable'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_duplicate_variable&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{coordinate}:</span> <span class="pre">variable</span> <span class="pre">{value!r}</span> <span class="pre">appears</span> <span class="pre">more</span> <span class="pre">than</span> <span class="pre">once')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'empty_but_colored'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'empty_but_colored'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_empty_but_colored&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{coordinate}</span> <span class="pre">({label})</span> <span class="pre">is</span> <span class="pre">colored</span> <span class="pre">but</span> <span class="pre">empty')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'filled_but_uncolored'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'filled_but_uncolored'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_filled_but_uncolored&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{coordinate}</span> <span class="pre">({label})</span> <span class="pre">has</span> <span class="pre">a</span> <span class="pre">value</span> <span class="pre">({value!r})</span> <span class="pre">but</span> <span class="pre">no</span> <span class="pre">color')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'not_binary'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'not_binary'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_not_binary&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{coordinate}</span> <span class="pre">({label})</span> <span class="pre">should</span> <span class="pre">be</span> <span class="pre">0</span> <span class="pre">or</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">but</span> <span class="pre">is</span> <span class="pre">{value!r}')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'year_not_consecutive'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Rule(name</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'year_not_consecutive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_year_not_consecutive&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&quot;year</span> <span class="pre">{value!r}</span> <span class="pre">in</span> <span class="pre">{coordinate}</span> <span class="pre">doesn't</span> <span class="pre">follow</span> <span class="pre">the</span> <span class="pre">previous</span> <span class="pre">year&quot;)}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**view_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/raw_data_diagnosis.html#print_diagnosis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.raw_data_diagnosis.print_diagnosis" title="Link to this definition">¶</a></dt>
 <dd><p>Print the diagnosis of the raw xls files in <code class="code docutils literal notranslate"><span class="pre">source_dir</span></code>.</p>
@@ -509,9 +484,11 @@ color rules only make sense for spreadsheets where filled cells are colored.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="odus.raw_data_diagnosis.sheet_view">
-<span class="sig-prename descclassname"><span class="pre">odus.raw_data_diagnosis.</span></span><span class="sig-name descname"><span class="pre">sheet_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_start_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_variable_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('List</span> <span class="pre">of</span> <span class="pre">States',</span> <span class="pre">'Select</span> <span class="pre">States</span> <span class="pre">below',</span> <span class="pre">'Selects</span> <span class="pre">States</span> <span class="pre">below')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/raw_data_diagnosis.html#sheet_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.raw_data_diagnosis.sheet_view" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">odus.raw_data_diagnosis.</span></span><span class="sig-name descname"><span class="pre">sheet_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheet</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SurveyLayout(year_row=1,</span> <span class="pre">age_row=2,</span> <span class="pre">data_start_row=3,</span> <span class="pre">label_col=None,</span> <span class="pre">section_titles=('List</span> <span class="pre">of</span> <span class="pre">States',</span> <span class="pre">'Select</span> <span class="pre">States</span> <span class="pre">below',</span> <span class="pre">'Selects</span> <span class="pre">States</span> <span class="pre">below'),</span> <span class="pre">empty_value=None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_start_row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_variable_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/raw_data_diagnosis.html#sheet_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.raw_data_diagnosis.sheet_view" title="Link to this definition">¶</a></dt>
 <dd><p>Make a <code class="docutils literal notranslate"><span class="pre">SheetView</span></code> of an <code class="docutils literal notranslate"><span class="pre">openpyxl</span></code> worksheet.</p>
-<p>The sheet is cropped to its last labeled row and last column with an age.</p>
+<p>Where things are in the sheet is given by <code class="docutils literal notranslate"><span class="pre">layout</span></code> (an
+<code class="docutils literal notranslate"><span class="pre">odus.raw_formats.SurveyLayout</span></code>); the other keyword arguments override it.
+The sheet is cropped to its last labeled row and last column with an age.</p>
 </dd></dl>
 
 </section>
@@ -521,12 +498,12 @@ color rules only make sense for spreadsheets where filled cells are colored.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="odus.sequential_var_sets.html">
+          <a class="next-page" href="odus.raw_formats.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">odus.sequential_var_sets</div>
+                <div class="title">odus.raw_formats</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -579,8 +556,6 @@ color rules only make sense for spreadsheets where filled cells are colored.</p>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.diagnose_file"><code class="docutils literal notranslate"><span class="pre">diagnose_file()</span></code></a></li>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.diagnose_view"><code class="docutils literal notranslate"><span class="pre">diagnose_view()</span></code></a></li>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.diagnosis_table"><code class="docutils literal notranslate"><span class="pre">diagnosis_table()</span></code></a></li>
-<li><a class="reference internal" href="#odus.raw_data_diagnosis.is_section_title"><code class="docutils literal notranslate"><span class="pre">is_section_title()</span></code></a></li>
-<li><a class="reference internal" href="#odus.raw_data_diagnosis.normalized_label"><code class="docutils literal notranslate"><span class="pre">normalized_label()</span></code></a></li>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.print_diagnosis"><code class="docutils literal notranslate"><span class="pre">print_diagnosis()</span></code></a></li>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.select_rules"><code class="docutils literal notranslate"><span class="pre">select_rules()</span></code></a></li>
 <li><a class="reference internal" href="#odus.raw_data_diagnosis.sheet_view"><code class="docutils literal notranslate"><span class="pre">sheet_view()</span></code></a></li>
@@ -595,7 +570,7 @@ color rules only make sense for spreadsheets where filled cells are colored.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=2a6a9ca9"></script>
+</div><script src="../_static/documentation_options.js?v=0adb0642"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

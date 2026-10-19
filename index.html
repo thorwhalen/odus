@@ -212,6 +212,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.pobj.html">odus.pobj</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/odus.util.html">odus.util</a></li>
 </ul>
@@ -378,6 +379,24 @@
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">DfStore</span></code> cleans each trajectory with <code class="docutils literal notranslate"><span class="pre">prep_trajectory_df</span></code>. It drops section-title rows (“Select States below”), merges a variable entered on two rows (a state lived in during two periods) into one column, and sets values other than 0 and 1 to 1 with a warning that names them. Change that with <code class="docutils literal notranslate"><span class="pre">df_store.non_binary</span> <span class="pre">=</span> <span class="pre">&quot;keep&quot;</span></code> (or <code class="docutils literal notranslate"><span class="pre">&quot;raise&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;binarize&quot;</span></code> to set them to 1 silently) and <code class="docutils literal notranslate"><span class="pre">df_store.duplicates</span> <span class="pre">=</span> <span class="pre">&quot;keep&quot;</span></code> (or <code class="docutils literal notranslate"><span class="pre">&quot;raise&quot;</span></code>).</p>
+<section id="other-data-formats-and-layouts">
+<h2>Other data formats and layouts<a class="headerlink" href="#other-data-formats-and-layouts" title="Link to this heading">¶</a></h2>
+<p>Where the data is read from is configuration, in <code class="docutils literal notranslate"><span class="pre">odus.raw_formats</span></code>:</p>
+<ul class="simple">
+<li><p><strong>Other file formats.</strong> <code class="docutils literal notranslate"><span class="pre">DfStore(folder</span> <span class="pre">+</span> <span class="pre">&quot;/{}.csv&quot;)</span></code> (or <code class="docutils literal notranslate"><span class="pre">.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">.xls</span></code>) works like the <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> store: each file is read with the reader of its extension (<code class="docutils literal notranslate"><span class="pre">TABLE_READERS</span></code>). Set <code class="docutils literal notranslate"><span class="pre">df_store.readers</span></code> to add others.</p></li>
+<li><p><strong>Other layouts.</strong> A <code class="docutils literal notranslate"><span class="pre">SurveyLayout</span></code> says where a table’s years, ages, variable names and values are. Its defaults describe the ODUS spreadsheets: years in row 2, ages in row 3, variables from row 4, the names in the column with the most text. For example, with ages in the first row, no years, and empty cells meaning 0:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">SurveyLayout</span>
+
+<span class="n">df_store</span> <span class="o">=</span> <span class="n">DfStore</span><span class="p">(</span><span class="n">my_folder</span> <span class="o">+</span> <span class="s2">"/</span><span class="si">{}</span><span class="s2">.csv"</span><span class="p">)</span>
+<span class="n">df_store</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">SurveyLayout</span><span class="p">(</span><span class="n">year_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">age_row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">empty_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The diagnosis tools take the same <code class="docutils literal notranslate"><span class="pre">layout</span></code> (<code class="docutils literal notranslate"><span class="pre">diagnose_file(path,</span> <span class="pre">layout=...)</span></code>).</p>
+<ul class="simple">
+<li><p><strong>Long (“tidy”) tables</strong>, with one row per (age, variable, value), become trajectories with <code class="docutils literal notranslate"><span class="pre">trajectory_from_long(df,</span> <span class="pre">age=&quot;age&quot;,</span> <span class="pre">variable=&quot;variable&quot;,</span> <span class="pre">value=&quot;value&quot;)</span></code>.</p></li>
+</ul>
+</section>
 </section>
 <section id="poking-around">
 <h1>Poking around<a class="headerlink" href="#poking-around" title="Link to this heading">¶</a></h1>
@@ -1554,7 +1573,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:10 UTC from <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a">70e537e</a> (master) · odus 0.0.15 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:31 UTC from <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d">4e56f9d</a> (master) · odus 0.0.16 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1590,7 +1609,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=2a6a9ca9"></script>
+</div><script src="_static/documentation_options.js?v=0adb0642"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

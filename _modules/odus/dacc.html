@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.pobj.html">odus.pobj</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.util.html">odus.util</a></li>
 </ul>
@@ -263,7 +264,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
 
 <span class="c1"># get py2store here: https://github.com/i2mint/py2store</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">py2store.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Store</span>
@@ -275,6 +275,15 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">odus.sequential_var_sets</span><span class="w"> </span><span class="kn">import</span> <span class="n">PVar</span><span class="p">,</span> <span class="n">VarSet</span><span class="p">,</span> <span class="n">DfData</span><span class="p">,</span> <span class="n">extract_kps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_formats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DFLT_LAYOUT</span><span class="p">,</span>
+    <span class="n">TABLE_READERS</span><span class="p">,</span>
+    <span class="n">YEAR_OF_AGE</span><span class="p">,</span>  <span class="c1"># noqa: F401  (re-exported: it used to be defined here)</span>
+    <span class="n">is_section_title</span><span class="p">,</span>
+    <span class="n">normalized_label</span><span class="p">,</span>
+    <span class="n">read_raw_table</span><span class="p">,</span>
+    <span class="n">trajectory_from_table</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># from ut.pplot.matrix import heatmap</span>
 
@@ -370,7 +379,6 @@
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
 
-<span class="n">YEAR_OF_AGE</span> <span class="o">=</span> <span class="s2">"year_of_age"</span>  <span class="c1"># attrs key of a trajectory's {age: year} mapping</span>
 <span class="n">NON_BINARY_POLICIES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"warn"</span><span class="p">,</span> <span class="s2">"binarize"</span><span class="p">,</span> <span class="s2">"keep"</span><span class="p">,</span> <span class="s2">"raise"</span><span class="p">)</span>
 
 
@@ -390,8 +398,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">prep_trajectory_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">non_binary</span><span class="o">=</span><span class="s2">"warn"</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">"merge"</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Clean a trajectory DataFrame (index: ages, columns: variables).</span>
 
-<span class="sd">    - Columns named like a section title of the survey sheet (``NON_VARIABLE_LABELS``</span>
-<span class="sd">      of ``odus.raw_data_diagnosis``, e.g. "Select States below") are dropped.</span>
+<span class="sd">    - Columns named like a section title of the survey sheet (``SECTION_TITLES``</span>
+<span class="sd">      of ``odus.raw_formats``, e.g. "Select States below") are dropped.</span>
 <span class="sd">    - ``duplicates``: what to do with variables appearing more than once (e.g. a</span>
 <span class="sd">      state lived in during two periods, entered as two rows), names compared</span>
 <span class="sd">      ignoring case and extra spaces. ``"merge"``: one column (with the first</span>
@@ -412,8 +420,6 @@
 <span class="sd">    &gt;&gt;&gt; out.columns.tolist(), out.values.tolist()</span>
 <span class="sd">    (['GA', 'NJ'], [[1, 0], [0, 1]])</span>
 <span class="sd">    """</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_data_diagnosis</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_section_title</span><span class="p">,</span> <span class="n">normalized_label</span>
-
     <span class="k">if</span> <span class="n">non_binary</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NON_BINARY_POLICIES</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"non_binary should be one of </span><span class="si">{</span><span class="n">NON_BINARY_POLICIES</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">duplicates</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DUPLICATES_POLICIES</span><span class="p">:</span>
@@ -461,41 +467,37 @@
 <div class="viewcode-block" id="DfStore">
 <a class="viewcode-back" href="../../_autosummary/odus.dacc.html#odus.dacc.DfStore">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DfStore</span><span class="p">(</span><span class="n">HashableMixin</span><span class="p">,</span> <span class="n">ReadOnlyMixin</span><span class="p">,</span> <span class="n">LocalBinaryStore</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""The trajectory DataFrames of a folder of survey spreadsheets.</span>
+<span class="w">    </span><span class="sd">"""The trajectory DataFrames of a folder of survey tables.</span>
 
-<span class="sd">    Values are cleaned by ``prep_trajectory_df``, with the ``non_binary`` and</span>
-<span class="sd">    ``duplicates`` policies set as attributes (``store.non_binary = "raise"``, or</span>
-<span class="sd">    in a subclass).</span>
+<span class="sd">    ``DfStore(folder + "{}.xlsx")`` (or ``"{}.csv"``, ``"{}.tsv"``...) gives the</span>
+<span class="sd">    trajectory of each file, read by ``odus.raw_formats`` with the reader of its</span>
+<span class="sd">    extension (``readers``) and the ``layout`` of the tables. Values are then</span>
+<span class="sd">    cleaned by ``prep_trajectory_df`` with the ``non_binary`` and ``duplicates``</span>
+<span class="sd">    policies. All four are attributes: set them on a store, or in a subclass.</span>
 <span class="sd">    """</span>
 
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">DFLT_LAYOUT</span>
+    <span class="n">readers</span> <span class="o">=</span> <span class="n">TABLE_READERS</span>
     <span class="n">non_binary</span> <span class="o">=</span> <span class="s2">"warn"</span>
     <span class="n">duplicates</span> <span class="o">=</span> <span class="s2">"merge"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"_df_cache"</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">policies</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">non_binary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicates</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">policies</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
-            <span class="n">cache</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">policies</span><span class="p">]</span> <span class="o">=</span> <span class="n">prep_trajectory_df</span><span class="p">(</span>
+        <span class="n">readers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">ext</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">ext</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">readers</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">readers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_binary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicates</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">read_raw_table</span><span class="p">(</span>
                 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
+                <span class="n">ext</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">readers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">readers</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">settings</span><span class="p">]</span> <span class="o">=</span> <span class="n">prep_trajectory_df</span><span class="p">(</span>
+                <span class="n">trajectory_from_table</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">),</span>
                 <span class="n">source</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
                 <span class="n">non_binary</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">non_binary</span><span class="p">,</span>
                 <span class="n">duplicates</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duplicates</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">policies</span><span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_obj_of_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"year"</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"age"</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"INTERVIEW ID NUMBER (enter in red)"</span><span class="p">:</span> <span class="s2">"category"</span><span class="p">})</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">year_of_age</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)))</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># the year is kept in attrs, since it isn't a variable</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"age"</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">YEAR_OF_AGE</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_of_age</span>
-        <span class="k">return</span> <span class="n">df</span></div>
+        <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">settings</span><span class="p">]</span></div>
 
 
 
@@ -651,7 +653,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=2a6a9ca9"></script>
+</div><script src="../../_static/documentation_options.js?v=0adb0642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

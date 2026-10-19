@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.plot_utils.html">odus.plot_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.pobj.html">odus.pobj</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.raw_data_diagnosis.html">odus.raw_data_diagnosis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.raw_formats.html">odus.raw_formats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.sequential_var_sets.html">odus.sequential_var_sets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/odus.util.html">odus.util</a></li>
 </ul>
@@ -277,6 +278,14 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_formats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F401  (some re-exported: they were defined here)</span>
+    <span class="n">DFLT_LAYOUT</span><span class="p">,</span>
+    <span class="n">SECTION_TITLES</span><span class="p">,</span>
+    <span class="n">find_label_col</span><span class="p">,</span>
+    <span class="n">is_empty</span><span class="p">,</span>
+    <span class="n">is_section_title</span><span class="p">,</span>
+    <span class="n">normalized_label</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openpyxl</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">load_workbook</span><span class="p">,</span>
 <span class="p">)</span>  <span class="c1"># Get it here: https://pypi.org/project/openpyxl/ (or pip install openpyxl)</span>
@@ -412,39 +421,11 @@
 <span class="c1"># --------------------------------------------------------------------------------------</span>
 <span class="c1"># Rule-based diagnosis</span>
 
-<span class="n">YEAR_ROW</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># row holding the years (0-based, in the sheet)</span>
-<span class="n">AGE_ROW</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># row holding the ages</span>
-<span class="n">DATA_START_ROW</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># first row of variables</span>
-<span class="n">NON_VARIABLE_LABELS</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># section titles, compared ignoring case and spaces</span>
-    <span class="s2">"List of States"</span><span class="p">,</span>
-    <span class="s2">"Select States below"</span><span class="p">,</span>
-    <span class="s2">"Selects States below"</span><span class="p">,</span>  <span class="c1"># a typo found in the surveys</span>
-<span class="p">)</span>
-
-
-<div class="viewcode-block" id="normalized_label">
-<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.normalized_label">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">normalized_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A label with case and extra whitespace ignored, to compare labels.</span>
-
-<span class="sd">    &gt;&gt;&gt; normalized_label('  New   York ') == normalized_label('new york')</span>
-<span class="sd">    True</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="is_section_title">
-<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.is_section_title">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_section_title</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">section_titles</span><span class="o">=</span><span class="n">NON_VARIABLE_LABELS</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Whether a row label is a section title (like "Select States below").</span>
-
-<span class="sd">    &gt;&gt;&gt; is_section_title(' select states BELOW'), is_section_title('HEROIN')</span>
-<span class="sd">    (True, False)</span>
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="n">normalized_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">normalized_label</span><span class="p">,</span> <span class="n">section_titles</span><span class="p">))</span></div>
-
-
+<span class="c1"># The layout of the sheets is configured in odus.raw_formats (DFLT_LAYOUT)</span>
+<span class="n">YEAR_ROW</span> <span class="o">=</span> <span class="n">DFLT_LAYOUT</span><span class="o">.</span><span class="n">year_row</span>  <span class="c1"># row holding the years (0-based, in the sheet)</span>
+<span class="n">AGE_ROW</span> <span class="o">=</span> <span class="n">DFLT_LAYOUT</span><span class="o">.</span><span class="n">age_row</span>  <span class="c1"># row holding the ages</span>
+<span class="n">DATA_START_ROW</span> <span class="o">=</span> <span class="n">DFLT_LAYOUT</span><span class="o">.</span><span class="n">data_start_row</span>  <span class="c1"># first row of variables</span>
+<span class="n">NON_VARIABLE_LABELS</span> <span class="o">=</span> <span class="n">SECTION_TITLES</span>  <span class="c1"># section titles, compared ignoring case/spaces</span>
 
 <span class="n">UNREADABLE_SHEET</span> <span class="o">=</span> <span class="s2">"unreadable_sheet"</span>  <span class="c1"># rule name of a sheet that can't be read</span>
 
@@ -484,7 +465,7 @@
     <span class="n">coordinate</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
     <span class="n">label_col</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">data_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-    <span class="n">year_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">YEAR_ROW</span>
+    <span class="n">year_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">YEAR_ROW</span>
     <span class="n">age_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">AGE_ROW</span>
 
     <span class="nd">@property</span>
@@ -516,34 +497,29 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_label_col</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_start_row</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""The column with the most text from ``data_start_row`` on (the variable names)."""</span>
-    <span class="n">is_text</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">data_start_row</span><span class="p">:]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-    <span class="p">)</span>
-    <span class="n">n_texts</span> <span class="o">=</span> <span class="n">is_text</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">n_texts</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Couldn't find the column of variable names: no text from row "</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data_start_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> of the sheet on"</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">n_texts</span><span class="p">))</span>
-
-
 <div class="viewcode-block" id="sheet_view">
 <a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.sheet_view">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sheet_view</span><span class="p">(</span>
     <span class="n">sheet</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">year_row</span><span class="o">=</span><span class="n">YEAR_ROW</span><span class="p">,</span>
-    <span class="n">age_row</span><span class="o">=</span><span class="n">AGE_ROW</span><span class="p">,</span>
-    <span class="n">data_start_row</span><span class="o">=</span><span class="n">DATA_START_ROW</span><span class="p">,</span>
-    <span class="n">non_variable_labels</span><span class="o">=</span><span class="n">NON_VARIABLE_LABELS</span><span class="p">,</span>
+    <span class="n">layout</span><span class="o">=</span><span class="n">DFLT_LAYOUT</span><span class="p">,</span>
+    <span class="n">year_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">age_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_start_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">non_variable_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Make a ``SheetView`` of an ``openpyxl`` worksheet.</span>
 
+<span class="sd">    Where things are in the sheet is given by ``layout`` (an</span>
+<span class="sd">    ``odus.raw_formats.SurveyLayout``); the other keyword arguments override it.</span>
 <span class="sd">    The sheet is cropped to its last labeled row and last column with an age.</span>
 <span class="sd">    """</span>
+    <span class="n">year_row</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">year_row</span> <span class="k">if</span> <span class="n">year_row</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">year_row</span>
+    <span class="n">age_row</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">age_row</span> <span class="k">if</span> <span class="n">age_row</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">age_row</span>
+    <span class="k">if</span> <span class="n">data_start_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_start_row</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">data_start_row</span>
+    <span class="k">if</span> <span class="n">non_variable_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">non_variable_labels</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">section_titles</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sheet</span><span class="p">]</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
     <span class="n">colored</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="n">_is_colored</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">])</span>
@@ -551,7 +527,9 @@
     <span class="k">if</span> <span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">data_start_row</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The sheet has only </span><span class="si">{</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows: Nothing to check"</span><span class="p">)</span>
 
-    <span class="n">label_col</span> <span class="o">=</span> <span class="n">_label_col</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="n">data_start_row</span><span class="p">)</span>
+    <span class="n">label_col</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">label_col</span>
+    <span class="k">if</span> <span class="n">label_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">label_col</span> <span class="o">=</span> <span class="n">find_label_col</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="n">data_start_row</span><span class="p">)</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">label_col</span><span class="p">]</span>
     <span class="n">is_row_label</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
     <span class="n">is_title</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">is_section_title</span><span class="p">,</span> <span class="n">section_titles</span><span class="o">=</span><span class="n">non_variable_labels</span><span class="p">))</span>
@@ -665,12 +643,16 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_year_not_consecutive</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">year_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># the layout has no years</span>
+        <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">_header_row_flags</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">year_row</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_age_year_mismatch</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Flag ages for which ``year - age`` differs from that of most columns."""</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">year_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># the layout has no years</span>
+        <span class="k">return</span> <span class="n">mask</span>
     <span class="n">diffs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">j</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">year_row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">data_cols</span>
@@ -907,7 +889,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=2a6a9ca9"></script>
+</div><script src="../../_static/documentation_options.js?v=0adb0642"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

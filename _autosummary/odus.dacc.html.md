@@ -18,25 +18,27 @@ trajectory dataframes, their count tables, and the corresponding potentials.
 
 ### Classes
 
-| `Dacc`(xls_rootdir[, categories])                                                     |                                                               |
-|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| `DelegMap`(dfunc[, dmap])                                                             |                                                               |
-| [`DfStore`](#odus.dacc.DfStore)(path_format[, max_levels])   | The trajectory DataFrames of a folder of survey spreadsheets. |
-| `HashableMixin`()                                                                     |                                                               |
-| [`PotStore`](#odus.dacc.PotStore)(df_store[, store])          |                                                               |
-| `Struct`(\*\*kwargs)                                                                  |                                                               |
-| [`VarSetCountsStore`](#odus.dacc.VarSetCountsStore)(df_store[, store]) |                                                               |
-| [`VarStr`](#odus.dacc.VarStr)                               |                                                               |
+| `Dacc`(xls_rootdir[, categories])                                                     |                                                         |
+|---------------------------------------------------------------------------------------|---------------------------------------------------------|
+| `DelegMap`(dfunc[, dmap])                                                             |                                                         |
+| [`DfStore`](#odus.dacc.DfStore)(path_format[, max_levels])   | The trajectory DataFrames of a folder of survey tables. |
+| `HashableMixin`()                                                                     |                                                         |
+| [`PotStore`](#odus.dacc.PotStore)(df_store[, store])          |                                                         |
+| `Struct`(\*\*kwargs)                                                                  |                                                         |
+| [`VarSetCountsStore`](#odus.dacc.VarSetCountsStore)(df_store[, store]) |                                                         |
+| [`VarStr`](#odus.dacc.VarStr)                               |                                                         |
 
 ### *class* odus.dacc.DfStore(path_format, max_levels=None)
 
 Bases: `HashableMixin`, `ReadOnlyMixin`, `LocalBinaryStore`
 
-The trajectory DataFrames of a folder of survey spreadsheets.
+The trajectory DataFrames of a folder of survey tables.
 
-Values are cleaned by `prep_trajectory_df`, with the `non_binary` and
-`duplicates` policies set as attributes (`store.non_binary = "raise"`, or
-in a subclass).
+`DfStore(folder + "{}.xlsx")` (or `"{}.csv"`, `"{}.tsv"`…) gives the
+trajectory of each file, read by `odus.raw_formats` with the reader of its
+extension (`readers`) and the `layout` of the tables. Values are then
+cleaned by `prep_trajectory_df` with the `non_binary` and `duplicates`
+policies. All four are attributes: set them on a store, or in a subclass.
 
 ### *class* odus.dacc.PotStore(df_store, store=None)
 
@@ -54,8 +56,8 @@ Bases: [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 Clean a trajectory DataFrame (index: ages, columns: variables).
 
-- Columns named like a section title of the survey sheet (`NON_VARIABLE_LABELS`
-  of `odus.raw_data_diagnosis`, e.g. “Select States below”) are dropped.
+- Columns named like a section title of the survey sheet (`SECTION_TITLES`
+  of `odus.raw_formats`, e.g. “Select States below”) are dropped.
 - `duplicates`: what to do with variables appearing more than once (e.g. a
   state lived in during two periods, entered as two rows), names compared
   ignoring case and extra spaces. `"merge"`: one column (with the first

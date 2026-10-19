@@ -1,4 +1,4 @@
-> built 2026-10-19 12:10 UTC from 70e537e (master) · odus 0.0.15. Details: build_info.json
+> built 2026-10-19 12:31 UTC from 4e56f9d (master) · odus 0.0.16. Details: build_info.json
 
 # index.html.md
 
@@ -127,6 +127,24 @@ pstore = PotStore(df_store)
 ```
 
 `DfStore` cleans each trajectory with `prep_trajectory_df`. It drops section-title rows (“Select States below”), merges a variable entered on two rows (a state lived in during two periods) into one column, and sets values other than 0 and 1 to 1 with a warning that names them. Change that with `df_store.non_binary = "keep"` (or `"raise"`, or `"binarize"` to set them to 1 silently) and `df_store.duplicates = "keep"` (or `"raise"`).
+
+## Other data formats and layouts
+
+Where the data is read from is configuration, in `odus.raw_formats`:
+
+- **Other file formats.** `DfStore(folder + "/{}.csv")` (or `.tsv`, `.xls`) works like the `.xlsx` store: each file is read with the reader of its extension (`TABLE_READERS`). Set `df_store.readers` to add others.
+- **Other layouts.** A `SurveyLayout` says where a table’s years, ages, variable names and values are. Its defaults describe the ODUS spreadsheets: years in row 2, ages in row 3, variables from row 4, the names in the column with the most text. For example, with ages in the first row, no years, and empty cells meaning 0:
+
+```python
+from odus.raw_formats import SurveyLayout
+
+df_store = DfStore(my_folder + "/{}.csv")
+df_store.layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1, empty_value=0)
+```
+
+The diagnosis tools take the same `layout` (`diagnose_file(path, layout=...)`).
+
+- **Long (“tidy”) tables**, with one row per (age, variable, value), become trajectories with `trajectory_from_long(df, age="age", variable="variable", value="value")`.
 
 # Poking around
 
@@ -1486,25 +1504,27 @@ trajectory dataframes, their count tables, and the corresponding potentials.
 
 ### Classes
 
-| `Dacc`(xls_rootdir[, categories])                                                     |                                                               |
-|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| `DelegMap`(dfunc[, dmap])                                                             |                                                               |
-| [`DfStore`](_autosummary/odus.dacc.html.md#odus.dacc.DfStore)(path_format[, max_levels])   | The trajectory DataFrames of a folder of survey spreadsheets. |
-| `HashableMixin`()                                                                     |                                                               |
-| [`PotStore`](_autosummary/odus.dacc.html.md#odus.dacc.PotStore)(df_store[, store])          |                                                               |
-| `Struct`(\*\*kwargs)                                                                  |                                                               |
-| [`VarSetCountsStore`](_autosummary/odus.dacc.html.md#odus.dacc.VarSetCountsStore)(df_store[, store]) |                                                               |
-| [`VarStr`](_autosummary/odus.dacc.html.md#odus.dacc.VarStr)                               |                                                               |
+| `Dacc`(xls_rootdir[, categories])                                                     |                                                         |
+|---------------------------------------------------------------------------------------|---------------------------------------------------------|
+| `DelegMap`(dfunc[, dmap])                                                             |                                                         |
+| [`DfStore`](_autosummary/odus.dacc.html.md#odus.dacc.DfStore)(path_format[, max_levels])   | The trajectory DataFrames of a folder of survey tables. |
+| `HashableMixin`()                                                                     |                                                         |
+| [`PotStore`](_autosummary/odus.dacc.html.md#odus.dacc.PotStore)(df_store[, store])          |                                                         |
+| `Struct`(\*\*kwargs)                                                                  |                                                         |
+| [`VarSetCountsStore`](_autosummary/odus.dacc.html.md#odus.dacc.VarSetCountsStore)(df_store[, store]) |                                                         |
+| [`VarStr`](_autosummary/odus.dacc.html.md#odus.dacc.VarStr)                               |                                                         |
 
 ### *class* odus.dacc.DfStore(path_format, max_levels=None)
 
 Bases: `HashableMixin`, `ReadOnlyMixin`, `LocalBinaryStore`
 
-The trajectory DataFrames of a folder of survey spreadsheets.
+The trajectory DataFrames of a folder of survey tables.
 
-Values are cleaned by `prep_trajectory_df`, with the `non_binary` and
-`duplicates` policies set as attributes (`store.non_binary = "raise"`, or
-in a subclass).
+`DfStore(folder + "{}.xlsx")` (or `"{}.csv"`, `"{}.tsv"`…) gives the
+trajectory of each file, read by `odus.raw_formats` with the reader of its
+extension (`readers`) and the `layout` of the tables. Values are then
+cleaned by `prep_trajectory_df` with the `non_binary` and `duplicates`
+policies. All four are attributes: set them on a store, or in a subclass.
 
 ### *class* odus.dacc.PotStore(df_store, store=None)
 
@@ -1522,8 +1542,8 @@ Bases: [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 Clean a trajectory DataFrame (index: ages, columns: variables).
 
-- Columns named like a section title of the survey sheet (`NON_VARIABLE_LABELS`
-  of `odus.raw_data_diagnosis`, e.g. “Select States below”) are dropped.
+- Columns named like a section title of the survey sheet (`SECTION_TITLES`
+  of `odus.raw_formats`, e.g. “Select States below”) are dropped.
 - `duplicates`: what to do with variables appearing more than once (e.g. a
   state lived in during two periods, entered as two rows), names compared
   ignoring case and extra spaces. `"merge"`: one column (with the first
@@ -1571,6 +1591,7 @@ used by the rest of the package to reach the bundled survey files.
 | [`plot_utils`](_autosummary/odus.plot_utils.html.md#module-odus.plot_utils)                   | Plotting helpers for trajectories and matrices.                                      |
 | [`pobj`](_autosummary/odus.pobj.html.md#module-odus.pobj)                               | Dynamic method injection on objects and classes.                                     |
 | [`raw_data_diagnosis`](_autosummary/odus.raw_data_diagnosis.html.md#module-odus.raw_data_diagnosis)   | Diagnosis of the raw survey spreadsheets.                                            |
+| [`raw_formats`](_autosummary/odus.raw_formats.html.md#module-odus.raw_formats)                 | Reading raw survey data, of several formats, into trajectories.                      |
 | [`sequential_var_sets`](_autosummary/odus.sequential_var_sets.html.md#module-odus.sequential_var_sets) | Variables and variable sets over sequential (time-indexed) data.                     |
 | [`util`](_autosummary/odus.util.html.md#module-odus.util)                               | General utilities: image conversion and multi-image file writing.                    |
 
@@ -2065,19 +2086,17 @@ passing any `{name: Rule}` mapping as `rules`:
 | `diagnosis_lidx`(df)                                                                             |                                                                        |
 | `diagnosis_lidx_of_xls_file`(xls_filepath[, ...])                                                |                                                                        |
 | [`diagnosis_table`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.diagnosis_table)(problems)                       | A DataFrame with one row per problem (columns: the `Problem` fields).  |
-| [`is_section_title`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.is_section_title)(label, \*[, section_titles])   | Whether a row label is a section title (like "Select States below").   |
 | `last_true_idx`(series)                                                                          |                                                                        |
 | `lidx_of_empty_non_white_or_non_empty_white`(df)                                                 |                                                                        |
 | `matmask`(df, mask)                                                                              |                                                                        |
 | `mk_dotpath_getter`(dotpath)                                                                     |                                                                        |
 | `mk_known_exceptions_lidx`(vals_df)                                                              |                                                                        |
-| [`normalized_label`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.normalized_label)(label)                         | A label with case and extra whitespace ignored, to compare labels.     |
 | `pra`(obj)                                                                                       |                                                                        |
 | [`print_diagnosis`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.print_diagnosis)([source_dir, sheetname, rules]) | Print the diagnosis of the raw xls files in `source_dir`.              |
 | `row_lidx_to_mat_lidx`(row_lidx, n_cols)                                                         |                                                                        |
 | [`select_rules`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.select_rules)([include, exclude, extra, rules])  | Make a `{name: Rule}` mapping: turn rules on or off, and add your own. |
 | `sheet_to_format_prepped_df`(sheet)                                                              |                                                                        |
-| [`sheet_view`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.sheet_view)(sheet, \*[, year_row, age_row, ...]) | Make a `SheetView` of an `openpyxl` worksheet.                         |
+| [`sheet_view`](_autosummary/odus.raw_data_diagnosis.html.md#odus.raw_data_diagnosis.sheet_view)(sheet, \*[, layout, year_row, ...])  | Make a `SheetView` of an `openpyxl` worksheet.                         |
 | `valid_vals_int_coords`(vals_df)                                                                 |                                                                        |
 
 ### Classes
@@ -2147,24 +2166,6 @@ A DataFrame with one row per problem (columns: the `Problem` fields).
 * **Return type:**
   `DataFrame`
 
-### odus.raw_data_diagnosis.is_section_title(label, , section_titles=('List of States', 'Select States below', 'Selects States below'))
-
-Whether a row label is a section title (like “Select States below”).
-
-```pycon
->>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
-(True, False)
-```
-
-### odus.raw_data_diagnosis.normalized_label(label)
-
-A label with case and extra whitespace ignored, to compare labels.
-
-```pycon
->>> normalized_label('  New   York ') == normalized_label('new york')
-True
-```
-
 ### odus.raw_data_diagnosis.print_diagnosis(source_dir='.', sheetname=None, \*, rules={'age_not_consecutive': Rule(name='age_not_consecutive', flag=<function \_age_not_consecutive>, message="age {value!r} in {coordinate} doesn't follow the previous age"), 'age_year_mismatch': Rule(name = 'age_year_mismatch', flag=<function \_age_year_mismatch>, message="age {value!r} in {coordinate} doesn't match its year (year - age differs from the first column's)"), 'duplicate_variable': Rule(name = 'duplicate_variable', flag=<function \_duplicate_variable>, message='{coordinate}: variable {value!r} appears more than once'), 'empty_but_colored': Rule(name = 'empty_but_colored', flag=<function \_empty_but_colored>, message='{coordinate} ({label}) is colored but empty'), 'filled_but_uncolored': Rule(name = 'filled_but_uncolored', flag=<function \_filled_but_uncolored>, message='{coordinate} ({label}) has a value ({value!r}) but no color'), 'not_binary': Rule(name = 'not_binary', flag=<function \_not_binary>, message='{coordinate} ({label}) should be 0 or 1, but is {value!r}'), 'year_not_consecutive': Rule(name = 'year_not_consecutive', flag=<function \_year_not_consecutive>, message="year {value!r} in {coordinate} doesn't follow the previous year")}, \*\*view_kwargs)
 
 Print the diagnosis of the raw xls files in `source_dir`.
@@ -2195,11 +2196,151 @@ Make a `{name: Rule}` mapping: turn rules on or off, and add your own.
 True
 ```
 
-### odus.raw_data_diagnosis.sheet_view(sheet, , year_row=1, age_row=2, data_start_row=3, non_variable_labels=('List of States', 'Select States below', 'Selects States below'))
+### odus.raw_data_diagnosis.sheet_view(sheet, , layout=SurveyLayout(year_row=1, age_row=2, data_start_row=3, label_col=None, section_titles=('List of States', 'Select States below', 'Selects States below'), empty_value=None), year_row=None, age_row=None, data_start_row=None, non_variable_labels=None)
 
 Make a `SheetView` of an `openpyxl` worksheet.
 
+Where things are in the sheet is given by `layout` (an
+`odus.raw_formats.SurveyLayout`); the other keyword arguments override it.
 The sheet is cropped to its last labeled row and last column with an age.
+
+
+# _autosummary/odus.raw_formats.html.md
+
+# odus.raw_formats
+
+Reading raw survey data, of several formats, into trajectories.
+
+A *trajectory* is a DataFrame with one row per age (the index, named `age`) and
+one column per variable, holding the respondent’s value of that variable at that
+age (typically 0 or 1). Its `attrs[YEAR_OF_AGE]` maps each age to its year.
+
+What varies from one data source to another is configuration, not code:
+
+- **The file format**: `read_raw_table` picks a reader in `TABLE_READERS` by
+  file extension (`.xlsx`, `.xls`, `.csv`, `.tsv`). Pass `readers=` with
+  more entries to read other formats.
+- **The layout of a “wide” table** (variables as rows, ages as columns, as in the
+  ODUS spreadsheets): a `SurveyLayout` says where the years, the ages, the
+  variable names and the values are. `trajectory_from_table` reads one.
+- **“Long” (tidy) tables**, with one row per (age, variable, value), are read by
+  `trajectory_from_long`.
+
+```pycon
+>>> raw = pd.DataFrame([
+...     [None, 'ID', 'X01', None],
+...     [0, 'YEAR', 2000, 2001],
+...     [1, 'AGE', 20, 21],
+...     [3, 'HEROIN', 0, 1],
+...     [4, 'WORK', 1, 1],
+... ])
+>>> t = trajectory_from_table(raw)
+>>> t.index.tolist(), t.columns.tolist(), t.values.tolist()
+([20, 21], ['HEROIN', 'WORK'], [[0, 1], [1, 1]])
+>>> t.attrs[YEAR_OF_AGE]
+{20: 2000, 21: 2001}
+```
+
+### Functions
+
+| [`find_label_col`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.find_label_col)(vals, \*, data_start_row)           | The column with the most text from `data_start_row` on (the variable names).   |
+|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [`is_empty`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.is_empty)(x)                                        | Whether a cell value is empty (None, NaN or an empty string).                  |
+| [`is_section_title`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.is_section_title)(label, \*[, section_titles])      | Whether a row label is a section title (like "Select States below").           |
+| [`normalized_label`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.normalized_label)(label)                            | A label with case and extra whitespace ignored, to compare labels.             |
+| [`read_raw_table`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.read_raw_table)(src, \*[, ext, readers])            | Read a raw table, as is (no header), with the reader of its file extension.    |
+| [`trajectory_from_long`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.trajectory_from_long)(df, \*[, age, variable, ...]) | Make a trajectory from a "long" table: one row per (age, variable, value).     |
+| [`trajectory_from_table`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.trajectory_from_table)(raw, \*[, layout])           | Make a trajectory from a "wide" table, read as is (e.g. by `read_raw_table`).  |
+
+### Classes
+
+| [`SurveyLayout`](_autosummary/odus.raw_formats.html.md#odus.raw_formats.SurveyLayout)([year_row, age_row, ...])   | Where things are in a "wide" survey table (0-based row and column numbers).   |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+
+### *class* odus.raw_formats.SurveyLayout(year_row=1, age_row=2, data_start_row=3, label_col=None, section_titles=('List of States', 'Select States below', 'Selects States below'), empty_value=None)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Where things are in a “wide” survey table (0-based row and column numbers).
+
+* **Parameters:**
+  * **year_row** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – The row holding the years (None if there’s none).
+  * **age_row** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – The row holding the ages.
+  * **data_start_row** ([`int`](https://docs.python.org/3/builtins/functions.html#int)) – The first row of variables.
+  * **label_col** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – The column holding the variable names. None: the column with
+    the most text from `data_start_row` on. The ages and values are in
+    the columns after it.
+  * **section_titles** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Labels of rows that title a section rather than name a
+    variable (compared ignoring case and extra spaces). Those rows are
+    skipped.
+  * **empty_value** ([`float`](https://docs.python.org/3/builtins/functions.html#float) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – The value of an empty data cell. None: an empty cell is an
+    error.
+
+### odus.raw_formats.find_label_col(vals, , data_start_row)
+
+The column with the most text from `data_start_row` on (the variable names).
+
+### odus.raw_formats.is_empty(x)
+
+Whether a cell value is empty (None, NaN or an empty string).
+
+### odus.raw_formats.is_section_title(label, , section_titles=('List of States', 'Select States below', 'Selects States below'))
+
+Whether a row label is a section title (like “Select States below”).
+
+```pycon
+>>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
+(True, False)
+```
+
+### odus.raw_formats.normalized_label(label)
+
+A label with case and extra whitespace ignored, to compare labels.
+
+```pycon
+>>> normalized_label('  New   York ') == normalized_label('new york')
+True
+```
+
+### odus.raw_formats.read_raw_table(src, \*, ext=None, readers={'.csv': functools.partial(<function read_csv>, header=None, dtype=<class 'object'>, keep_default_na=False), '.tsv': functools.partial(<function read_csv>, sep='\\t', header=None, dtype=<class 'object'>, keep_default_na=False), '.xls': <function \_read_excel>, '.xlsx': <function \_read_excel>})
+
+Read a raw table, as is (no header), with the reader of its file extension.
+
+* **Parameters:**
+  * **src** – A file path, or the file’s bytes.
+  * **ext** – The file extension (like `".csv"`). Default: the one of `src`
+    (required when `src` is bytes).
+  * **readers** – `{extension: reader}`; a reader takes a path or file-like
+    object and returns a DataFrame.
+
+### odus.raw_formats.trajectory_from_long(df, , age='age', variable='variable', value='value', year=None, fill_value=0)
+
+Make a trajectory from a “long” table: one row per (age, variable, value).
+
+* **Parameters:**
+  * **df** – The long table.
+  * **age** – The names of its columns holding those.
+  * **variable** – The names of its columns holding those.
+  * **value** – The names of its columns holding those.
+  * **year** – The name of the column holding the year (optional).
+  * **fill_value** – The value of (age, variable) pairs absent from the table.
+
+```pycon
+>>> long = pd.DataFrame({
+...     'age': [20, 21, 21], 'year': [2000, 2001, 2001],
+...     'variable': ['HEROIN', 'HEROIN', 'WORK'], 'value': [0, 1, 1],
+... })
+>>> t = trajectory_from_long(long, year='year')
+>>> t.values.tolist(), t.attrs[YEAR_OF_AGE]
+([[0, 0], [1, 1]], {20: 2000, 21: 2001})
+```
+
+### odus.raw_formats.trajectory_from_table(raw, , layout=SurveyLayout(year_row=1, age_row=2, data_start_row=3, label_col=None, section_titles=('List of States', 'Select States below', 'Selects States below'), empty_value=None))
+
+Make a trajectory from a “wide” table, read as is (e.g. by `read_raw_table`).
+
+Rows from `layout.data_start_row` on with a (non section title) label are
+variables; columns after the label column with an age are ages.
 
 
 # _autosummary/odus.sequential_var_sets.html.md
@@ -2264,18 +2405,18 @@ Write images or figs into pdf pages (one image per page)
 
 # About this build
 
-This documentation was built on **2026-10-19 12:10 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e</code></a> on branch <code>master</code>, for **odus 0.0.15** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:31 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9d</code></a> on branch <code>master</code>, for **odus 0.0.16** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.15) is behind the latest release on PyPI (0.0.16): `pip install odus` gives newer code than these docs describe.
+- The documented version (0.0.16) is behind the latest release on PyPI (0.0.17): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/70e537e07a4d9e03e83b0f17d9582ff04287d19a"><code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d"><code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2286,9 +2427,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39249774653">39249774653</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39252446723">39252446723</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>70e537e07a4d9e03e83b0f17d9582ff04287d19a</code> (in the history of the built commit) |
+| Event commit | <code>4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2313,13 +2454,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.16/">0.0.16</a>, newer than the documented version (0.0.15).
+Latest release: <a href="https://pypi.org/project/odus/0.0.17/">0.0.17</a>, newer than the documented version (0.0.16).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 70e537e07a4d9e03e83b0f17d9582ff04287d19a
+git checkout 4e56f9db94d1d90ce3bf360bd4b0ea7987dcd18d
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
