@@ -117,6 +117,7 @@ class HashableMixin:
         return hash(self) == hash(other)
 
 
+YEAR_OF_AGE = "year_of_age"  # attrs key of a trajectory's {age: year} mapping
 NON_BINARY_POLICIES = ("warn", "binarize", "keep", "raise")
 
 
@@ -163,6 +164,7 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
     if duplicates not in DUPLICATES_POLICIES:
         raise ValueError(f"duplicates should be one of {DUPLICATES_POLICIES}")
     where = f" in {source}" if source is not None else ""
+    attrs = dict(df.attrs)  # e.g. YEAR_OF_AGE: kept whatever pandas does with attrs
 
     df = df.loc[:, [not is_section_title(c) for c in df.columns]]
 
@@ -196,6 +198,7 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
                 stacklevel=2,
             )
         df = df.where(df.eq(0), 1)
+    df.attrs = attrs
     return df
 
 
@@ -230,9 +233,11 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
         df = df.rename(columns={"INTERVIEW ID NUMBER (enter in red)": "category"})
         df = df.T
         df.columns = df.iloc[0, :]
-        df = df.iloc[1:, 1:]  # TODO: would like to keep year, but not in column
-        df = df.set_index("age")
-        return df.astype(int)
+        year_of_age = dict(zip(df.iloc[1:, 1].astype(int), df.iloc[1:, 0].astype(int)))
+        df = df.iloc[1:, 1:]  # the year is kept in attrs, since it isn't a variable
+        df = df.set_index("age").astype(int)
+        df.attrs[YEAR_OF_AGE] = year_of_age
+        return df
 
 
 def _cached_per_instance(getter):
