@@ -260,6 +260,8 @@
 <p>Plotting helpers for trajectories and matrices.</p>
 <p>Heatmaps, life-course plots, iteration over a store’s trajectory plots, and
 writing a selection of trajectories out to a (multi-page) file.</p>
+<p><code class="docutils literal notranslate"><span class="pre">stacked_trajectories</span></code> puts several of them one above the other, aligned on
+age, year, or the years since some variable was first non-zero.</p>
 <p><code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> is the readable rendering of a single trajectory: a gap
 between cells (wider every <code class="docutils literal notranslate"><span class="pre">major_every</span></code> years), alternating grey rows so the
 eye can follow a row back to its variable, optional light shading of variable
@@ -290,7 +292,10 @@ spreadsheet with <code class="docutils literal notranslate"><span class="pre">ro
 <tr class="row-odd"><td><p><a class="reference internal" href="#odus.plot_utils.row_colors_of_xls" title="odus.plot_utils.row_colors_of_xls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row_colors_of_xls</span></code></a>(xls_filepath, *[, ...])</p></td>
 <td><p>Get a <code class="docutils literal notranslate"><span class="pre">{variable:</span> <span class="pre">color}</span></code> mapping from the cell colors of a spreadsheet.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file" title="odus.plot_utils.write_trajectories_to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_trajectories_to_file</span></code></a>(df_store[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#odus.plot_utils.stacked_trajectories" title="odus.plot_utils.stacked_trajectories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stacked_trajectories</span></code></a>(df_store[, fields, ...])</p></td>
+<td><p>Plot several trajectories one above the other, aligned on a common x axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file" title="odus.plot_utils.write_trajectories_to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_trajectories_to_file</span></code></a>(df_store[, ...])</p></td>
 <td><p>Write the trajectory plots of (selected) keys of <code class="docutils literal notranslate"><span class="pre">df_store</span></code>, one per page.</p></td>
 </tr>
 </tbody>
@@ -310,7 +315,7 @@ spreadsheet with <code class="docutils literal notranslate"><span class="pre">ro
 
 <dl class="py function">
 <dt class="sig sig-object py" id="odus.plot_utils.plot_trajectory">
-<span class="sig-prename descclassname"><span class="pre">odus.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1b2a49'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_backgrounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('#ffffff',</span> <span class="pre">'#ebebeb')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_tint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xtick_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/plot_utils.html#plot_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.plot_utils.plot_trajectory" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">odus.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1b2a49'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_backgrounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('#ffffff',</span> <span class="pre">'#ebebeb')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_tint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xtick_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/plot_utils.html#plot_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.plot_utils.plot_trajectory" title="Link to this definition">¶</a></dt>
 <dd><p>Plot one trajectory (index: ages or years, columns: variables) readably.</p>
 <p>Each variable is a row and each age/year a column. A cell takes its row’s
 color in proportion to its value, over the row’s background.</p>
@@ -346,6 +351,10 @@ column when there’s room for it, else to <code class="docutils literal notrans
 <li><p><strong>cell_size</strong> – Size (inches) of a cell, used when <code class="docutils literal notranslate"><span class="pre">ax</span></code> is None.</p></li>
 <li><p><strong>fontsize</strong> – Font size of the tick labels.</p></li>
 <li><p><strong>ylabel_right</strong> – Whether to also label the variables on the right.</p></li>
+<li><p><strong>x</strong> – Where to draw the columns on the x axis: one number per age, each one
+more than the previous (e.g. the years, or the years since some event).
+Default: column positions, labeled with the index (the ages). Plots
+drawn with comparable <code class="docutils literal notranslate"><span class="pre">x</span></code> line up (see <code class="docutils literal notranslate"><span class="pre">stacked_trajectories</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -370,6 +379,47 @@ solid RGB or indexed (palette) fill are left out, as are theme colors.</p>
 <li><p><strong>label_col</strong> – The (1-based) column holding the variable names.</p></li>
 <li><p><strong>data_col</strong> – The (1-based) first column holding the data.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odus.plot_utils.stacked_trajectories">
+<span class="sig-prename descclassname"><span class="pre">odus.plot_utils.</span></span><span class="sig-name descname"><span class="pre">stacked_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'age'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_df_to_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_title_of_key&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xtick_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**plot_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/plot_utils.html#stacked_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.plot_utils.stacked_trajectories" title="Link to this definition">¶</a></dt>
+<dd><p>Plot several trajectories one above the other, aligned on a common x axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_store</strong> – A mapping of trajectories (like a <code class="docutils literal notranslate"><span class="pre">DfStore</span></code>).</p></li>
+<li><p><strong>fields</strong> – The variables to show (default: all, per trajectory).</p></li>
+<li><p><strong>keys</strong> – The keys of <code class="docutils literal notranslate"><span class="pre">df_store</span></code> to plot, or a filter function of the keys.</p></li>
+<li><p><strong>x_align</strong> – <p>What to align the trajectories on:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;age&quot;</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">&quot;year&quot;</span></code> (needs <code class="docutils literal notranslate"><span class="pre">df.attrs[&quot;year_of_age&quot;]</span></code>,
+which <code class="docutils literal notranslate"><span class="pre">DfStore</span></code> provides);</p></li>
+<li><p>a variable name: the years since that variable was first non-zero
+(e.g. <code class="docutils literal notranslate"><span class="pre">&quot;HEROIN&quot;</span></code>: years since first heroin use). Trajectories
+where it never is are left out, with a warning;</p></li>
+<li><p>a function <code class="docutils literal notranslate"><span class="pre">x_align(df)</span></code> returning the x of each age (one more from
+each age to the next), or None to leave the trajectory out.</p></li>
+</ul>
+</p></li>
+<li><p><strong>x_label</strong> – Label of the x axis (default: from <code class="docutils literal notranslate"><span class="pre">x_align</span></code>).</p></li>
+<li><p><strong>k_df_to_title</strong> – <code class="docutils literal notranslate"><span class="pre">k_df_to_title(key,</span> <span class="pre">df)</span></code> gives the title of each plot.</p></li>
+<li><p><strong>cell_size</strong> – Passed on to
+<code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (see there).</p></li>
+<li><p><strong>fontsize</strong> – Passed on to
+<code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (see there).</p></li>
+<li><p><strong>major_every</strong> – Passed on to
+<code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (see there).</p></li>
+<li><p><strong>xtick_every</strong> – Passed on to
+<code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (see there).</p></li>
+<li><p><strong>plot_kwargs</strong> – Passed on to
+<code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (see there).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -439,6 +489,7 @@ solid RGB or indexed (palette) fill are left out, as are theme colors.</p>
 <li><a class="reference internal" href="#odus.plot_utils.plot_life"><code class="docutils literal notranslate"><span class="pre">plot_life()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.plot_trajectory"><code class="docutils literal notranslate"><span class="pre">plot_trajectory()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.row_colors_of_xls"><code class="docutils literal notranslate"><span class="pre">row_colors_of_xls()</span></code></a></li>
+<li><a class="reference internal" href="#odus.plot_utils.stacked_trajectories"><code class="docutils literal notranslate"><span class="pre">stacked_trajectories()</span></code></a></li>
 <li><a class="reference internal" href="#odus.plot_utils.write_trajectories_to_file"><code class="docutils literal notranslate"><span class="pre">write_trajectories_to_file()</span></code></a></li>
 </ul>
 </li>
@@ -451,7 +502,7 @@ solid RGB or indexed (palette) fill are left out, as are theme colors.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=c249dd19"></script>
+</div><script src="../_static/documentation_options.js?v=6b09a97f"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

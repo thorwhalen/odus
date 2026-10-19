@@ -732,6 +732,19 @@ dtype: int64
 <p><img alt="png" src="_images/output_32_8.png" /></p>
 <p><img alt="png" src="_images/output_32_9.png" /></p>
 </section>
+<section id="stacking-trajectories-to-compare-them">
+<h3>Stacking trajectories to compare them<a class="headerlink" href="#stacking-trajectories-to-compare-them" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">stacked_trajectories</span></code> draws several trajectories one above the other, on a common x axis, so they line up. Align them on <code class="docutils literal notranslate"><span class="pre">x_align=&quot;age&quot;</span></code> (the default), <code class="docutils literal notranslate"><span class="pre">&quot;year&quot;</span></code>, or a variable: the years since it was first non-zero. For instance, to compare what happened around the first use of heroin:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">stacked_trajectories</span>
+
+<span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"PHYSICAL ILLNESS"</span><span class="p">,</span> <span class="s2">"AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"HEROIN"</span><span class="p">,</span> <span class="s2">"OTHER OPIOID"</span><span class="p">]</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"surveys/A60.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/B32.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/B49.xlsx"</span><span class="p">,</span> <span class="s2">"surveys/A01.xlsx"</span><span class="p">]</span>
+<span class="n">stacked_trajectories</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">x_align</span><span class="o">=</span><span class="s2">"HEROIN"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="_images/stacked_trajectories.png" /></p>
+<p>Trajectories where the variable is never non-zero are left out (with a warning). <code class="docutils literal notranslate"><span class="pre">x_align</span></code> can also be a function of a trajectory returning the x of each of its ages, for any other alignment.</p>
+</section>
 </section>
 <section id="making-a-pdf-of-trajectories">
 <h2>Making a pdf of trajectories<a class="headerlink" href="#making-a-pdf-of-trajectories" title="Link to this heading">¶</a></h2>
@@ -1530,7 +1543,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:30 UTC from <a href="https://github.com/thorwhalen/odus/commit/327cc251e48e03964d233eb9b7efb4cb8775e26f">327cc25</a> (master) · odus 0.0.12 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:43 UTC from <a href="https://github.com/thorwhalen/odus/commit/0e275fb7c88d18316591b312f84346f50bec20bb">0e275fb</a> (master) · odus 0.0.13 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1566,7 +1579,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=c249dd19"></script>
+</div><script src="_static/documentation_options.js?v=6b09a97f"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

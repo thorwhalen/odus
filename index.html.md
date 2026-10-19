@@ -517,6 +517,22 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)]
 
 ![png](../img/output_32_9.png)
 
+### Stacking trajectories to compare them
+
+`stacked_trajectories` draws several trajectories one above the other, on a common x axis, so they line up. Align them on `x_align="age"` (the default), `"year"`, or a variable: the years since it was first non-zero. For instance, to compare what happened around the first use of heroin:
+
+```python
+from odus.plot_utils import stacked_trajectories
+
+fields = ["PHYSICAL ILLNESS", "AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID"]
+keys = ["surveys/A60.xlsx", "surveys/B32.xlsx", "surveys/B49.xlsx", "surveys/A01.xlsx"]
+stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
+```
+
+![png](../img/stacked_trajectories.png)
+
+Trajectories where the variable is never non-zero are left out (with a warning). `x_align` can also be a function of a trajectory returning the x of each of its ages, for any other alignment.
+
 ## Making a pdf of trajectories
 
 ```python

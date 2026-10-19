@@ -5,6 +5,9 @@ Plotting helpers for trajectories and matrices.
 Heatmaps, life-course plots, iteration over a store’s trajectory plots, and
 writing a selection of trajectories out to a (multi-page) file.
 
+`stacked_trajectories` puts several of them one above the other, aligned on
+age, year, or the years since some variable was first non-zero.
+
 `plot_trajectory` is the readable rendering of a single trajectory: a gap
 between cells (wider every `major_every` years), alternating grey rows so the
 eye can follow a row back to its variable, optional light shading of variable
@@ -21,6 +24,7 @@ spreadsheet with `row_colors_of_xls`).
 | `plot_life_course`(df[, grid, figsize])                                                        |                                                                             |
 | [`plot_trajectory`](#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...]) | Plot one trajectory (index: ages or years, columns: variables) readably.    |
 | [`row_colors_of_xls`](#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])    | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.    |
+| [`stacked_trajectories`](#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...]) | Plot several trajectories one above the other, aligned on a common x axis.  |
 | [`write_trajectories_to_file`](#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])   | Write the trajectory plots of (selected) keys of `df_store`, one per page.  |
 
 ### odus.plot_utils.life_plots(df_store, fields=None, keys=None, k_df_to_title=<function \_title_of_key>, \*\*plot_kwargs)
@@ -31,7 +35,7 @@ Yield the axes of the trajectory plot of each (selected) key of `df_store`.
 
 Plot a trajectory; `plot_kwargs` go to `plot_trajectory`.
 
-### odus.plot_utils.plot_trajectory(df, fields=None, , title=None, ax=None, row_colors=None, default_color='#1b2a49', row_backgrounds=('#ffffff', '#ebebeb'), row_groups=None, group_colors=None, group_tint=0.35, gap_color='white', minor_gap=0.6, major_gap=2.5, major_every=5, xtick_every=None, cell_size=0.22, fontsize=8, ylabel_right=False)
+### odus.plot_utils.plot_trajectory(df, fields=None, , title=None, ax=None, row_colors=None, default_color='#1b2a49', row_backgrounds=('#ffffff', '#ebebeb'), row_groups=None, group_colors=None, group_tint=0.35, gap_color='white', minor_gap=0.6, major_gap=2.5, major_every=5, xtick_every=None, cell_size=0.22, fontsize=8, ylabel_right=False, x=None)
 
 Plot one trajectory (index: ages or years, columns: variables) readably.
 
@@ -68,6 +72,10 @@ color in proportion to its value, over the row’s background.
   * **cell_size** – Size (inches) of a cell, used when `ax` is None.
   * **fontsize** – Font size of the tick labels.
   * **ylabel_right** – Whether to also label the variables on the right.
+  * **x** – Where to draw the columns on the x axis: one number per age, each one
+    more than the previous (e.g. the years, or the years since some event).
+    Default: column positions, labeled with the index (the ages). Plots
+    drawn with comparable `x` line up (see `stacked_trajectories`).
 * **Returns:**
   The matplotlib axes drawn on.
 
@@ -85,6 +93,39 @@ solid RGB or indexed (palette) fill are left out, as are theme colors.
   * **sheetname** – The sheet to read (default: the active one).
   * **label_col** – The (1-based) column holding the variable names.
   * **data_col** – The (1-based) first column holding the data.
+
+### odus.plot_utils.stacked_trajectories(df_store, fields=None, keys=None, \*, x_align='age', x_label=None, k_df_to_title=<function \_title_of_key>, cell_size=0.22, fontsize=8, major_every=5, xtick_every=None, \*\*plot_kwargs)
+
+Plot several trajectories one above the other, aligned on a common x axis.
+
+* **Parameters:**
+  * **df_store** – A mapping of trajectories (like a `DfStore`).
+  * **fields** – The variables to show (default: all, per trajectory).
+  * **keys** – The keys of `df_store` to plot, or a filter function of the keys.
+  * **x_align** – 
+
+    What to align the trajectories on:
+    - `"age"` (default) or `"year"` (needs `df.attrs["year_of_age"]`,
+      which `DfStore` provides);
+    - a variable name: the years since that variable was first non-zero
+      (e.g. `"HEROIN"`: years since first heroin use). Trajectories
+      where it never is are left out, with a warning;
+    - a function `x_align(df)` returning the x of each age (one more from
+      each age to the next), or None to leave the trajectory out.
+  * **x_label** – Label of the x axis (default: from `x_align`).
+  * **k_df_to_title** – `k_df_to_title(key, df)` gives the title of each plot.
+  * **cell_size** – Passed on to
+    `plot_trajectory` (see there).
+  * **fontsize** – Passed on to
+    `plot_trajectory` (see there).
+  * **major_every** – Passed on to
+    `plot_trajectory` (see there).
+  * **xtick_every** – Passed on to
+    `plot_trajectory` (see there).
+  * **plot_kwargs** – Passed on to
+    `plot_trajectory` (see there).
+* **Returns:**
+  The matplotlib figure.
 
 ### odus.plot_utils.write_trajectories_to_file(df_store, fields=None, keys=None, fp='test.pdf', pil_write_format=None, to_pil_image_kwargs=None, \*, k_df_to_title=<function \_title_of_key>, plot_kwargs=None, \*\*pil_save_kwargs)
 
