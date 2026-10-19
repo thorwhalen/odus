@@ -13,6 +13,7 @@ import html
 
 import numpy as np
 
+from odus.raw_formats import YEAR_OF_AGE
 from odus.plot_utils import (
     DFLT_MAJOR_EVERY,
     _consecutive_numbers,
@@ -21,7 +22,6 @@ from odus.plot_utils import (
     trajectory_colors,
 )
 
-YEAR_OF_AGE = "year_of_age"  # same attrs key as odus.dacc.YEAR_OF_AGE
 _STYLE_ARGS = (  # the keyword arguments of trajectory_colors
     "row_colors",
     "default_color",

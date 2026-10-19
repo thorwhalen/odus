@@ -135,6 +135,23 @@ pstore = PotStore(df_store)
 
 `DfStore` cleans each trajectory with `prep_trajectory_df`. It drops section-title rows ("Select States below"), merges a variable entered on two rows (a state lived in during two periods) into one column, and sets values other than 0 and 1 to 1 with a warning that names them. Change that with `df_store.non_binary = "keep"` (or `"raise"`, or `"binarize"` to set them to 1 silently) and `df_store.duplicates = "keep"` (or `"raise"`).
 
+### Other data formats and layouts
+
+Where the data is read from is configuration, in `odus.raw_formats`:
+
+- **Other file formats.** `DfStore(folder + "/{}.csv")` (or `.tsv`, `.xls`) works like the `.xlsx` store: each file is read with the reader of its extension (`TABLE_READERS`). Set `df_store.readers` to add others.
+- **Other layouts.** A `SurveyLayout` says where a table's years, ages, variable names and values are. Its defaults describe the ODUS spreadsheets: years in row 2, ages in row 3, variables from row 4, the names in the column with the most text. For example, with ages in the first row, no years, and empty cells meaning 0:
+
+```python
+from odus.raw_formats import SurveyLayout
+
+df_store = DfStore(my_folder + "/{}.csv")
+df_store.layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1, empty_value=0)
+```
+
+  The diagnosis tools take the same `layout` (`diagnose_file(path, layout=...)`).
+- **Long ("tidy") tables**, with one row per (age, variable, value), become trajectories with `trajectory_from_long(df, age="age", variable="variable", value="value")`.
+
 # Poking around
 
 ## df_store

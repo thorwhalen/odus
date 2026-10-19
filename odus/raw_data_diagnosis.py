@@ -27,6 +27,14 @@ import os
 
 import pandas as pd
 import numpy as np
+from odus.raw_formats import (  # noqa: F401  (some re-exported: they were defined here)
+    DFLT_LAYOUT,
+    SECTION_TITLES,
+    find_label_col,
+    is_empty,
+    is_section_title,
+    normalized_label,
+)
 from openpyxl import (
     load_workbook,
 )  # Get it here: https://pypi.org/project/openpyxl/ (or pip install openpyxl)
@@ -162,33 +170,11 @@ def diagnosis_items(source_dir, sheetname=None):
 # --------------------------------------------------------------------------------------
 # Rule-based diagnosis
 
-YEAR_ROW = 1  # row holding the years (0-based, in the sheet)
-AGE_ROW = 2  # row holding the ages
-DATA_START_ROW = 3  # first row of variables
-NON_VARIABLE_LABELS = (  # section titles, compared ignoring case and spaces
-    "List of States",
-    "Select States below",
-    "Selects States below",  # a typo found in the surveys
-)
-
-
-def normalized_label(label):
-    """A label with case and extra whitespace ignored, to compare labels.
-
-    >>> normalized_label('  New   York ') == normalized_label('new york')
-    True
-    """
-    return " ".join(str(label).split()).casefold()
-
-
-def is_section_title(label, *, section_titles=NON_VARIABLE_LABELS):
-    """Whether a row label is a section title (like "Select States below").
-
-    >>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
-    (True, False)
-    """
-    return normalized_label(label) in set(map(normalized_label, section_titles))
-
+# The layout of the sheets is configured in odus.raw_formats (DFLT_LAYOUT)
+YEAR_ROW = DFLT_LAYOUT.year_row  # row holding the years (0-based, in the sheet)
+AGE_ROW = DFLT_LAYOUT.age_row  # row holding the ages
+DATA_START_ROW = DFLT_LAYOUT.data_start_row  # first row of variables
+NON_VARIABLE_LABELS = SECTION_TITLES  # section titles, compared ignoring case/spaces
 
 UNREADABLE_SHEET = "unreadable_sheet"  # rule name of a sheet that can't be read
 
@@ -226,7 +212,7 @@ class SheetView:
     coordinate: pd.DataFrame
     label_col: int
     data_mask: np.ndarray
-    year_row: int = YEAR_ROW
+    year_row: int | None = YEAR_ROW
     age_row: int = AGE_ROW
 
     @property
@@ -251,32 +237,27 @@ class SheetView:
         return np.zeros(self.vals.shape, dtype=bool)
 
 
-def _label_col(vals, *, data_start_row):
-    """The column with the most text from ``data_start_row`` on (the variable names)."""
-    is_text = vals.iloc[data_start_row:].map(
-        lambda x: isinstance(x, str) and bool(x.strip())
-    )
-    n_texts = is_text.sum(axis=0).to_numpy()
-    if not n_texts.any():
-        raise ValueError(
-            f"Couldn't find the column of variable names: no text from row "
-            f"{data_start_row + 1} of the sheet on"
-        )
-    return int(np.argmax(n_texts))
-
-
 def sheet_view(
     sheet,
     *,
-    year_row=YEAR_ROW,
-    age_row=AGE_ROW,
-    data_start_row=DATA_START_ROW,
-    non_variable_labels=NON_VARIABLE_LABELS,
+    layout=DFLT_LAYOUT,
+    year_row=None,
+    age_row=None,
+    data_start_row=None,
+    non_variable_labels=None,
 ):
     """Make a ``SheetView`` of an ``openpyxl`` worksheet.
 
+    Where things are in the sheet is given by ``layout`` (an
+    ``odus.raw_formats.SurveyLayout``); the other keyword arguments override it.
     The sheet is cropped to its last labeled row and last column with an age.
     """
+    year_row = layout.year_row if year_row is None else year_row
+    age_row = layout.age_row if age_row is None else age_row
+    if data_start_row is None:
+        data_start_row = layout.data_start_row
+    if non_variable_labels is None:
+        non_variable_labels = layout.section_titles
     rows = [list(row) for row in sheet]
     vals = pd.DataFrame([[c.value for c in row] for row in rows], dtype=object)
     colored = pd.DataFrame([[_is_colored(c) for c in row] for row in rows])
@@ -284,7 +265,9 @@ def sheet_view(
     if vals.shape[0] <= data_start_row:
         raise ValueError(f"The sheet has only {vals.shape[0]} rows: Nothing to check")
 
-    label_col = _label_col(vals, data_start_row=data_start_row)
+    label_col = layout.label_col
+    if label_col is None:
+        label_col = find_label_col(vals, data_start_row=data_start_row)
     labels = vals.iloc[:, label_col]
     is_row_label = labels.map(lambda x: not _is_empty(x))
     is_title = labels.map(partial(is_section_title, section_titles=non_variable_labels))
@@ -391,12 +374,16 @@ def _age_not_consecutive(view):
 
 
 def _year_not_consecutive(view):
+    if view.year_row is None:  # the layout has no years
+        return view.false_mask()
     return _header_row_flags(view, view.year_row, lambda a, b: b - a != 1)
 
 
 def _age_year_mismatch(view):
     """Flag ages for which ``year - age`` differs from that of most columns."""
     mask = view.false_mask()
+    if view.year_row is None:  # the layout has no years
+        return mask
     diffs = {
         j: view.vals.iat[view.year_row, j] - view.vals.iat[view.age_row, j]
         for j in view.data_cols
