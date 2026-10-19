@@ -677,8 +677,21 @@ dtype: int64
 <span class="n">plot_trajectory</span><span class="p">(</span>
     <span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
     <span class="n">row_groups</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">"social"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SON/DAUGHTER"</span><span class="p">,</span> <span class="s2">"SIBLING"</span><span class="p">,</span> <span class="s2">"FATHER/MOTHER"</span><span class="p">,</span> <span class="s2">"SPOUSE"</span><span class="p">,</span> <span class="s2">"FRIEND USER"</span><span class="p">,</span> <span class="s2">"FRIEND NON USER"</span><span class="p">],</span>
-        <span class="s2">"opioids"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"NOT AS PRESCRIBED OPIOID"</span><span class="p">,</span> <span class="s2">"HEROIN"</span><span class="p">,</span> <span class="s2">"OTHER OPIOID"</span><span class="p">,</span> <span class="s2">"INJECTED"</span><span class="p">],</span>
+        <span class="s2">"social"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"SON/DAUGHTER"</span><span class="p">,</span>
+            <span class="s2">"SIBLING"</span><span class="p">,</span>
+            <span class="s2">"FATHER/MOTHER"</span><span class="p">,</span>
+            <span class="s2">"SPOUSE"</span><span class="p">,</span>
+            <span class="s2">"FRIEND USER"</span><span class="p">,</span>
+            <span class="s2">"FRIEND NON USER"</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">"opioids"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"AS PRESCRIBED OPIOID"</span><span class="p">,</span>
+            <span class="s2">"NOT AS PRESCRIBED OPIOID"</span><span class="p">,</span>
+            <span class="s2">"HEROIN"</span><span class="p">,</span>
+            <span class="s2">"OTHER OPIOID"</span><span class="p">,</span>
+            <span class="s2">"INJECTED"</span><span class="p">,</span>
+        <span class="p">],</span>
     <span class="p">},</span>
     <span class="n">row_colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"HEROIN"</span><span class="p">:</span> <span class="s2">"#c0392b"</span><span class="p">,</span> <span class="s2">"INJECTED"</span><span class="p">:</span> <span class="s2">"#8e44ad"</span><span class="p">,</span> <span class="s2">"IN TREATMENT"</span><span class="p">:</span> <span class="s2">"#27ae60"</span><span class="p">},</span>
 <span class="p">)</span>
@@ -730,6 +743,70 @@ dtype: int64
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+<section id="diagnosing-the-raw-spreadsheets">
+<h2>Diagnosing the raw spreadsheets<a class="headerlink" href="#diagnosing-the-raw-spreadsheets" title="Link to this heading">¶</a></h2>
+<p>Before preparing the data, check the raw spreadsheets for data-entry problems. <code class="docutils literal notranslate"><span class="pre">print_diagnosis</span></code> lists, file by file and rule by rule, the cells to check, with an explanation for each:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_data_diagnosis</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_diagnosis</span>
+
+<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>The possibly problematic cells for A03.xlsx:
+  duplicate_variable:
+    - B36: variable 'New Jersey' appears more than once
+
+The possibly problematic cells for A13.xlsx:
+  not_binary:
+    - Q8 (INCARCERATION) should be 0 or 1, but is 16
+    ...
+</pre></div>
+</div>
+<p>Each check is a rule; <code class="docutils literal notranslate"><span class="pre">DFLT_RULES</span></code> holds the default ones:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>rule</p></th>
+<th class="head"><p>flags</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">empty_but_colored</span></code></p></td>
+<td><p>an empty data cell that is colored</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">filled_but_uncolored</span></code></p></td>
+<td><p>a data cell with a value but no color (only on sheets that use colors)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">not_binary</span></code></p></td>
+<td><p>a value that isn’t 0 or 1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">age_not_consecutive</span></code>, <code class="docutils literal notranslate"><span class="pre">year_not_consecutive</span></code></p></td>
+<td><p>an age (year) that doesn’t follow the previous one</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">age_year_mismatch</span></code></p></td>
+<td><p>an age whose <code class="docutils literal notranslate"><span class="pre">year</span> <span class="pre">-</span> <span class="pre">age</span></code> differs from most columns’</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">duplicate_variable</span></code></p></td>
+<td><p>a variable listed more than once</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A file that doesn’t have the expected layout is reported (rule <code class="docutils literal notranslate"><span class="pre">unreadable_sheet</span></code>) and the others are still checked.</p>
+<p>Turn rules on or off, or add your own, with <code class="docutils literal notranslate"><span class="pre">select_rules</span></code>. A rule is a name, a function that takes a <code class="docutils literal notranslate"><span class="pre">SheetView</span></code> (the sheet’s values, colors and cell coordinates) and returns a boolean array marking the cells to flag, and a message:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.raw_data_diagnosis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">select_rules</span><span class="p">,</span> <span class="n">diagnose_dir</span><span class="p">,</span> <span class="n">diagnosis_table</span>
+
+<span class="n">not_too_old</span> <span class="o">=</span> <span class="n">Rule</span><span class="p">(</span>
+    <span class="s2">"too_old"</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">view</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">data_mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">numeric</span><span class="p">()[</span><span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">),</span>
+    <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2"> (</span><span class="si">{label}</span><span class="s2">): the respondent would be over 90"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="n">select_rules</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">"filled_but_uncolored"</span><span class="p">],</span> <span class="n">extra</span><span class="o">=</span><span class="p">[</span><span class="n">not_too_old</span><span class="p">])</span>
+
+<span class="n">print_diagnosis</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">)</span>
+<span class="n">diagnosis_table</span><span class="p">(</span><span class="n">diagnose_dir</span><span class="p">(</span><span class="n">survey_dir</span> <span class="o">+</span> <span class="s2">"/surveys"</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">))</span>  <span class="c1"># as a DataFrame</span>
 </pre></div>
 </div>
 </section>
@@ -1452,7 +1529,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 10:59 UTC from <a href="https://github.com/thorwhalen/odus/commit/dcafd52e54cb32709a575d2baebba053c36a88cd">dcafd52</a> (master) · odus 0.0.10 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:12 UTC from <a href="https://github.com/thorwhalen/odus/commit/96daf5cb22450a121bf8dea85cece6ab9e6aca41">96daf5c</a> (master) · odus 0.0.11 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1488,7 +1565,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=4bb83394"></script>
+</div><script src="_static/documentation_options.js?v=e2f847f2"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

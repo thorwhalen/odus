@@ -250,11 +250,28 @@
 <span></span><span class="sd">"""Diagnosis of the raw survey spreadsheets.</span>
 
 <span class="sd">Reads the source ``.xlsx`` files with ``openpyxl`` (values *and* cell colors)</span>
-<span class="sd">and reports cells whose content and formatting disagree -- the data-entry</span>
-<span class="sd">anomalies that must be resolved before the data can be prepared.</span>
+<span class="sd">and reports the data-entry anomalies that must be resolved before the data can</span>
+<span class="sd">be prepared: cells whose content and color disagree, values that aren't 0 or 1,</span>
+<span class="sd">ages and years that don't follow each other, repeated variables...</span>
+
+<span class="sd">Each check is a ``Rule``: a name, a function marking the problematic cells of a</span>
+<span class="sd">``SheetView``, and a message explaining the problem. ``DFLT_RULES`` maps names to</span>
+<span class="sd">the rules used by default; pick, drop or add rules with ``select_rules``, or by</span>
+<span class="sd">passing any ``{name: Rule}`` mapping as ``rules``:</span>
+
+<span class="sd">&gt;&gt;&gt; sorted(select_rules(exclude=['filled_but_uncolored'])) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">['age_not_consecutive', 'age_year_mismatch', 'duplicate_variable',</span>
+<span class="sd"> 'empty_but_colored', 'not_binary', 'year_not_consecutive']</span>
+
+<span class="sd">``diagnose_file`` and ``diagnose_dir`` yield one ``Problem`` per flagged cell,</span>
+<span class="sd">``diagnosis_table`` puts them in a DataFrame, and ``print_diagnosis`` prints them.</span>
 <span class="sd">"""</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">groupby</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -391,27 +408,444 @@
             <span class="k">yield</span> <span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">lidx</span>
 
 
+<span class="c1"># --------------------------------------------------------------------------------------</span>
+<span class="c1"># Rule-based diagnosis</span>
+
+<span class="n">YEAR_ROW</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># row holding the years (0-based, in the sheet)</span>
+<span class="n">AGE_ROW</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># row holding the ages</span>
+<span class="n">DATA_START_ROW</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># first row of variables</span>
+<span class="n">NON_VARIABLE_LABELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"List of States"</span><span class="p">,</span> <span class="s2">"Select States below"</span><span class="p">)</span>  <span class="c1"># section titles</span>
+<span class="n">UNREADABLE_SHEET</span> <span class="o">=</span> <span class="s2">"unreadable_sheet"</span>  <span class="c1"># rule name of a sheet that can't be read</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_colored</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Whether the cell has a fill (a solid white fill doesn't count)."""</span>
+    <span class="n">fill</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">fill</span>
+    <span class="k">if</span> <span class="n">fill</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fill</span><span class="o">.</span><span class="n">fill_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fill</span><span class="p">,</span> <span class="s2">"fgColor"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">is_white</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">fill</span><span class="o">.</span><span class="n">fill_type</span> <span class="o">==</span> <span class="s2">"solid"</span>
+        <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"rgb"</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">rgb</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">color</span><span class="o">.</span><span class="n">rgb</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"FFFFFF"</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">is_white</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">==</span> <span class="s2">""</span>
+
+
+<div class="viewcode-block" id="SheetView">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.SheetView">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SheetView</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The parts of a survey sheet that rules look at.</span>
+
+<span class="sd">    ``vals``, ``colored`` and ``coordinate`` are aligned DataFrames (one entry per</span>
+<span class="sd">    cell). ``label_col`` is the column holding the variable names, and</span>
+<span class="sd">    ``data_mask`` marks the cells holding a variable's value at some age.</span>
+<span class="sd">    """</span>
+
+    <span class="n">vals</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="n">colored</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="n">coordinate</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="n">label_col</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">data_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">year_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">YEAR_ROW</span>
+    <span class="n">age_row</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">AGE_ROW</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_col</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_col</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SheetView.empty">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.SheetView.empty">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Boolean array: is the cell empty?"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">_is_empty</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SheetView.numeric">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.SheetView.numeric">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Float array of the values: NaN where the cell doesn't hold a number."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">false_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_label_col</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_start_row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The column with the most text from ``data_start_row`` on (the variable names)."""</span>
+    <span class="n">is_text</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">data_start_row</span><span class="p">:]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">n_texts</span> <span class="o">=</span> <span class="n">is_text</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">n_texts</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Couldn't find the column of variable names: no text from row "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">data_start_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> of the sheet on"</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">n_texts</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="sheet_view">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.sheet_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sheet_view</span><span class="p">(</span>
+    <span class="n">sheet</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">year_row</span><span class="o">=</span><span class="n">YEAR_ROW</span><span class="p">,</span>
+    <span class="n">age_row</span><span class="o">=</span><span class="n">AGE_ROW</span><span class="p">,</span>
+    <span class="n">data_start_row</span><span class="o">=</span><span class="n">DATA_START_ROW</span><span class="p">,</span>
+    <span class="n">non_variable_labels</span><span class="o">=</span><span class="n">NON_VARIABLE_LABELS</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Make a ``SheetView`` of an ``openpyxl`` worksheet.</span>
+
+<span class="sd">    The sheet is cropped to its last labeled row and last column with an age.</span>
+<span class="sd">    """</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sheet</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="n">c</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">colored</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="n">_is_colored</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">])</span>
+    <span class="n">coordinate</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="n">c</span><span class="o">.</span><span class="n">coordinate</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">data_start_row</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The sheet has only </span><span class="si">{</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows: Nothing to check"</span><span class="p">)</span>
+
+    <span class="n">label_col</span> <span class="o">=</span> <span class="n">_label_col</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">data_start_row</span><span class="o">=</span><span class="n">data_start_row</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">label_col</span><span class="p">]</span>
+    <span class="n">is_row_label</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">n_rows</span> <span class="o">=</span> <span class="n">last_true_idx</span><span class="p">(</span><span class="n">is_row_label</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">labels</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_variable_labels</span><span class="p">))</span>
+    <span class="n">has_age</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">age_row</span><span class="p">,</span> <span class="n">label_col</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_age</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No ages found in row </span><span class="si">{</span><span class="n">age_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> of the sheet"</span><span class="p">)</span>
+    <span class="n">n_cols</span> <span class="o">=</span> <span class="n">label_col</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">last_true_idx</span><span class="p">(</span><span class="n">has_age</span><span class="p">)</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">colored</span><span class="p">,</span> <span class="n">coordinate</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">crop</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">colored</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">is_variable_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">is_variable_row</span><span class="p">[</span><span class="n">data_start_row</span><span class="p">:]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">label_col</span><span class="p">]</span>
+    <span class="n">is_variable_row</span> <span class="o">&amp;=</span> <span class="n">labels</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">is_variable_row</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">labels</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_variable_labels</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">data_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">data_mask</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">is_variable_row</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">label_col</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">))]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">SheetView</span><span class="p">(</span>
+        <span class="n">vals</span><span class="p">,</span>
+        <span class="n">colored</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span>
+        <span class="n">coordinate</span><span class="p">,</span>
+        <span class="n">label_col</span><span class="p">,</span>
+        <span class="n">data_mask</span><span class="p">,</span>
+        <span class="n">year_row</span><span class="o">=</span><span class="n">year_row</span><span class="p">,</span>
+        <span class="n">age_row</span><span class="o">=</span><span class="n">age_row</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Rule">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.Rule">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Rule</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A diagnosis rule.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: Identifier of the rule (and its key in a rules mapping).</span>
+<span class="sd">        flag: ``flag(view: SheetView) -&gt; bool array`` marking the problematic cells</span>
+<span class="sd">            (same shape as ``view.vals``).</span>
+<span class="sd">        message: Explanation shown for each flagged cell. Can use ``{value}``,</span>
+<span class="sd">            ``{coordinate}`` and ``{label}`` (the variable of the cell's row).</span>
+<span class="sd">    """</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">flag</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SheetView</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Problem">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.Problem">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Problem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A cell flagged by a rule."""</span>
+
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rule</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">coordinate</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">object</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_empty_but_colored</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">data_mask</span> <span class="o">&amp;</span> <span class="n">view</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">view</span><span class="o">.</span><span class="n">colored</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_filled_but_uncolored</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="n">colored</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">colored</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">colored</span> <span class="o">&amp;</span> <span class="n">view</span><span class="o">.</span><span class="n">data_mask</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>  <span class="c1"># the data uses no colors: nothing to compare with</span>
+    <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">data_mask</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">view</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">colored</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_not_binary</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_bad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">data_mask</span> <span class="o">&amp;</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_bad</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_header_row_flags</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">is_bad_step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Flag cells of a header row whose step from the previous cell is bad."""</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">data_cols</span>
+    <span class="k">for</span> <span class="n">prev</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">prev</span><span class="p">],</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bad_step</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># not a number at all</span>
+    <span class="k">if</span> <span class="n">cols</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]):</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_number</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">))</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_age_not_consecutive</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_header_row_flags</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_year_not_consecutive</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_header_row_flags</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">year_row</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_age_year_mismatch</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Flag ages for which ``year - age`` differs from that of most columns."""</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">j</span><span class="p">:</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">year_row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">data_cols</span>
+        <span class="k">if</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">year_row</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+        <span class="ow">and</span> <span class="n">_is_number</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">diffs</span><span class="p">:</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">diffs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># ties: leftmost</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">diffs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">view</span><span class="o">.</span><span class="n">age_row</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">expected</span>
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_duplicate_variable</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">false_mask</span><span class="p">()</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">data_mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">rows</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">casefold</span><span class="p">())</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">rows</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">"first"</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()],</span> <span class="n">view</span><span class="o">.</span><span class="n">label_col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="n">DFLT_RULES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">rule</span>
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"empty_but_colored"</span><span class="p">,</span>
+            <span class="n">_empty_but_colored</span><span class="p">,</span>
+            <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2"> (</span><span class="si">{label}</span><span class="s2">) is colored but empty"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"filled_but_uncolored"</span><span class="p">,</span>
+            <span class="n">_filled_but_uncolored</span><span class="p">,</span>
+            <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2"> (</span><span class="si">{label}</span><span class="s2">) has a value (</span><span class="si">{value!r}</span><span class="s2">) but no color"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"not_binary"</span><span class="p">,</span>
+            <span class="n">_not_binary</span><span class="p">,</span>
+            <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2"> (</span><span class="si">{label}</span><span class="s2">) should be 0 or 1, but is </span><span class="si">{value!r}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"age_not_consecutive"</span><span class="p">,</span>
+            <span class="n">_age_not_consecutive</span><span class="p">,</span>
+            <span class="s2">"age </span><span class="si">{value!r}</span><span class="s2"> in </span><span class="si">{coordinate}</span><span class="s2"> doesn't follow the previous age"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"year_not_consecutive"</span><span class="p">,</span>
+            <span class="n">_year_not_consecutive</span><span class="p">,</span>
+            <span class="s2">"year </span><span class="si">{value!r}</span><span class="s2"> in </span><span class="si">{coordinate}</span><span class="s2"> doesn't follow the previous year"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"age_year_mismatch"</span><span class="p">,</span>
+            <span class="n">_age_year_mismatch</span><span class="p">,</span>
+            <span class="s2">"age </span><span class="si">{value!r}</span><span class="s2"> in </span><span class="si">{coordinate}</span><span class="s2"> doesn't match its year "</span>
+            <span class="s2">"(year - age differs from the first column's)"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">Rule</span><span class="p">(</span>
+            <span class="s2">"duplicate_variable"</span><span class="p">,</span>
+            <span class="n">_duplicate_variable</span><span class="p">,</span>
+            <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2">: variable </span><span class="si">{value!r}</span><span class="s2"> appears more than once"</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="select_rules">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.select_rules">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">select_rules</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">(),</span> <span class="o">*</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Make a ``{name: Rule}`` mapping: turn rules on or off, and add your own.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        include: Names of the rules to keep (default: all of ``rules``).</span>
+<span class="sd">        exclude: Names of the rules to drop.</span>
+<span class="sd">        extra: More rules to add: a ``{name: Rule}`` mapping or an iterable of</span>
+<span class="sd">            ``Rule`` instances.</span>
+<span class="sd">        rules: The rules to start from (default: ``DFLT_RULES``).</span>
+
+<span class="sd">    &gt;&gt;&gt; list(select_rules(include=['not_binary']))</span>
+<span class="sd">    ['not_binary']</span>
+<span class="sd">    &gt;&gt;&gt; my_rule = Rule('never', lambda view: view.false_mask(), 'never happens')</span>
+<span class="sd">    &gt;&gt;&gt; 'never' in select_rules(extra=[my_rule])</span>
+<span class="sd">    True</span>
+<span class="sd">    """</span>
+    <span class="n">rules</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">DFLT_RULES</span> <span class="k">if</span> <span class="n">rules</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rules</span><span class="p">)</span>
+    <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="n">include</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">include</span>
+    <span class="n">exclude</span> <span class="o">=</span> <span class="p">[</span><span class="n">exclude</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">exclude</span>
+    <span class="n">unknown</span> <span class="o">=</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">include</span> <span class="ow">or</span> <span class="p">())</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">exclude</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Unknown rule(s): </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">. Known rules: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">rules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">include</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+        <span class="n">rules</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="n">extra</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">rules</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">rule</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">extra</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">rules</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_iter_rules</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">Rule</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">rules</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rules</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="diagnose_view">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.diagnose_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diagnose_view</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">DFLT_RULES</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">""</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Yield the ``Problem``s that ``rules`` find in a ``SheetView``."""</span>
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">_iter_rules</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="n">view</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Rule </span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> returned a mask of shape </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, but the "</span>
+                <span class="sa">f</span><span class="s2">"sheet's shape is </span><span class="si">{</span><span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">coordinate</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">label_col</span><span class="p">]</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">message</span> <span class="ow">or</span> <span class="s2">"</span><span class="si">{coordinate}</span><span class="s2"> (</span><span class="si">{label}</span><span class="s2">): </span><span class="si">{value!r}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">coordinate</span><span class="o">=</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">Problem</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">coordinate</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="diagnose_file">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.diagnose_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diagnose_file</span><span class="p">(</span><span class="n">xls_filepath</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">DFLT_RULES</span><span class="p">,</span> <span class="o">**</span><span class="n">view_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Yield the ``Problem``s that ``rules`` find in a spreadsheet.</span>
+
+<span class="sd">    ``view_kwargs`` (``year_row``, ``age_row``...) go to ``sheet_view``. A sheet</span>
+<span class="sd">    that doesn't have the expected layout gives one ``Problem`` whose rule is</span>
+<span class="sd">    ``UNREADABLE_SHEET``.</span>
+<span class="sd">    """</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">xls_filepath</span><span class="p">)</span>
+    <span class="n">wb</span> <span class="o">=</span> <span class="n">load_workbook</span><span class="p">(</span><span class="n">xls_filepath</span><span class="p">,</span> <span class="n">data_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">sheet</span> <span class="o">=</span> <span class="n">wb</span><span class="p">[</span><span class="n">sheetname</span><span class="p">]</span> <span class="k">if</span> <span class="n">sheetname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">wb</span><span class="p">[</span><span class="n">wb</span><span class="o">.</span><span class="n">sheetnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">sheet_view</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="o">**</span><span class="n">view_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># the sheet doesn't have the expected layout</span>
+        <span class="k">yield</span> <span class="n">Problem</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">UNREADABLE_SHEET</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="k">yield from</span> <span class="n">diagnose_view</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="diagnose_dir">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.diagnose_dir">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diagnose_dir</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">DFLT_RULES</span><span class="p">,</span> <span class="o">**</span><span class="n">view_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Yield the ``Problem``s found in the ``.xlsx`` files of ``source_dir``."""</span>
+    <span class="n">source_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">source_dir</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">source_dir</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".xlsx"</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"~$"</span><span class="p">):</span>
+            <span class="k">yield from</span> <span class="n">diagnose_file</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+                <span class="n">sheetname</span><span class="p">,</span>
+                <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">view_kwargs</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="diagnosis_table">
+<a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.diagnosis_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diagnosis_table</span><span class="p">(</span><span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Problem</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A DataFrame with one row per problem (columns: the ``Problem`` fields)."""</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Problem</span><span class="o">.</span><span class="n">__dataclass_fields__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">[[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span>
+    <span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="print_diagnosis">
 <a class="viewcode-back" href="../../_autosummary/odus.raw_data_diagnosis.html#odus.raw_data_diagnosis.print_diagnosis">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">print_diagnosis</span><span class="p">(</span><span class="n">source_dir</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_diagnosis</span><span class="p">(</span><span class="n">source_dir</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">sheetname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">DFLT_RULES</span><span class="p">,</span> <span class="o">**</span><span class="n">view_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Print the diagnosis of the raw xls files in `source_dir`.</span>
-<span class="sd">    Namely, for every file that has a problem, the script will print the name of the problematic files,</span>
-<span class="sd">    and print the coordinates of the cells that should be checked for problems.</span>
 
-<span class="sd">    The problems that are checked for:</span>
-<span class="sd">    - Cells (in the "data" range) that are (a) empty, but have color or (b) NOT empty, but without color.</span>
+<span class="sd">    For every file that has a problem, print its name, then for each rule that</span>
+<span class="sd">    flagged something, the rule's name and the explanation of each flagged cell.</span>
 
-<span class="sd">    See functions `lidx_of_empty_non_white_or_non_empty_white` and `mk_known_exceptions_lidx` functions for details.</span>
+<span class="sd">    The checks are the ``rules`` (default ``DFLT_RULES``); see the module docstring</span>
+<span class="sd">    and ``select_rules`` to turn some off or add your own. For instance, the</span>
+<span class="sd">    color rules only make sense for spreadsheets where filled cells are colored.</span>
 <span class="sd">    """</span>
     <span class="n">source_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">source_dir</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Diagnosing xls files of "</span><span class="si">{</span><span class="n">source_dir</span><span class="si">}</span><span class="s1">" ...</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">lidx</span> <span class="ow">in</span> <span class="n">diagnosis_items</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">sheetname</span><span class="p">):</span>
+    <span class="n">problems</span> <span class="o">=</span> <span class="n">diagnose_dir</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">sheetname</span><span class="p">,</span> <span class="n">rules</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="o">**</span><span class="n">view_kwargs</span><span class="p">)</span>
+    <span class="n">n_files</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">file_problems</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">n_files</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The possibly problematic cells for </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">matmask</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">lidx</span><span class="p">))</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
-        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">", "</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">rule</span><span class="p">,</span> <span class="n">rule_problems</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">file_problems</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">rule</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rule_problems</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    - </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">n_files</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"No problems found."</span><span class="p">)</span></div>
 
 </pre></div>
         </article>
@@ -441,7 +875,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=4bb83394"></script>
+</div><script src="../../_static/documentation_options.js?v=e2f847f2"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

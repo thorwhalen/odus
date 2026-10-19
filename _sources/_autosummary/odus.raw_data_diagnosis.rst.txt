@@ -11,9 +11,13 @@ odus.raw\_data\_diagnosis
       coord_val_and_bgcolor_of_cell
       crop
       dfof
+      diagnose_dir
+      diagnose_file
+      diagnose_view
       diagnosis_items
       diagnosis_lidx
       diagnosis_lidx_of_xls_file
+      diagnosis_table
       last_true_idx
       lidx_of_empty_non_white_or_non_empty_white
       matmask
@@ -22,6 +26,16 @@ odus.raw\_data\_diagnosis
       pra
       print_diagnosis
       row_lidx_to_mat_lidx
+      select_rules
       sheet_to_format_prepped_df
+      sheet_view
       valid_vals_int_coords
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Problem
+      Rule
+      SheetView
    

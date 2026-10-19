@@ -445,8 +445,21 @@ from odus.plot_utils import plot_trajectory
 plot_trajectory(
     df_store[k],
     row_groups={
-        "social": ["SON/DAUGHTER", "SIBLING", "FATHER/MOTHER", "SPOUSE", "FRIEND USER", "FRIEND NON USER"],
-        "opioids": ["AS PRESCRIBED OPIOID", "NOT AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID", "INJECTED"],
+        "social": [
+            "SON/DAUGHTER",
+            "SIBLING",
+            "FATHER/MOTHER",
+            "SPOUSE",
+            "FRIEND USER",
+            "FRIEND NON USER",
+        ],
+        "opioids": [
+            "AS PRESCRIBED OPIOID",
+            "NOT AS PRESCRIBED OPIOID",
+            "HEROIN",
+            "OTHER OPIOID",
+            "INJECTED",
+        ],
     },
     row_colors={"HEROIN": "#c0392b", "INJECTED": "#8e44ad", "IN TREATMENT": "#27ae60"},
 )
@@ -516,6 +529,56 @@ write_trajectories_to_file(df_store, fp="all_respondents_all_fields.pdf")
 
 ```python
 
+```
+
+## Diagnosing the raw spreadsheets
+
+Before preparing the data, check the raw spreadsheets for data-entry problems. `print_diagnosis` lists, file by file and rule by rule, the cells to check, with an explanation for each:
+
+```python
+from odus.raw_data_diagnosis import print_diagnosis
+
+print_diagnosis(survey_dir + "/surveys")
+```
+
+```none
+The possibly problematic cells for A03.xlsx:
+  duplicate_variable:
+    - B36: variable 'New Jersey' appears more than once
+
+The possibly problematic cells for A13.xlsx:
+  not_binary:
+    - Q8 (INCARCERATION) should be 0 or 1, but is 16
+    ...
+```
+
+Each check is a rule; `DFLT_RULES` holds the default ones:
+
+| rule                                          | flags                                                                  |
+|-----------------------------------------------|------------------------------------------------------------------------|
+| `empty_but_colored`                           | an empty data cell that is colored                                     |
+| `filled_but_uncolored`                        | a data cell with a value but no color (only on sheets that use colors) |
+| `not_binary`                                  | a value that isn’t 0 or 1                                              |
+| `age_not_consecutive`, `year_not_consecutive` | an age (year) that doesn’t follow the previous one                     |
+| `age_year_mismatch`                           | an age whose `year - age` differs from most columns’                   |
+| `duplicate_variable`                          | a variable listed more than once                                       |
+
+A file that doesn’t have the expected layout is reported (rule `unreadable_sheet`) and the others are still checked.
+
+Turn rules on or off, or add your own, with `select_rules`. A rule is a name, a function that takes a `SheetView` (the sheet’s values, colors and cell coordinates) and returns a boolean array marking the cells to flag, and a message:
+
+```python
+from odus.raw_data_diagnosis import Rule, select_rules, diagnose_dir, diagnosis_table
+
+not_too_old = Rule(
+    "too_old",
+    lambda view: view.data_mask & (view.numeric()[view.age_row] > 90),
+    "{coordinate} ({label}): the respondent would be over 90",
+)
+rules = select_rules(exclude=["filled_but_uncolored"], extra=[not_too_old])
+
+print_diagnosis(survey_dir + "/surveys", rules=rules)
+diagnosis_table(diagnose_dir(survey_dir + "/surveys", rules=rules))  # as a DataFrame
 ```
 
 ## Demo s and v
