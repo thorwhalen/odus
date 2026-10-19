@@ -111,3 +111,51 @@ def test_diagnosis_follows_the_layout(tmp_path):
     layout = SurveyLayout(year_row=None, age_row=0, data_start_row=1)
     problems = {(p.rule, p.coordinate) for p in diagnose_file(fp, layout=layout)}
     assert problems == {("not_binary", "C2")}
+
+
+def test_csv_with_na_like_and_numeric_variable_names(tmp_path):
+    raw = read_raw_table(os.path.join(SURVEYS, "A01.xlsx"))
+    raw.iat[3, 1], raw.iat[4, 1] = "None", "NA"  # names a CSV reader may guess as NaN
+    raw.iat[5, 1] = "1999"  # a numeric name
+    raw.to_csv(tmp_path / "B01.csv", header=False, index=False)
+    t = _store(tmp_path, ".csv")["B01.csv"]
+    assert t.shape == (19, 31)
+    assert t.columns[:3].tolist() == ["None", "NA", "1999"]
+
+
+def test_booleans_and_bad_numbers():
+    raw = pd.DataFrame(
+        [["ID", "R1", None], ["Y", 1990, 1991], ["A", 20, 21], ["HEROIN", True, False]]
+    )
+    assert trajectory_from_table(raw)["HEROIN"].tolist() == [1, 0]
+    raw.iat[3, 1] = "nan"
+    with pytest.raises(ValueError, match="should be a number, but is 'nan'"):
+        trajectory_from_table(raw)
+    raw.iat[3, 1], raw.iat[2, 2] = 1, 20
+    with pytest.raises(ValueError, match="ages appear more than once"):
+        trajectory_from_table(raw)
+
+
+def test_layouts_are_hashable_even_with_a_list_of_titles(tmp_path):
+    shutil.copy(os.path.join(SURVEYS, "A01.xlsx"), tmp_path / "A01.xlsx")
+    store = _store(tmp_path, ".xlsx")
+    store.layout = SurveyLayout(section_titles=["List of States"])
+    assert store["A01.xlsx"].shape[0] == 19
+
+
+def test_long_tables_with_text_ages_years_and_missing_values():
+    long = pd.DataFrame(
+        {
+            "age": ["9", "10", "10"],
+            "year": ["1999", "2000", "2000"],
+            "variable": ["A", "A", "B"],
+            "value": ["1", "0", "1"],
+        }
+    )
+    t = trajectory_from_long(long, year="year")
+    assert t.index.tolist() == [9, 10]  # numeric order, not text order
+    assert t.to_dict() == {"A": {9: 1, 10: 0}, "B": {9: 0, 10: 1}}
+    assert t.attrs[YEAR_OF_AGE] == {9: 1999, 10: 2000}
+    long.loc[0, "value"] = None
+    with pytest.raises(ValueError, match="Empty values"):
+        trajectory_from_long(long)

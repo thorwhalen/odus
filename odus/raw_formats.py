@@ -70,6 +70,9 @@ class SurveyLayout:
     section_titles: tuple = SECTION_TITLES
     empty_value: float | None = None
 
+    def __post_init__(self):  # a tuple, so that layouts are hashable
+        object.__setattr__(self, "section_titles", tuple(self.section_titles))
+
 
 DFLT_LAYOUT = SurveyLayout()  # the layout of the ODUS spreadsheets
 
@@ -94,19 +97,30 @@ def is_section_title(label, *, section_titles=SECTION_TITLES):
 
 def is_empty(x):
     """Whether a cell value is empty (None, NaN or an empty string)."""
-    return x is None or (isinstance(x, float) and np.isnan(x)) or x == ""
+    if isinstance(x, str):
+        return not x.strip()
+    return x is None or (isinstance(x, float) and np.isnan(x))
+
+
+def _is_label_like(x):
+    """Text that isn't a number (CSV readers give numbers as text too)."""
+    if not isinstance(x, str) or not x.strip():
+        return False
+    try:
+        float(x)
+        return False
+    except ValueError:
+        return True
 
 
 def find_label_col(vals, *, data_start_row):
     """The column with the most text from ``data_start_row`` on (the variable names)."""
-    is_text = vals.iloc[data_start_row:].map(
-        lambda x: isinstance(x, str) and bool(x.strip())
-    )
+    is_text = vals.iloc[data_start_row:].map(_is_label_like)
     n_texts = is_text.sum(axis=0).to_numpy()
     if not n_texts.any():
         raise ValueError(
             f"Couldn't find the column of variable names: no text from row "
-            f"{data_start_row + 1} of the table on"
+            f"{data_start_row + 1} of the table on (set the layout's label_col)"
         )
     return int(np.argmax(n_texts))
 
@@ -115,11 +129,13 @@ def _read_excel(src, **kwargs):
     return pd.read_excel(src, header=None, **kwargs)
 
 
+_CSV_AS_IS = dict(header=None, dtype=object, keep_default_na=False)  # "NA" is text
+
 TABLE_READERS = {  # file extension -> function(file path or file-like) -> DataFrame
     ".xlsx": _read_excel,
     ".xls": _read_excel,
-    ".csv": partial(pd.read_csv, header=None),
-    ".tsv": partial(pd.read_csv, header=None, sep="\t"),
+    ".csv": partial(pd.read_csv, **_CSV_AS_IS),
+    ".tsv": partial(pd.read_csv, sep="\t", **_CSV_AS_IS),
 }
 
 
@@ -137,7 +153,8 @@ def read_raw_table(src, *, ext=None, readers=TABLE_READERS):
         if not isinstance(src, (str, os.PathLike)):
             raise ValueError("Give the file extension (ext=...) to read bytes")
         ext = os.path.splitext(str(src))[1]
-    reader = readers.get(ext.lower())
+    ext = ext.lower() if ext.startswith(".") else "." + ext.lower()
+    reader = readers.get(ext)
     if reader is None:
         raise ValueError(
             f"No reader for {ext!r} files. Readers exist for: {sorted(readers)}. "
@@ -149,12 +166,17 @@ def read_raw_table(src, *, ext=None, readers=TABLE_READERS):
 
 
 def _as_number(x, *, where):
-    if isinstance(x, (int, float, np.number)) and not isinstance(x, bool):
+    if isinstance(x, (bool, np.bool_)):
+        return int(x)
+    if isinstance(x, (int, float, np.number)):
         return x
     try:
-        return float(str(x).strip())
+        number = float(str(x).strip())
     except ValueError:
+        number = None
+    if number is None or not np.isfinite(number):
         raise ValueError(f"{where} should be a number, but is {x!r}") from None
+    return number
 
 
 def _as_int_if_integral(values):
@@ -183,8 +205,17 @@ def trajectory_from_table(raw, *, layout=DFLT_LAYOUT):
     if not cols:
         raise ValueError(f"No ages found in row {layout.age_row + 1} of the table")
     ages = _as_int_if_integral(
-        [_as_number(age_cells[j], where=f"The age in column {j + 1}") for j in cols]
+        [
+            _as_number(
+                age_cells[j],
+                where=f"The age in column {j + 1} (if the variable names aren't in "
+                f"column {label_col + 1}, set the layout's label_col)",
+            )
+            for j in cols
+        ]
     )
+    if len(set(ages.tolist())) < len(ages):
+        raise ValueError(f"Some ages appear more than once: {ages.tolist()}")
 
     labels = raw.iloc[:, label_col]
     rows = [
@@ -244,6 +275,14 @@ def trajectory_from_long(
     missing = [c for c in (age, variable, value, year) if c is not None and c not in df]
     if missing:
         raise KeyError(f"The table has no columns {missing}: it has {list(df.columns)}")
+    df = df.copy()
+    df[age] = _as_int_if_integral([_as_number(a, where="An age") for a in df[age]])
+    if df[value].map(is_empty).any():
+        rows = df.index[df[value].map(is_empty)].tolist()[:10]
+        raise ValueError(f"Empty values (rows {rows}): fill them in, or drop the rows")
+    df[value] = _as_int_if_integral(
+        [_as_number(v, where=f"The value {v!r}") for v in df[value]]
+    )
     repeated = df.duplicated([age, variable])
     if repeated.any():
         raise ValueError(
@@ -251,12 +290,20 @@ def trajectory_from_long(
             f"{df.loc[repeated, [age, variable]].values.tolist()[:10]}"
         )
     traj = df.pivot(index=age, columns=variable, values=value)
-    traj = traj.reindex(sorted(traj.index)).fillna(fill_value)
+    traj = traj.sort_index().astype(float).fillna(fill_value)  # absent pairs
     traj = traj.astype(int) if (traj == traj.round()).all().all() else traj
     traj.index.name, traj.columns.name = "age", "category"
     if year is not None:
+        if df[year].map(is_empty).any():
+            raise ValueError(f"Some rows have no {year!r}")
+        df[year] = _as_int_if_integral(
+            [_as_number(y, where="A year") for y in df[year]]
+        )
         years = df.groupby(age)[year].unique()
         if inconsistent := [a for a, ys in years.items() if len(ys) > 1]:
             raise ValueError(f"Ages with more than one year: {inconsistent}")
-        traj.attrs[YEAR_OF_AGE] = {a: ys[0].item() for a, ys in years.items()}
+        traj.attrs[YEAR_OF_AGE] = {
+            int(a) if float(a).is_integer() else a: ys[0].item()
+            for a, ys in years.items()
+        }
     return traj

@@ -224,7 +224,8 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
 
     def __getitem__(self, k):
         cache = self.__dict__.setdefault("_df_cache", {})
-        settings = (self.layout, id(self.readers), self.non_binary, self.duplicates)
+        readers = tuple((ext, id(r)) for ext, r in self.readers.items())
+        settings = (self.layout, readers, self.non_binary, self.duplicates)
         if (k, settings) not in cache:
             raw = read_raw_table(
                 super().__getitem__(k),

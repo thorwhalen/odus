@@ -175,7 +175,6 @@ YEAR_ROW = DFLT_LAYOUT.year_row  # row holding the years (0-based, in the sheet)
 AGE_ROW = DFLT_LAYOUT.age_row  # row holding the ages
 DATA_START_ROW = DFLT_LAYOUT.data_start_row  # first row of variables
 NON_VARIABLE_LABELS = SECTION_TITLES  # section titles, compared ignoring case/spaces
-_is_empty = is_empty
 
 UNREADABLE_SHEET = "unreadable_sheet"  # rule name of a sheet that can't be read
 
