@@ -72,7 +72,7 @@ def _hover_texts(df, x):
             lines = [f"<b>{html.escape(str(var))}</b>", f"age {age}"]
             if age in year_of_age:
                 lines.append(f"year {year_of_age[age]}")
-            if x is not None:
+            if x is not None and x[j] != age:
                 lines.append(f"x {x[j]}")
             lines.append(f"value {value}")
             row.append("<br>".join(lines))
@@ -264,13 +264,15 @@ def stacked_trajectories_interactive(
     if not aligned:
         raise ValueError(f"No trajectory to plot (aligned on {x_align!r})")
 
-    lo = min(x[0] for _, _, x in aligned)
-    hi = max(x[-1] for _, _, x in aligned)
-    full_x = list(range(int(lo), int(hi) + 1))
+    if any(not np.allclose(x, np.round(x)) for _, _, x in aligned):
+        raise ValueError("A stacked view needs whole-number x (one column per year)")
+    lo = int(round(min(x[0] for _, _, x in aligned)))
+    hi = int(round(max(x[-1] for _, _, x in aligned)))
+    full_x = list(range(lo, hi + 1))
     hexes, texts, customdata, ticktext, row_breaks = [], [], [], [], []
     for k, df, x in aligned:
         img, group_of_row = trajectory_colors(df, **style)
-        offset = int(x[0]) - int(lo)
+        offset = int(round(x[0])) - lo
         pad = [None] * offset, [None] * (len(full_x) - offset - len(x))
         block_texts = _hover_texts(df, list(x))
         ages = [a.item() if hasattr(a, "item") else a for a in df.index]

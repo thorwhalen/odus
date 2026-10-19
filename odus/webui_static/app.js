@@ -19,7 +19,9 @@ const api = async (name, params = {}) => {
   const query = search.toString();
   const response = await fetch(`api/${name}${query ? "?" + query : ""}`);
   const body = await response.json();
-  if (!response.ok) throw new Error(body.error || response.statusText);
+  if (!response.ok) {
+    throw Object.assign(new Error(body.error || response.statusText), { status: response.status });
+  }
   return body;
 };
 
@@ -167,8 +169,10 @@ async function render() {
     if (request !== latestRequest) return; // a newer view was asked for meanwhile
     plot.removeAttribute("aria-busy");
     await Plotly.react(plot, result.figure.data, result.figure.layout, { responsive: true });
+    if (request !== latestRequest) return; // superseded while drawing
     plot.setAttribute("aria-label", `Trajectory of ${respondent}`);
-    onCellClick(plot, ([, variable]) => navigate({ ...route, align: variable }));
+    // just that variable: the respondent's other choices could leave everyone out
+    onCellClick(plot, ([, variable]) => navigate({ respondent, fields: [], align: variable }));
     const missing = result.missing_fields.length
       ? `${respondent} has no ${result.missing_fields.join(", ")}. `
       : "";
@@ -176,40 +180,47 @@ async function render() {
   } catch (error) {
     if (request !== latestRequest) return;
     plot.removeAttribute("aria-busy");
-    showError(`Couldn't show ${respondent}: ${error.message}`, render);
+    showError(`Couldn't show ${respondent}: ${error.message}`, retryable(error) && render);
   }
 }
 
 async function renderStack(route, request) {
   const { fields, align } = route;
   const plot = $("plot");
-  document.title = `First ${align} · odus explorer`;
+  document.title = `Lined up on ${align} · odus explorer`;
   plot.replaceChildren();
   plot.setAttribute("aria-busy", "true");
-  setStatus(`Lining everyone up on the first year of ${align}…`);
+  setStatus(`Lining everyone up on ${align}…`);
   try {
     const result = await api("stack", { align, fields });
     if (request !== latestRequest) return;
     plot.removeAttribute("aria-busy");
     await Plotly.react(plot, result.figure.data, result.figure.layout, { responsive: true });
-    plot.setAttribute("aria-label", `Everyone aligned on the first year of ${align}`);
+    if (request !== latestRequest) return; // superseded while drawing
+    plot.setAttribute("aria-label", `Everyone lined up by ${result.x_label}`);
     onCellClick(plot, ([key]) => navigate({ respondent: key, fields, align: null }));
     const { not_aligned, missing_fields } = result.left_out;
+    const unreadable = Object.keys(result.unreadable || {}).length;
     const out = [
       not_aligned && `${not_aligned} never had ${align}`,
       missing_fields && `${missing_fields} lack some of the variables`,
+      unreadable && `${unreadable} couldn't be read`,
     ].filter(Boolean);
+    const n = result.respondents.length;
     setStatus(
-      `${result.respondents.length} respondents lined up on the first year of ${align}` +
+      `${n} respondent${n === 1 ? "" : "s"} lined up by ${result.x_label}` +
         (out.length ? ` (left out: ${out.join(", ")})` : "") +
         ". Click a row to open that respondent."
     );
   } catch (error) {
     if (request !== latestRequest) return;
     plot.removeAttribute("aria-busy");
-    showError(`Couldn't line up on ${align}: ${error.message}`, render);
+    showError(`Couldn't line up on ${align}: ${error.message}`, retryable(error) && render);
   }
 }
+
+// Retrying helps when the server or the network failed, not when the request can't work.
+const retryable = (error) => !error.status || error.status >= 500;
 
 // A click on a cell calls handle(customdata), i.e. [respondent, variable, age].
 function onCellClick(plot, handle) {

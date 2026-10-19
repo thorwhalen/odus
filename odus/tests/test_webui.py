@@ -140,3 +140,23 @@ def test_stack(store):
     code, _, body = get(make_app(store=store), "/api/stack", "align=HEROIN&fields=WORK")
     assert code == 200 and json.loads(body)["fields"] == ["WORK"]
     assert get(make_app(store=store), "/api/stack", "align=NOPE")[0] == 404
+
+
+def test_stack_edge_cases(store):
+    from odus.explore import stack
+
+    class OneBad(dict):
+        def __getitem__(self, k):
+            if k == "C.xlsx":
+                raise RuntimeError("corrupt file")
+            return super().__getitem__(k)
+
+    result = stack("HEROIN", store=OneBad(store))
+    assert result["respondents"] == ["A.xlsx", "B.xlsx"]
+    assert result["unreadable"] == {"C.xlsx": "RuntimeError: corrupt file"}
+    assert result["x_label"] == "years since first HEROIN"
+    with pytest.raises(ValueError, match="Choose the variables"):
+        stack("age", store=store)
+    assert stack("age", ["WORK"], store=store)["x_label"] == "age"
+    with pytest.raises(ValueError, match="one variable"):
+        stack(["HEROIN", "WORK"], store=store)

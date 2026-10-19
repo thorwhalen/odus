@@ -121,21 +121,32 @@ def stack(align, fields=None, *, store=None):
         align: The variable to align on: each trajectory's x is the years since it
             was first non-zero. Also ``"age"`` or ``"year"``.
         fields: The variables to show (a list of names, or one name). Default: the
-            ``align`` variable (or all the variables, for ``"age"`` and ``"year"``).
+            ``align`` variable. Required for ``"age"`` and ``"year"``.
         store: The trajectories (default: the bundled surveys).
 
     Returns:
-        ``{"align", "fields", "respondents", "left_out", "figure"}``:
-        ``respondents`` are those shown, in order, and ``left_out`` counts those
-        that aren't (never had ``align``, or lack some of the ``fields``).
+        ``{"align", "x_label", "fields", "respondents", "left_out", "unreadable",
+        "figure"}``: ``respondents`` are those shown, in order, ``left_out``
+        counts those that aren't (never had ``align``, or lack some of the
+        ``fields``), and ``unreadable`` lists those whose data can't be read.
     """
     from odus.interactive import stacked_trajectories_interactive
+    from odus.plot_utils import _x_label
 
+    if not isinstance(align, str):
+        raise ValueError(f"Align on one variable, not {align!r}")
     store = _store(store)
     wanted = _as_list(fields)
-    if wanted is None and align not in ("age", "year"):
+    if wanted is None:
+        if align in ("age", "year"):
+            raise ValueError(f"Choose the variables to line everyone up by {align}")
         wanted = [align]
-    readable = {k: _trajectory(store, k) for k in sorted(store)}
+    readable, unreadable = {}, {}
+    for k in sorted(store):
+        try:
+            readable[k] = _trajectory(store, k)
+        except Exception as e:  # one bad file shouldn't hide all the others
+            unreadable[str(k)] = f"{type(e).__name__}: {e}"
     if align not in ("age", "year") and not any(
         align in df.columns for df in readable.values()
     ):
@@ -145,12 +156,14 @@ def stack(align, fields=None, *, store=None):
     shown = [k for k in shown if k not in left_out["missing_fields"]]
     return {
         "align": align,
+        "x_label": _x_label(align),
         "fields": wanted,
         "respondents": shown,
         "left_out": {
             "not_aligned": len(left_out["not_aligned"]),
             "missing_fields": len(left_out["missing_fields"]),
         },
+        "unreadable": unreadable,
         "figure": json.loads(fig.to_json()),
     }
 

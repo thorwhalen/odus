@@ -104,3 +104,14 @@ def test_stacked_interactive_aligns_blocks_of_rows(traj):
     assert fig.layout.xaxis.title.text == "years since first HEROIN"
     breaks = [s.y0 for s in fig.layout.shapes if s.y0 == s.y1]
     assert breaks == [1.5]  # a wider gap between the two respondents
+
+
+def test_stacked_interactive_needs_whole_number_x(traj):
+    from odus.interactive import stacked_trajectories_interactive
+
+    with pytest.raises(ValueError, match="whole-number x"):
+        stacked_trajectories_interactive({"k": traj}, x_align=lambda df: df.index - 0.5)
+    fig, _ = stacked_trajectories_interactive(
+        {"a": traj, "b": traj}, x_align=lambda df: df.index - 30
+    )
+    assert list(fig.data[0].x) == list(range(-12, -5))  # negative x line up too
