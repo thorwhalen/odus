@@ -834,6 +834,60 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">age</span> <span class="o">-</span> <span class="n">first_age</span> <span class="k">for</span> <span class="n">age</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
 
 
+<div class="viewcode-block" id="aligned_trajectories">
+<a class="viewcode-back" href="../../_autosummary/odus.plot_utils.html#odus.plot_utils.aligned_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">aligned_trajectories</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x_align</span><span class="o">=</span><span class="s2">"age"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The trajectories of ``df_store``, with their x positions aligned by ``x_align``.</span>
+
+<span class="sd">    See ``stacked_trajectories`` for the arguments. Returns ``(aligned, left_out)``:</span>
+<span class="sd">    ``aligned`` is a list of ``(key, trajectory_of_the_fields, x)``, and</span>
+<span class="sd">    ``left_out`` says which trajectories were left out: ``{"not_aligned": [keys],</span>
+<span class="sd">    "missing_fields": {key: [fields]}}``.</span>
+<span class="sd">    """</span>
+    <span class="n">aligned</span><span class="p">,</span> <span class="n">not_aligned</span><span class="p">,</span> <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_get_keys</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">_x_of_trajectory</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_align</span><span class="p">)</span>  <span class="c1"># on all variables, not only the fields</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">not_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">wanted</span> <span class="o">=</span> <span class="p">[</span><span class="n">fields</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">wanted</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
+                <span class="n">missing_fields</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">missing</span>
+                <span class="k">continue</span>
+        <span class="n">df_fields</span> <span class="o">=</span> <span class="n">_select_fields</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">df_fields</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No variables to plot for </span><span class="si">{</span><span class="n">k</span><span class="si">!r}</span><span class="s2"> (fields=</span><span class="si">{</span><span class="n">fields</span><span class="si">!r}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="n">aligned</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">df_fields</span><span class="p">,</span> <span class="n">_consecutive_numbers</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="p">{</span><span class="s2">"not_aligned"</span><span class="p">:</span> <span class="n">not_aligned</span><span class="p">,</span> <span class="s2">"missing_fields"</span><span class="p">:</span> <span class="n">missing_fields</span><span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_warn_left_out</span><span class="p">(</span><span class="n">left_out</span><span class="p">,</span> <span class="n">x_align</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">not_aligned</span> <span class="o">:=</span> <span class="n">left_out</span><span class="p">[</span><span class="s2">"not_aligned"</span><span class="p">]:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Left out </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">not_aligned</span><span class="p">)</span><span class="si">}</span><span class="s2"> trajectories that can't be aligned on "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_name_of</span><span class="p">(</span><span class="n">x_align</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">not_aligned</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">missing_fields</span> <span class="o">:=</span> <span class="n">left_out</span><span class="p">[</span><span class="s2">"missing_fields"</span><span class="p">]:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Left out </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2"> trajectories lacking some of the "</span>
+            <span class="sa">f</span><span class="s2">"fields: </span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_x_label</span><span class="p">(</span><span class="n">x_align</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x_align</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">_name_of</span><span class="p">(</span><span class="n">x_align</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"&lt;lambda&gt;"</span> <span class="k">else</span> <span class="n">name</span>
+    <span class="k">if</span> <span class="n">x_align</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"age"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x_align</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"years since first </span><span class="si">{</span><span class="n">x_align</span><span class="si">}</span><span class="s2">"</span>
+
+
 <div class="viewcode-block" id="stacked_trajectories">
 <a class="viewcode-back" href="../../_autosummary/odus.plot_utils.html#odus.plot_utils.stacked_trajectories">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">stacked_trajectories</span><span class="p">(</span>
@@ -873,35 +927,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The matplotlib figure.</span>
 <span class="sd">    """</span>
+    <span class="n">plotted</span><span class="p">,</span> <span class="n">left_out</span> <span class="o">=</span> <span class="n">aligned_trajectories</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">x_align</span><span class="o">=</span><span class="n">x_align</span><span class="p">)</span>
+    <span class="n">_warn_left_out</span><span class="p">(</span><span class="n">left_out</span><span class="p">,</span> <span class="n">x_align</span><span class="p">)</span>
     <span class="n">align_name</span> <span class="o">=</span> <span class="n">_name_of</span><span class="p">(</span><span class="n">x_align</span><span class="p">)</span>
-    <span class="n">plotted</span><span class="p">,</span> <span class="n">not_aligned</span><span class="p">,</span> <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_get_keys</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">_x_of_trajectory</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x_align</span><span class="p">)</span>  <span class="c1"># on all variables, not only the fields</span>
-        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">not_aligned</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="k">continue</span>
-        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">wanted</span> <span class="o">=</span> <span class="p">[</span><span class="n">fields</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">missing</span> <span class="o">:=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">wanted</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]:</span>
-                <span class="n">missing_fields</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">missing</span>
-                <span class="k">continue</span>
-        <span class="n">df_fields</span> <span class="o">=</span> <span class="n">_select_fields</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">df_fields</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No variables to plot for </span><span class="si">{</span><span class="n">k</span><span class="si">!r}</span><span class="s2"> (fields=</span><span class="si">{</span><span class="n">fields</span><span class="si">!r}</span><span class="s2">)"</span><span class="p">)</span>
-        <span class="n">plotted</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">df_fields</span><span class="p">,</span> <span class="n">_consecutive_numbers</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))))</span>
-    <span class="k">if</span> <span class="n">not_aligned</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Left out </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">not_aligned</span><span class="p">)</span><span class="si">}</span><span class="s2"> trajectories that can't be aligned on "</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">align_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">not_aligned</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">missing_fields</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Left out </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2"> trajectories lacking some of the "</span>
-            <span class="sa">f</span><span class="s2">"fields: </span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">plotted</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No trajectory to plot (aligned on </span><span class="si">{</span><span class="n">align_name</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 
@@ -952,12 +980,7 @@
             <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">x_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x_align</span><span class="p">):</span>
-            <span class="n">x_label</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">align_name</span> <span class="o">==</span> <span class="s2">"&lt;lambda&gt;"</span> <span class="k">else</span> <span class="n">align_name</span>
-        <span class="k">elif</span> <span class="n">x_align</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"age"</span><span class="p">,</span> <span class="s2">"year"</span><span class="p">):</span>
-            <span class="n">x_label</span> <span class="o">=</span> <span class="n">x_align</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">x_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"years since first </span><span class="si">{</span><span class="n">x_align</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">x_label</span> <span class="o">=</span> <span class="n">_x_label</span><span class="p">(</span><span class="n">x_align</span><span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span></div>
 
@@ -1022,7 +1045,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=01ec8363"></script>
+</div><script src="../../_static/documentation_options.js?v=a8acf705"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

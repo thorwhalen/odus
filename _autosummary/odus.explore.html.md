@@ -19,6 +19,7 @@ True
 | [`bundled_store`](#odus.explore.bundled_store)()                         | A `DfStore` of the surveys bundled with odus.                                  |
 |------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
 | [`respondents`](#odus.explore.respondents)(\*[, store])                | The keys of the respondents, sorted.                                           |
+| [`stack`](#odus.explore.stack)(align[, fields, store])           | Every respondent's trajectory, aligned on the first year of a variable.        |
 | [`trajectory`](#odus.explore.trajectory)(respondent[, fields, store]) | The interactive (plotly) figure of a respondent's trajectory, as JSON data.    |
 | [`variables`](#odus.explore.variables)(\*[, store])                  | The variables, with the number of respondents having each (most common first). |
 
@@ -40,6 +41,22 @@ A `DfStore` of the surveys bundled with odus.
 ### odus.explore.respondents(, store=None)
 
 The keys of the respondents, sorted.
+
+### odus.explore.stack(align, fields=None, , store=None)
+
+Every respondent’s trajectory, aligned on the first year of a variable.
+
+* **Parameters:**
+  * **align** – The variable to align on: each trajectory’s x is the years since it
+    was first non-zero. Also `"age"` or `"year"`.
+  * **fields** – The variables to show (a list of names, or one name). Default: the
+    `align` variable. Required for `"age"` and `"year"`.
+  * **store** – The trajectories (default: the bundled surveys).
+* **Returns:**
+  `{"align", "x_label", "fields", "respondents", "left_out", "unreadable",
+  "figure"}`: `respondents` are those shown, in order, `left_out`
+  counts those that aren’t (never had `align`, or lack some of the
+  `fields`), and `unreadable` lists those whose data can’t be read.
 
 ### odus.explore.trajectory(respondent, fields=None, , store=None)
 

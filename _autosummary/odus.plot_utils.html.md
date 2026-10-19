@@ -16,17 +16,27 @@ spreadsheet with `row_colors_of_xls`).
 
 ### Functions
 
-| `heatmap`(X[, y, col_labels, figsize, cmap, ...])                                              |                                                                             |
-|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `ihead`(it)                                                                                    |                                                                             |
-| [`life_plots`](#odus.plot_utils.life_plots)(df_store[, fields, keys, ...])     | Yield the axes of the trajectory plot of each (selected) key of `df_store`. |
-| [`plot_life`](#odus.plot_utils.plot_life)(df[, fields, title, ax])            | Plot a trajectory; `plot_kwargs` go to `plot_trajectory`.                   |
-| `plot_life_course`(df[, grid, figsize])                                                        |                                                                             |
-| [`plot_trajectory`](#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...]) | Plot one trajectory (index: ages or years, columns: variables) readably.    |
-| [`row_colors_of_xls`](#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])    | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.    |
-| [`stacked_trajectories`](#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...]) | Plot several trajectories one above the other, aligned on a common x axis.  |
-| [`trajectory_colors`](#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])  | The colors of the cells of a trajectory: the styling every renderer shares. |
-| [`write_trajectories_to_file`](#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])   | Write the trajectory plots of (selected) keys of `df_store`, one per page.  |
+| [`aligned_trajectories`](#odus.plot_utils.aligned_trajectories)(df_store[, fields, ...])   | The trajectories of `df_store`, with their x positions aligned by `x_align`.   |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `heatmap`(X[, y, col_labels, figsize, cmap, ...])                                                |                                                                                |
+| `ihead`(it)                                                                                      |                                                                                |
+| [`life_plots`](#odus.plot_utils.life_plots)(df_store[, fields, keys, ...])       | Yield the axes of the trajectory plot of each (selected) key of `df_store`.    |
+| [`plot_life`](#odus.plot_utils.plot_life)(df[, fields, title, ax])              | Plot a trajectory; `plot_kwargs` go to `plot_trajectory`.                      |
+| `plot_life_course`(df[, grid, figsize])                                                          |                                                                                |
+| [`plot_trajectory`](#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...])   | Plot one trajectory (index: ages or years, columns: variables) readably.       |
+| [`row_colors_of_xls`](#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])      | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.       |
+| [`stacked_trajectories`](#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...])   | Plot several trajectories one above the other, aligned on a common x axis.     |
+| [`trajectory_colors`](#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])    | The colors of the cells of a trajectory: the styling every renderer shares.    |
+| [`write_trajectories_to_file`](#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])     | Write the trajectory plots of (selected) keys of `df_store`, one per page.     |
+
+### odus.plot_utils.aligned_trajectories(df_store, fields=None, keys=None, , x_align='age')
+
+The trajectories of `df_store`, with their x positions aligned by `x_align`.
+
+See `stacked_trajectories` for the arguments. Returns `(aligned, left_out)`:
+`aligned` is a list of `(key, trajectory_of_the_fields, x)`, and
+`left_out` says which trajectories were left out: `{"not_aligned": [keys],
+"missing_fields": {key: [fields]}}`.
 
 ### odus.plot_utils.life_plots(df_store, fields=None, keys=None, k_df_to_title=<function \_title_of_key>, \*\*plot_kwargs)
 

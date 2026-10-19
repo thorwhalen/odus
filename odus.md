@@ -1,4 +1,4 @@
-> built 2026-10-19 13:13 UTC from 37d92b7 (master) · odus 0.0.18. Details: build_info.json
+> built 2026-10-19 13:37 UTC from 5af62c5 (master) · odus 0.0.19. Details: build_info.json
 
 # index.html.md
 
@@ -554,7 +554,7 @@ Trajectories where the variable is never non-zero are left out (with a warning).
 
 ### Interactive trajectories
 
-With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors.
+With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors. `stacked_trajectories_interactive` is the interactive `stacked_trajectories`, and every cell carries `[respondent, variable, age]` as plotly `customdata` for click handlers.
 
 ```python
 from odus.interactive import plot_trajectory_interactive
@@ -571,9 +571,9 @@ With plotly installed (`pip install "odus[interactive]"`), run
 python -m odus.webui --open
 ```
 
-and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. The URL keeps the view, so the Back button and links work. `--data FOLDER --ext .csv` explores your own files instead.
+and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. Click a cell to line every respondent up on the first year of that variable (`stack` in `odus.explore`), and click a row there to open that respondent. The URL keeps the view, so the Back button and links work. `--data FOLDER --ext .csv` explores your own files instead.
 
-The page is served by a small WSGI app (`odus.webui.make_app(store=...)`, which any WSGI server can run) over a JSON API made of the functions in `odus.explore` (`respondents`, `variables`, `trajectory`). Those are plain Python functions too.
+The page is served by a small WSGI app (`odus.webui.make_app(store=...)`, which any WSGI server can run) over a JSON API made of the functions in `odus.explore` (`respondents`, `variables`, `trajectory`, `stack`). Those are plain Python functions too.
 
 ## Making a pdf of trajectories
 
@@ -1598,6 +1598,7 @@ True
 | [`bundled_store`](_autosummary/odus.explore.html.md#odus.explore.bundled_store)()                         | A `DfStore` of the surveys bundled with odus.                                  |
 |------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
 | [`respondents`](_autosummary/odus.explore.html.md#odus.explore.respondents)(\*[, store])                | The keys of the respondents, sorted.                                           |
+| [`stack`](_autosummary/odus.explore.html.md#odus.explore.stack)(align[, fields, store])           | Every respondent's trajectory, aligned on the first year of a variable.        |
 | [`trajectory`](_autosummary/odus.explore.html.md#odus.explore.trajectory)(respondent[, fields, store]) | The interactive (plotly) figure of a respondent's trajectory, as JSON data.    |
 | [`variables`](_autosummary/odus.explore.html.md#odus.explore.variables)(\*[, store])                  | The variables, with the number of respondents having each (most common first). |
 
@@ -1619,6 +1620,22 @@ A `DfStore` of the surveys bundled with odus.
 ### odus.explore.respondents(, store=None)
 
 The keys of the respondents, sorted.
+
+### odus.explore.stack(align, fields=None, , store=None)
+
+Every respondent’s trajectory, aligned on the first year of a variable.
+
+* **Parameters:**
+  * **align** – The variable to align on: each trajectory’s x is the years since it
+    was first non-zero. Also `"age"` or `"year"`.
+  * **fields** – The variables to show (a list of names, or one name). Default: the
+    `align` variable. Required for `"age"` and `"year"`.
+  * **store** – The trajectories (default: the bundled surveys).
+* **Returns:**
+  `{"align", "x_label", "fields", "respondents", "left_out", "unreadable",
+  "figure"}`: `respondents` are those shown, in order, `left_out`
+  counts those that aren’t (never had `align`, or lack some of the
+  `fields`), and `unreadable` lists those whose data can’t be read.
 
 ### odus.explore.trajectory(respondent, fields=None, , store=None)
 
@@ -1689,10 +1706,11 @@ doesn’t need it; calling the function does.
 
 ### Functions
 
-| [`plot_trajectory_interactive`](_autosummary/odus.interactive.html.md#odus.interactive.plot_trajectory_interactive)(df[, fields, ...])   | Plot a trajectory with plotly; hovering a cell shows what it is.   |
-|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [`plot_trajectory_interactive`](_autosummary/odus.interactive.html.md#odus.interactive.plot_trajectory_interactive)(df[, fields, ...])    | Plot a trajectory with plotly; hovering a cell shows what it is.     |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`stacked_trajectories_interactive`](_autosummary/odus.interactive.html.md#odus.interactive.stacked_trajectories_interactive)(df_store[, ...]) | Plot several trajectories one above the other, aligned, with plotly. |
 
-### odus.interactive.plot_trajectory_interactive(df, fields=None, , title=None, x=None, gap_color='white', minor_gap=1, major_gap=4, major_every=5, cell_px=18, \*\*style)
+### odus.interactive.plot_trajectory_interactive(df, fields=None, , title=None, x=None, key=None, gap_color='white', minor_gap=1, major_gap=4, major_every=5, cell_px=18, \*\*style)
 
 Plot a trajectory with plotly; hovering a cell shows what it is.
 
@@ -1702,6 +1720,8 @@ Plot a trajectory with plotly; hovering a cell shows what it is.
   * **title** – Optional title.
   * **x** – Where to put the ages on the x axis (one number per age, each one more
     than the previous), as in `plot_trajectory`. Default: the ages.
+  * **key** – The respondent’s key, put with the variable and the age in each
+    cell’s `customdata`, for click handlers (`plotly_click`).
   * **gap_color** – Color of the gaps between cells.
   * **minor_gap** – Gap between cells, in pixels.
   * **major_gap** – Wider gap (pixels) before every age multiple of
@@ -1714,6 +1734,22 @@ Plot a trajectory with plotly; hovering a cell shows what it is.
 * **Returns:**
   A `plotly.graph_objects.Figure` (show it with `fig.show()`, or save
   it with `fig.write_html(path)`).
+
+### odus.interactive.stacked_trajectories_interactive(df_store, fields=None, keys=None, , x_align='age', x_label=None, title=None, k_df_to_title=None, gap_color='white', minor_gap=1, major_gap=4, major_every=5, cell_px=18, \*\*style)
+
+Plot several trajectories one above the other, aligned, with plotly.
+
+The interactive version of `odus.plot_utils.stacked_trajectories` (see it
+for `fields`, `keys`, `x_align`, `x_label` and `k_df_to_title`): one
+block of rows per trajectory, labeled with its title, separated by a wider
+gap. The cells are those of `plot_trajectory_interactive`: hover text, and a
+`customdata` of `[respondent key, variable, age]` for click handlers.
+
+* **Returns:**
+  the plotly figure, and the trajectories left out
+  (as `odus.plot_utils.aligned_trajectories` gives them).
+* **Return type:**
+  `(figure, left_out)`
 
 
 # _autosummary/odus.nothing.html.md
@@ -1913,17 +1949,27 @@ spreadsheet with `row_colors_of_xls`).
 
 ### Functions
 
-| `heatmap`(X[, y, col_labels, figsize, cmap, ...])                                              |                                                                             |
-|------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `ihead`(it)                                                                                    |                                                                             |
-| [`life_plots`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.life_plots)(df_store[, fields, keys, ...])     | Yield the axes of the trajectory plot of each (selected) key of `df_store`. |
-| [`plot_life`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.plot_life)(df[, fields, title, ax])            | Plot a trajectory; `plot_kwargs` go to `plot_trajectory`.                   |
-| `plot_life_course`(df[, grid, figsize])                                                        |                                                                             |
-| [`plot_trajectory`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...]) | Plot one trajectory (index: ages or years, columns: variables) readably.    |
-| [`row_colors_of_xls`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])    | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.    |
-| [`stacked_trajectories`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...]) | Plot several trajectories one above the other, aligned on a common x axis.  |
-| [`trajectory_colors`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])  | The colors of the cells of a trajectory: the styling every renderer shares. |
-| [`write_trajectories_to_file`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])   | Write the trajectory plots of (selected) keys of `df_store`, one per page.  |
+| [`aligned_trajectories`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.aligned_trajectories)(df_store[, fields, ...])   | The trajectories of `df_store`, with their x positions aligned by `x_align`.   |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `heatmap`(X[, y, col_labels, figsize, cmap, ...])                                                |                                                                                |
+| `ihead`(it)                                                                                      |                                                                                |
+| [`life_plots`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.life_plots)(df_store[, fields, keys, ...])       | Yield the axes of the trajectory plot of each (selected) key of `df_store`.    |
+| [`plot_life`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.plot_life)(df[, fields, title, ax])              | Plot a trajectory; `plot_kwargs` go to `plot_trajectory`.                      |
+| `plot_life_course`(df[, grid, figsize])                                                          |                                                                                |
+| [`plot_trajectory`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.plot_trajectory)(df[, fields, title, ax, ...])   | Plot one trajectory (index: ages or years, columns: variables) readably.       |
+| [`row_colors_of_xls`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.row_colors_of_xls)(xls_filepath, \*[, ...])      | Get a `{variable: color}` mapping from the cell colors of a spreadsheet.       |
+| [`stacked_trajectories`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.stacked_trajectories)(df_store[, fields, ...])   | Plot several trajectories one above the other, aligned on a common x axis.     |
+| [`trajectory_colors`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.trajectory_colors)(df, \*[, row_colors, ...])    | The colors of the cells of a trajectory: the styling every renderer shares.    |
+| [`write_trajectories_to_file`](_autosummary/odus.plot_utils.html.md#odus.plot_utils.write_trajectories_to_file)(df_store[, ...])     | Write the trajectory plots of (selected) keys of `df_store`, one per page.     |
+
+### odus.plot_utils.aligned_trajectories(df_store, fields=None, keys=None, , x_align='age')
+
+The trajectories of `df_store`, with their x positions aligned by `x_align`.
+
+See `stacked_trajectories` for the arguments. Returns `(aligned, left_out)`:
+`aligned` is a list of `(key, trajectory_of_the_fields, x)`, and
+`left_out` says which trajectories were left out: `{"not_aligned": [keys],
+"missing_fields": {key: [fields]}}`.
 
 ### odus.plot_utils.life_plots(df_store, fields=None, keys=None, k_df_to_title=<function \_title_of_key>, \*\*plot_kwargs)
 
@@ -2501,7 +2547,7 @@ python -m odus.webui --data FOLDER --ext .csv --port 8050 --open
 | [`make_app`](_autosummary/odus.webui.html.md#odus.webui.make_app)(\*[, store, funcs])                 | Make the WSGI app of the explorer.                          |
 | [`serve`](_autosummary/odus.webui.html.md#odus.webui.serve)(\*[, store, host, port, open_browser]) | Serve the explorer at `http://host:port` until interrupted. |
 
-### odus.webui.make_app(\*, store=None, funcs=(<function respondents>, <function variables>, <function trajectory>))
+### odus.webui.make_app(\*, store=None, funcs=(<function respondents>, <function variables>, <function trajectory>, <function stack>))
 
 Make the WSGI app of the explorer.
 
@@ -2521,16 +2567,18 @@ Serve the explorer at `http://host:port` until interrupted.
 
 # About this build
 
-This documentation was built on **2026-10-19 13:13 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2"><code>37d92b7</code></a> on branch <code>master</code>, for **odus 0.0.18** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 13:37 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/5af62c540fc08e6b413a363a29d41ad392564f75"><code>5af62c5</code></a> on branch <code>master</code>, for **odus 0.0.19** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.19) is behind the latest release on PyPI (0.0.20): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2"><code>37d92b74d2c1d796b767e10d99b2fa29d348bbf2</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/5af62c540fc08e6b413a363a29d41ad392564f75"><code>5af62c540fc08e6b413a363a29d41ad392564f75</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2541,9 +2589,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39258015571">39258015571</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39261401067">39261401067</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>37d92b74d2c1d796b767e10d99b2fa29d348bbf2</code> (in the history of the built commit) |
+| Event commit | <code>5af62c540fc08e6b413a363a29d41ad392564f75</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2568,13 +2616,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.18/">0.0.18</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/odus/0.0.20/">0.0.20</a>, newer than the documented version (0.0.19).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 37d92b74d2c1d796b767e10d99b2fa29d348bbf2
+git checkout 5af62c540fc08e6b413a363a29d41ad392564f75
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

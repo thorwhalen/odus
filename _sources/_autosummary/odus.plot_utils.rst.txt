@@ -8,6 +8,7 @@ odus.plot\_utils
 
    .. autosummary::
    
+      aligned_trajectories
       heatmap
       ihead
       life_plots

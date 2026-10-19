@@ -767,7 +767,7 @@ dtype: int64
 </section>
 <section id="interactive-trajectories">
 <h3>Interactive trajectories<a class="headerlink" href="#interactive-trajectories" title="Link to this heading">¶</a></h3>
-<p>With plotly installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;odus[interactive]&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">plot_trajectory_interactive</span></code> draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (<code class="docutils literal notranslate"><span class="pre">row_colors</span></code>, <code class="docutils literal notranslate"><span class="pre">row_groups</span></code>, …) and computes the same colors.</p>
+<p>With plotly installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;odus[interactive]&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">plot_trajectory_interactive</span></code> draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code> (<code class="docutils literal notranslate"><span class="pre">row_colors</span></code>, <code class="docutils literal notranslate"><span class="pre">row_groups</span></code>, …) and computes the same colors. <code class="docutils literal notranslate"><span class="pre">stacked_trajectories_interactive</span></code> is the interactive <code class="docutils literal notranslate"><span class="pre">stacked_trajectories</span></code>, and every cell carries <code class="docutils literal notranslate"><span class="pre">[respondent,</span> <span class="pre">variable,</span> <span class="pre">age]</span></code> as plotly <code class="docutils literal notranslate"><span class="pre">customdata</span></code> for click handlers.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odus.interactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_trajectory_interactive</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_trajectory_interactive</span><span class="p">(</span><span class="n">df_store</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">row_colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"HEROIN"</span><span class="p">:</span> <span class="s2">"#c0392b"</span><span class="p">})</span>
@@ -781,8 +781,8 @@ dtype: int64
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">odus</span><span class="o">.</span><span class="n">webui</span> <span class="o">--</span><span class="nb">open</span>
 </pre></div>
 </div>
-<p>and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. The URL keeps the view, so the Back button and links work. <code class="docutils literal notranslate"><span class="pre">--data</span> <span class="pre">FOLDER</span> <span class="pre">--ext</span> <span class="pre">.csv</span></code> explores your own files instead.</p>
-<p>The page is served by a small WSGI app (<code class="docutils literal notranslate"><span class="pre">odus.webui.make_app(store=...)</span></code>, which any WSGI server can run) over a JSON API made of the functions in <code class="docutils literal notranslate"><span class="pre">odus.explore</span></code> (<code class="docutils literal notranslate"><span class="pre">respondents</span></code>, <code class="docutils literal notranslate"><span class="pre">variables</span></code>, <code class="docutils literal notranslate"><span class="pre">trajectory</span></code>). Those are plain Python functions too.</p>
+<p>and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. Click a cell to line every respondent up on the first year of that variable (<code class="docutils literal notranslate"><span class="pre">stack</span></code> in <code class="docutils literal notranslate"><span class="pre">odus.explore</span></code>), and click a row there to open that respondent. The URL keeps the view, so the Back button and links work. <code class="docutils literal notranslate"><span class="pre">--data</span> <span class="pre">FOLDER</span> <span class="pre">--ext</span> <span class="pre">.csv</span></code> explores your own files instead.</p>
+<p>The page is served by a small WSGI app (<code class="docutils literal notranslate"><span class="pre">odus.webui.make_app(store=...)</span></code>, which any WSGI server can run) over a JSON API made of the functions in <code class="docutils literal notranslate"><span class="pre">odus.explore</span></code> (<code class="docutils literal notranslate"><span class="pre">respondents</span></code>, <code class="docutils literal notranslate"><span class="pre">variables</span></code>, <code class="docutils literal notranslate"><span class="pre">trajectory</span></code>, <code class="docutils literal notranslate"><span class="pre">stack</span></code>). Those are plain Python functions too.</p>
 </section>
 </section>
 <section id="making-a-pdf-of-trajectories">
@@ -1581,7 +1581,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 13:13 UTC from <a href="https://github.com/thorwhalen/odus/commit/37d92b74d2c1d796b767e10d99b2fa29d348bbf2">37d92b7</a> (master) · odus 0.0.18 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 13:37 UTC from <a href="https://github.com/thorwhalen/odus/commit/5af62c540fc08e6b413a363a29d41ad392564f75">5af62c5</a> (master) · odus 0.0.19 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1617,7 +1617,7 @@ the official views of the National Institute on Drug Abuse or the National Insti
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=01ec8363"></script>
+</div><script src="_static/documentation_options.js?v=a8acf705"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

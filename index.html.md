@@ -550,7 +550,7 @@ Trajectories where the variable is never non-zero are left out (with a warning).
 
 ### Interactive trajectories
 
-With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors.
+With plotly installed (`pip install "odus[interactive]"`), `plot_trajectory_interactive` draws a trajectory you can explore: hovering a cell shows its variable, age, year and value. It takes the color arguments of `plot_trajectory` (`row_colors`, `row_groups`, …) and computes the same colors. `stacked_trajectories_interactive` is the interactive `stacked_trajectories`, and every cell carries `[respondent, variable, age]` as plotly `customdata` for click handlers.
 
 ```python
 from odus.interactive import plot_trajectory_interactive
@@ -567,9 +567,9 @@ With plotly installed (`pip install "odus[interactive]"`), run
 python -m odus.webui --open
 ```
 
-and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. The URL keeps the view, so the Back button and links work. `--data FOLDER --ext .csv` explores your own files instead.
+and explore the bundled surveys in your browser: pick a respondent (or step through them with the arrows), choose which variables to show, and hover the cells. Click a cell to line every respondent up on the first year of that variable (`stack` in `odus.explore`), and click a row there to open that respondent. The URL keeps the view, so the Back button and links work. `--data FOLDER --ext .csv` explores your own files instead.
 
-The page is served by a small WSGI app (`odus.webui.make_app(store=...)`, which any WSGI server can run) over a JSON API made of the functions in `odus.explore` (`respondents`, `variables`, `trajectory`). Those are plain Python functions too.
+The page is served by a small WSGI app (`odus.webui.make_app(store=...)`, which any WSGI server can run) over a JSON API made of the functions in `odus.explore` (`respondents`, `variables`, `trajectory`, `stack`). Those are plain Python functions too.
 
 ## Making a pdf of trajectories
 

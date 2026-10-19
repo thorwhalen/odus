@@ -325,7 +325,7 @@
             <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"&lt;b&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">))</span><span class="si">}</span><span class="s2">&lt;/b&gt;"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"age </span><span class="si">{</span><span class="n">age</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">age</span> <span class="ow">in</span> <span class="n">year_of_age</span><span class="p">:</span>
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"year </span><span class="si">{</span><span class="n">year_of_age</span><span class="p">[</span><span class="n">age</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">age</span><span class="p">:</span>
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"x </span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"value </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"&lt;br&gt;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
@@ -333,50 +333,16 @@
     <span class="k">return</span> <span class="n">texts</span>
 
 
-<div class="viewcode-block" id="plot_trajectory_interactive">
-<a class="viewcode-back" href="../../_autosummary/odus.interactive.html#odus.interactive.plot_trajectory_interactive">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_trajectory_interactive</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">,</span>
-    <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">gap_color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
-    <span class="n">minor_gap</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">major_gap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">major_every</span><span class="o">=</span><span class="n">DFLT_MAJOR_EVERY</span><span class="p">,</span>
-    <span class="n">cell_px</span><span class="o">=</span><span class="n">DFLT_CELL_PX</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">style</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Plot a trajectory with plotly; hovering a cell shows what it is.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        df: A trajectory DataFrame: one row per age, one column per variable.</span>
-<span class="sd">        fields: The variables to show, in order (default: all).</span>
-<span class="sd">        title: Optional title.</span>
-<span class="sd">        x: Where to put the ages on the x axis (one number per age, each one more</span>
-<span class="sd">            than the previous), as in ``plot_trajectory``. Default: the ages.</span>
-<span class="sd">        gap_color: Color of the gaps between cells.</span>
-<span class="sd">        minor_gap: Gap between cells, in pixels.</span>
-<span class="sd">        major_gap: Wider gap (pixels) before every age multiple of</span>
-<span class="sd">            ``major_every``, and between row groups.</span>
-<span class="sd">        major_every: See ``major_gap``.</span>
-<span class="sd">        cell_px: Size of a cell, in pixels.</span>
-<span class="sd">        style: The cell colors, as in ``plot_trajectory`` (and only those):</span>
-<span class="sd">            ``row_colors``, ``default_color``, ``row_backgrounds``,</span>
-<span class="sd">            ``row_groups``, ``group_colors``, ``group_tint``.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A ``plotly.graph_objects.Figure`` (show it with ``fig.show()``, or save</span>
-<span class="sd">        it with ``fig.write_html(path)``).</span>
-<span class="sd">    """</span>
-    <span class="n">go</span> <span class="o">=</span> <span class="n">_graph_objects</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_style</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">func_name</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">not_colors</span> <span class="o">:=</span> <span class="nb">set</span><span class="p">(</span><span class="n">style</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">_STYLE_ARGS</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"plot_trajectory_interactive doesn't take </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">not_colors</span><span class="p">)</span><span class="si">}</span><span class="s2">: of "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2"> doesn't take </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">not_colors</span><span class="p">)</span><span class="si">}</span><span class="s2">: of "</span>
             <span class="sa">f</span><span class="s2">"plot_trajectory's styling, it takes the colors </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_STYLE_ARGS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">_select_fields</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_heatmap_parts</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">gap_color</span><span class="p">,</span> <span class="n">minor_gap</span><span class="p">,</span> <span class="n">major_gap</span><span class="p">,</span> <span class="n">major_every</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""What a trajectory's heatmap is made of: the trace's arguments, gap lines..."""</span>
     <span class="n">img</span><span class="p">,</span> <span class="n">group_of_row</span> <span class="o">=</span> <span class="n">trajectory_colors</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span><span class="p">)</span>
     <span class="n">varnames</span><span class="p">,</span> <span class="n">ages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ages</span><span class="p">)</span>
@@ -393,19 +359,217 @@
     <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="s2">"item"</span><span class="p">)</span> <span class="k">else</span> <span class="n">x_</span> <span class="k">for</span> <span class="n">x_</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
 
     <span class="n">z</span><span class="p">,</span> <span class="n">colorscale</span><span class="p">,</span> <span class="n">n_colors</span> <span class="o">=</span> <span class="n">_discrete_colorscale</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">ages_json</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"item"</span><span class="p">)</span> <span class="k">else</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ages</span><span class="p">]</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)),</span>
+        <span class="n">zmin</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">zmax</span><span class="o">=</span><span class="n">n_colors</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">colorscale</span><span class="o">=</span><span class="n">colorscale</span><span class="p">,</span>
+        <span class="n">showscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">xgap</span><span class="o">=</span><span class="n">minor_gap</span><span class="p">,</span>
+        <span class="n">ygap</span><span class="o">=</span><span class="n">minor_gap</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">_hover_texts</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">xs</span><span class="p">),</span>
+        <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"%</span><span class="si">{text}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+        <span class="c1"># what a click on a cell is about: [respondent key, variable, age]</span>
+        <span class="n">customdata</span><span class="o">=</span><span class="p">[[[</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ages_json</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">line</span><span class="p">(</span><span class="o">**</span><span class="n">coordinates</span><span class="p">):</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">gap_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">major_gap</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"line"</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">gap</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">"above"</span><span class="p">,</span> <span class="o">**</span><span class="n">coordinates</span><span class="p">)</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">n_rows</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">_major_boundaries</span><span class="p">(</span><span class="n">tick_values</span><span class="p">,</span> <span class="n">major_every</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span> <span class="n">xs</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">tick_values</span><span class="o">=</span><span class="n">tick_values</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="n">varnames</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_y_axis</span><span class="p">(</span><span class="n">varnames</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">tickvals</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">))),</span>
+        <span class="n">ticktext</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">],</span>
+        <span class="n">autorange</span><span class="o">=</span><span class="s2">"reversed"</span><span class="p">,</span>
+        <span class="n">showgrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">zeroline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_trajectory_interactive">
+<a class="viewcode-back" href="../../_autosummary/odus.interactive.html#odus.interactive.plot_trajectory_interactive">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_trajectory_interactive</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gap_color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
+    <span class="n">minor_gap</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">major_gap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">major_every</span><span class="o">=</span><span class="n">DFLT_MAJOR_EVERY</span><span class="p">,</span>
+    <span class="n">cell_px</span><span class="o">=</span><span class="n">DFLT_CELL_PX</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">style</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Plot a trajectory with plotly; hovering a cell shows what it is.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: A trajectory DataFrame: one row per age, one column per variable.</span>
+<span class="sd">        fields: The variables to show, in order (default: all).</span>
+<span class="sd">        title: Optional title.</span>
+<span class="sd">        x: Where to put the ages on the x axis (one number per age, each one more</span>
+<span class="sd">            than the previous), as in ``plot_trajectory``. Default: the ages.</span>
+<span class="sd">        key: The respondent's key, put with the variable and the age in each</span>
+<span class="sd">            cell's ``customdata``, for click handlers (``plotly_click``).</span>
+<span class="sd">        gap_color: Color of the gaps between cells.</span>
+<span class="sd">        minor_gap: Gap between cells, in pixels.</span>
+<span class="sd">        major_gap: Wider gap (pixels) before every age multiple of</span>
+<span class="sd">            ``major_every``, and between row groups.</span>
+<span class="sd">        major_every: See ``major_gap``.</span>
+<span class="sd">        cell_px: Size of a cell, in pixels.</span>
+<span class="sd">        style: The cell colors, as in ``plot_trajectory`` (and only those):</span>
+<span class="sd">            ``row_colors``, ``default_color``, ``row_backgrounds``,</span>
+<span class="sd">            ``row_groups``, ``group_colors``, ``group_tint``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotly.graph_objects.Figure`` (show it with ``fig.show()``, or save</span>
+<span class="sd">        it with ``fig.write_html(path)``).</span>
+<span class="sd">    """</span>
+    <span class="n">go</span> <span class="o">=</span> <span class="n">_graph_objects</span><span class="p">()</span>
+    <span class="n">_check_style</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="s2">"plot_trajectory_interactive"</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_select_fields</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">_heatmap_parts</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+        <span class="n">gap_color</span><span class="o">=</span><span class="n">gap_color</span><span class="p">,</span>
+        <span class="n">minor_gap</span><span class="o">=</span><span class="n">minor_gap</span><span class="p">,</span>
+        <span class="n">major_gap</span><span class="o">=</span><span class="n">major_gap</span><span class="p">,</span>
+        <span class="n">major_every</span><span class="o">=</span><span class="n">major_every</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">xs</span><span class="p">,</span> <span class="n">varnames</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"xs"</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"varnames"</span><span class="p">]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Heatmap</span><span class="p">(</span><span class="o">**</span><span class="n">parts</span><span class="p">[</span><span class="s2">"trace"</span><span class="p">]))</span>
+
+    <span class="n">label_px</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">)</span> <span class="o">*</span> <span class="n">DFLT_LABEL_PX_PER_CHAR</span>
+    <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="mi">30</span><span class="p">),</span> <span class="mi">50</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">shapes</span><span class="o">=</span><span class="n">parts</span><span class="p">[</span><span class="s2">"lines"</span><span class="p">],</span>
+        <span class="n">width</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">*</span> <span class="n">cell_px</span><span class="p">,</span> <span class="n">MIN_PLOT_WIDTH_PX</span><span class="p">)</span> <span class="o">+</span> <span class="n">label_px</span> <span class="o">+</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">)</span> <span class="o">*</span> <span class="n">cell_px</span> <span class="o">+</span> <span class="n">top</span> <span class="o">+</span> <span class="n">bottom</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="n">label_px</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">top</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bottom</span><span class="p">),</span>
+        <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">gap_color</span><span class="p">,</span>
+        <span class="n">paper_bgcolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
+        <span class="n">tickvals</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span>
+        <span class="n">ticktext</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[</span><span class="s2">"tick_values"</span><span class="p">]],</span>
+        <span class="n">showgrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">zeroline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="o">**</span><span class="n">_y_axis</span><span class="p">(</span><span class="n">varnames</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="stacked_trajectories_interactive">
+<a class="viewcode-back" href="../../_autosummary/odus.interactive.html#odus.interactive.stacked_trajectories_interactive">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stacked_trajectories_interactive</span><span class="p">(</span>
+    <span class="n">df_store</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">x_align</span><span class="o">=</span><span class="s2">"age"</span><span class="p">,</span>
+    <span class="n">x_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">k_df_to_title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gap_color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
+    <span class="n">minor_gap</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">major_gap</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">major_every</span><span class="o">=</span><span class="n">DFLT_MAJOR_EVERY</span><span class="p">,</span>
+    <span class="n">cell_px</span><span class="o">=</span><span class="n">DFLT_CELL_PX</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">style</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Plot several trajectories one above the other, aligned, with plotly.</span>
+
+<span class="sd">    The interactive version of ``odus.plot_utils.stacked_trajectories`` (see it</span>
+<span class="sd">    for ``fields``, ``keys``, ``x_align``, ``x_label`` and ``k_df_to_title``): one</span>
+<span class="sd">    block of rows per trajectory, labeled with its title, separated by a wider</span>
+<span class="sd">    gap. The cells are those of ``plot_trajectory_interactive``: hover text, and a</span>
+<span class="sd">    ``customdata`` of ``[respondent key, variable, age]`` for click handlers.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ``(figure, left_out)``: the plotly figure, and the trajectories left out</span>
+<span class="sd">        (as ``odus.plot_utils.aligned_trajectories`` gives them).</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">odus.plot_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_title_of_key</span><span class="p">,</span> <span class="n">_x_label</span><span class="p">,</span> <span class="n">aligned_trajectories</span>
+
+    <span class="n">go</span> <span class="o">=</span> <span class="n">_graph_objects</span><span class="p">()</span>
+    <span class="n">_check_style</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="s2">"stacked_trajectories_interactive"</span><span class="p">)</span>
+    <span class="n">k_df_to_title</span> <span class="o">=</span> <span class="n">k_df_to_title</span> <span class="ow">or</span> <span class="n">_title_of_key</span>
+    <span class="n">aligned</span><span class="p">,</span> <span class="n">left_out</span> <span class="o">=</span> <span class="n">aligned_trajectories</span><span class="p">(</span><span class="n">df_store</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">x_align</span><span class="o">=</span><span class="n">x_align</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">aligned</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No trajectory to plot (aligned on </span><span class="si">{</span><span class="n">x_align</span><span class="si">!r}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">aligned</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"A stacked view needs whole-number x (one column per year)"</span><span class="p">)</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">aligned</span><span class="p">)))</span>
+    <span class="n">hi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">aligned</span><span class="p">)))</span>
+    <span class="n">full_x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">hexes</span><span class="p">,</span> <span class="n">texts</span><span class="p">,</span> <span class="n">customdata</span><span class="p">,</span> <span class="n">ticktext</span><span class="p">,</span> <span class="n">row_breaks</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">aligned</span><span class="p">:</span>
+        <span class="n">img</span><span class="p">,</span> <span class="n">group_of_row</span> <span class="o">=</span> <span class="n">trajectory_colors</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">lo</span>
+        <span class="n">pad</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">offset</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">full_x</span><span class="p">)</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">block_texts</span> <span class="o">=</span> <span class="n">_hover_texts</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">ages</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">"item"</span><span class="p">)</span> <span class="k">else</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">hexes</span><span class="p">:</span>
+            <span class="n">row_breaks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexes</span><span class="p">))</span>  <span class="c1"># a wider gap between trajectories</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">row_breaks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hexes</span><span class="p">))</span>
+            <span class="n">hexes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="p">(</span><span class="n">_hex</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">img</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">title_line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"&lt;b&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k_df_to_title</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">)))</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;br&gt;"</span>
+            <span class="n">texts</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="p">(</span><span class="n">title_line</span> <span class="o">+</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">block_texts</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[[</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">),</span> <span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ages</span><span class="p">]</span>
+            <span class="n">customdata</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">cells</span><span class="p">,</span> <span class="o">*</span><span class="n">pad</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k_df_to_title</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> · </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">ticktext</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">h</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">hexes</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
+    <span class="n">index_of</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">colors</span><span class="p">)}</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">index_of</span><span class="p">[</span><span class="n">h</span><span class="p">]</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">hexes</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="n">colorscale</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">stop</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="k">for</span> <span class="n">stop</span> <span class="ow">in</span> <span class="p">([</span><span class="n">i</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="p">[(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+    <span class="p">]</span>
+    <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
         <span class="n">go</span><span class="o">.</span><span class="n">Heatmap</span><span class="p">(</span>
             <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">full_x</span><span class="p">,</span>
             <span class="n">y</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)),</span>
             <span class="n">zmin</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">zmax</span><span class="o">=</span><span class="n">n_colors</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">zmax</span><span class="o">=</span><span class="n">n</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
             <span class="n">colorscale</span><span class="o">=</span><span class="n">colorscale</span><span class="p">,</span>
             <span class="n">showscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">xgap</span><span class="o">=</span><span class="n">minor_gap</span><span class="p">,</span>
             <span class="n">ygap</span><span class="o">=</span><span class="n">minor_gap</span><span class="p">,</span>
-            <span class="n">text</span><span class="o">=</span><span class="n">_hover_texts</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">xs</span><span class="p">),</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">texts</span><span class="p">,</span>
+            <span class="n">customdata</span><span class="o">=</span><span class="n">customdata</span><span class="p">,</span>
             <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"%</span><span class="si">{text}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+            <span class="n">hoverongaps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
 
@@ -414,41 +578,34 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"line"</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">gap</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">"above"</span><span class="p">,</span> <span class="o">**</span><span class="n">coordinates</span><span class="p">)</span>
 
     <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">n_rows</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">_major_boundaries</span><span class="p">(</span><span class="n">tick_values</span><span class="p">,</span> <span class="n">major_every</span><span class="p">)</span>
+        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">full_x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">full_x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">n_rows</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">_major_boundaries</span><span class="p">(</span><span class="n">full_x</span><span class="p">,</span> <span class="n">major_every</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">shapes</span> <span class="o">+=</span> <span class="p">[</span>
-        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">group_of_row</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">lo</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">hi</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">row_breaks</span>
     <span class="p">]</span>
-
-    <span class="n">label_px</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">)</span> <span class="o">*</span> <span class="n">DFLT_LABEL_PX_PER_CHAR</span>
-    <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="mi">30</span><span class="p">),</span> <span class="mi">50</span>
+    <span class="n">label_px</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">ticktext</span><span class="p">))</span> <span class="o">*</span> <span class="n">DFLT_LABEL_PX_PER_CHAR</span>
+    <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="mi">30</span><span class="p">),</span> <span class="mi">60</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="n">cell_px</span><span class="p">,</span> <span class="n">MIN_PLOT_WIDTH_PX</span><span class="p">)</span> <span class="o">+</span> <span class="n">label_px</span> <span class="o">+</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">full_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">cell_px</span><span class="p">,</span> <span class="n">MIN_PLOT_WIDTH_PX</span><span class="p">)</span> <span class="o">+</span> <span class="n">label_px</span> <span class="o">+</span> <span class="mi">40</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">n_rows</span> <span class="o">*</span> <span class="n">cell_px</span> <span class="o">+</span> <span class="n">top</span> <span class="o">+</span> <span class="n">bottom</span><span class="p">,</span>
         <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="n">label_px</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">top</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bottom</span><span class="p">),</span>
         <span class="n">plot_bgcolor</span><span class="o">=</span><span class="n">gap_color</span><span class="p">,</span>
         <span class="n">paper_bgcolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
-        <span class="n">tickvals</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span>
-        <span class="n">ticktext</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tick_values</span><span class="p">],</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="n">x_label</span> <span class="ow">or</span> <span class="n">_x_label</span><span class="p">(</span><span class="n">x_align</span><span class="p">),</span>
         <span class="n">showgrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">zeroline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span>
+        <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="n">lo</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">hi</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">],</span>
+        <span class="n">side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+        <span class="n">mirror</span><span class="o">=</span><span class="s2">"ticks"</span><span class="p">,</span>
+        <span class="n">showticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
-        <span class="n">tickvals</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)),</span>
-        <span class="n">ticktext</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">],</span>
-        <span class="n">autorange</span><span class="o">=</span><span class="s2">"reversed"</span><span class="p">,</span>
-        <span class="n">showgrid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">zeroline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">fig</span></div>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="o">**</span><span class="n">_y_axis</span><span class="p">(</span><span class="n">ticktext</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">left_out</span></div>
 
 </pre></div>
         </article>
@@ -478,7 +635,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=01ec8363"></script>
+</div><script src="../../_static/documentation_options.js?v=a8acf705"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

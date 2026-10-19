@@ -21,7 +21,7 @@ python -m odus.webui --data FOLDER --ext .csv --port 8050 --open
 | [`make_app`](#odus.webui.make_app)(\*[, store, funcs])                 | Make the WSGI app of the explorer.                          |
 | [`serve`](#odus.webui.serve)(\*[, store, host, port, open_browser]) | Serve the explorer at `http://host:port` until interrupted. |
 
-### odus.webui.make_app(\*, store=None, funcs=(<function respondents>, <function variables>, <function trajectory>))
+### odus.webui.make_app(\*, store=None, funcs=(<function respondents>, <function variables>, <function trajectory>, <function stack>))
 
 Make the WSGI app of the explorer.
 

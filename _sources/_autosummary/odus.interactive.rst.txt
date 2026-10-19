@@ -9,4 +9,5 @@ odus.interactive
    .. autosummary::
    
       plot_trajectory_interactive
+      stacked_trajectories_interactive
    

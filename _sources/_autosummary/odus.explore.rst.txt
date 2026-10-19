@@ -10,6 +10,7 @@ odus.explore
    
       bundled_store
       respondents
+      stack
       trajectory
       variables
    

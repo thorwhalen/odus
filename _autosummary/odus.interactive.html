@@ -275,12 +275,15 @@ doesn’t need it; calling the function does.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#odus.interactive.plot_trajectory_interactive" title="odus.interactive.plot_trajectory_interactive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_trajectory_interactive</span></code></a>(df[, fields, ...])</p></td>
 <td><p>Plot a trajectory with plotly; hovering a cell shows what it is.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#odus.interactive.stacked_trajectories_interactive" title="odus.interactive.stacked_trajectories_interactive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stacked_trajectories_interactive</span></code></a>(df_store[, ...])</p></td>
+<td><p>Plot several trajectories one above the other, aligned, with plotly.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="odus.interactive.plot_trajectory_interactive">
-<span class="sig-prename descclassname"><span class="pre">odus.interactive.</span></span><span class="sig-name descname"><span class="pre">plot_trajectory_interactive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/interactive.html#plot_trajectory_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.interactive.plot_trajectory_interactive" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">odus.interactive.</span></span><span class="sig-name descname"><span class="pre">plot_trajectory_interactive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/interactive.html#plot_trajectory_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.interactive.plot_trajectory_interactive" title="Link to this definition">¶</a></dt>
 <dd><p>Plot a trajectory with plotly; hovering a cell shows what it is.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -290,6 +293,8 @@ doesn’t need it; calling the function does.</p>
 <li><p><strong>title</strong> – Optional title.</p></li>
 <li><p><strong>x</strong> – Where to put the ages on the x axis (one number per age, each one more
 than the previous), as in <code class="docutils literal notranslate"><span class="pre">plot_trajectory</span></code>. Default: the ages.</p></li>
+<li><p><strong>key</strong> – The respondent’s key, put with the variable and the age in each
+cell’s <code class="docutils literal notranslate"><span class="pre">customdata</span></code>, for click handlers (<code class="docutils literal notranslate"><span class="pre">plotly_click</span></code>).</p></li>
 <li><p><strong>gap_color</strong> – Color of the gaps between cells.</p></li>
 <li><p><strong>minor_gap</strong> – Gap between cells, in pixels.</p></li>
 <li><p><strong>major_gap</strong> – Wider gap (pixels) before every age multiple of
@@ -304,6 +309,26 @@ than the previous), as in <code class="docutils literal notranslate"><span class
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A <code class="docutils literal notranslate"><span class="pre">plotly.graph_objects.Figure</span></code> (show it with <code class="docutils literal notranslate"><span class="pre">fig.show()</span></code>, or save
 it with <code class="docutils literal notranslate"><span class="pre">fig.write_html(path)</span></code>).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odus.interactive.stacked_trajectories_interactive">
+<span class="sig-prename descclassname"><span class="pre">odus.interactive.</span></span><span class="sig-name descname"><span class="pre">stacked_trajectories_interactive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'age'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_df_to_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_gap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">style</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/odus/interactive.html#stacked_trajectories_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odus.interactive.stacked_trajectories_interactive" title="Link to this definition">¶</a></dt>
+<dd><p>Plot several trajectories one above the other, aligned, with plotly.</p>
+<p>The interactive version of <code class="docutils literal notranslate"><span class="pre">odus.plot_utils.stacked_trajectories</span></code> (see it
+for <code class="docutils literal notranslate"><span class="pre">fields</span></code>, <code class="docutils literal notranslate"><span class="pre">keys</span></code>, <code class="docutils literal notranslate"><span class="pre">x_align</span></code>, <code class="docutils literal notranslate"><span class="pre">x_label</span></code> and <code class="docutils literal notranslate"><span class="pre">k_df_to_title</span></code>): one
+block of rows per trajectory, labeled with its title, separated by a wider
+gap. The cells are those of <code class="docutils literal notranslate"><span class="pre">plot_trajectory_interactive</span></code>: hover text, and a
+<code class="docutils literal notranslate"><span class="pre">customdata</span></code> of <code class="docutils literal notranslate"><span class="pre">[respondent</span> <span class="pre">key,</span> <span class="pre">variable,</span> <span class="pre">age]</span></code> for click handlers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the plotly figure, and the trajectories left out
+(as <code class="docutils literal notranslate"><span class="pre">odus.plot_utils.aligned_trajectories</span></code> gives them).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(figure,</span> <span class="pre">left_out)</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -363,6 +388,7 @@ it with <code class="docutils literal notranslate"><span class="pre">fig.write_h
             <ul>
 <li><a class="reference internal" href="#">odus.interactive</a><ul>
 <li><a class="reference internal" href="#odus.interactive.plot_trajectory_interactive"><code class="docutils literal notranslate"><span class="pre">plot_trajectory_interactive()</span></code></a></li>
+<li><a class="reference internal" href="#odus.interactive.stacked_trajectories_interactive"><code class="docutils literal notranslate"><span class="pre">stacked_trajectories_interactive()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -374,7 +400,7 @@ it with <code class="docutils literal notranslate"><span class="pre">fig.write_h
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=01ec8363"></script>
+</div><script src="../_static/documentation_options.js?v=a8acf705"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
