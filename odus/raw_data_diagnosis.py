@@ -172,14 +172,22 @@ NON_VARIABLE_LABELS = (  # section titles, compared ignoring case and spaces
 )
 
 
+def normalized_label(label):
+    """A label with case and extra whitespace ignored, to compare labels.
+
+    >>> normalized_label('  New   York ') == normalized_label('new york')
+    True
+    """
+    return " ".join(str(label).split()).casefold()
+
+
 def is_section_title(label, *, section_titles=NON_VARIABLE_LABELS):
     """Whether a row label is a section title (like "Select States below").
 
     >>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
     (True, False)
     """
-    normalize = lambda x: " ".join(str(x).split()).casefold()
-    return normalize(label) in {normalize(t) for t in section_titles}
+    return normalized_label(label) in set(map(normalized_label, section_titles))
 
 
 UNREADABLE_SHEET = "unreadable_sheet"  # rule name of a sheet that can't be read
@@ -405,7 +413,7 @@ def _age_year_mismatch(view):
 def _duplicate_variable(view):
     mask = view.false_mask()
     rows = np.flatnonzero(view.data_mask.any(axis=1))
-    labels = view.labels.iloc[rows].map(lambda x: str(x).strip().casefold())
+    labels = view.labels.iloc[rows].map(normalized_label)
     mask[rows[labels.duplicated(keep="first").to_numpy()], view.label_col] = True
     return mask
 

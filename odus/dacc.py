@@ -9,10 +9,10 @@ from collections import defaultdict, Counter
 import matplotlib.pylab as plt
 import numpy as np
 import pandas as pd
-from py2store.caching import mk_memoizer  # like from cachetools import cached
 import os
 import re
 import warnings
+from functools import wraps
 from io import BytesIO
 
 # get py2store here: https://github.com/i2mint/py2store
@@ -118,6 +118,16 @@ class HashableMixin:
 
 
 NON_BINARY_POLICIES = ("warn", "binarize", "keep", "raise")
+
+
+def _first_non_zero(block):
+    """Merge same-variable columns: per row, the first non-zero value (else 0)."""
+    merged = block.iloc[:, 0].copy()
+    for j in range(1, block.shape[1]):
+        merged = merged.where(merged.ne(0), block.iloc[:, j])
+    return merged
+
+
 DUPLICATES_POLICIES = ("merge", "keep", "raise")
 
 
@@ -127,9 +137,10 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
     - Columns named like a section title of the survey sheet (``NON_VARIABLE_LABELS``
       of ``odus.raw_data_diagnosis``, e.g. "Select States below") are dropped.
     - ``duplicates``: what to do with variables appearing more than once (e.g. a
-      state lived in during two periods, entered as two rows). ``"merge"``: one
-      column, 1 wherever any of them is non-zero; ``"keep"``: leave them;
-      ``"raise"``: raise a ``ValueError``.
+      state lived in during two periods, entered as two rows), names compared
+      ignoring case and extra spaces. ``"merge"``: one column (with the first
+      name), holding at each age the first non-zero value of the duplicates;
+      ``"keep"``: leave them; ``"raise"``: raise a ``ValueError``.
     - ``non_binary``: what to do with values other than 0 and 1. ``"warn"``: set
       them to 1 and say which (variable, ages, values); ``"binarize"``: set them to
       1 silently; ``"keep"``: leave them; ``"raise"``: raise a ``ValueError``.
@@ -147,7 +158,7 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
     20   1   0
     21   0   1
     """
-    from odus.raw_data_diagnosis import is_section_title
+    from odus.raw_data_diagnosis import is_section_title, normalized_label
 
     if non_binary not in NON_BINARY_POLICIES:
         raise ValueError(f"non_binary should be one of {NON_BINARY_POLICIES}")
@@ -157,20 +168,27 @@ def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"
 
     df = df.loc[:, [not is_section_title(c) for c in df.columns]]
 
-    dup_names = list(dict.fromkeys(df.columns[df.columns.duplicated()]))
-    if dup_names and duplicates == "raise":
-        raise ValueError(f"Variables appearing more than once{where}: {dup_names}")
-    if dup_names and duplicates == "merge":
-        columns_name = df.columns.name
-        df = df.T.groupby(level=0, sort=False).max().T
-        df.columns.name = columns_name
+    positions_of = {}  # normalized label -> positions of the columns with that label
+    for j, c in enumerate(df.columns):
+        positions_of.setdefault(normalized_label(c), []).append(j)
+    dups = [ps for ps in positions_of.values() if len(ps) > 1]
+    if dups and duplicates == "raise":
+        names = [df.columns[ps[0]] for ps in dups]
+        raise ValueError(f"Variables appearing more than once{where}: {names}")
+    if dups and duplicates == "merge":
+        groups = list(positions_of.values())
+        merged = df.iloc[:, [ps[0] for ps in groups]].copy()
+        for i, ps in enumerate(groups):
+            if len(ps) > 1:
+                merged.iloc[:, i] = _first_non_zero(df.iloc[:, ps]).to_numpy()
+        df = merged
 
-    is_non_binary = ~df.isin([0, 1])
-    if non_binary != "keep" and is_non_binary.to_numpy().any():
+    is_non_binary = ~df.isin([0, 1]).to_numpy()
+    if non_binary != "keep" and is_non_binary.any():
         problems = "; ".join(
-            f"{col!r} at ages {list(df.index[is_non_binary[col].to_numpy()])} "
-            f"({sorted(set(df[col][is_non_binary[col]]))})"
-            for col in df.columns[is_non_binary.any().to_numpy()]
+            f"{df.columns[j]!r} at ages {list(df.index[is_non_binary[:, j]])} "
+            f"({sorted(set(df.iloc[:, j][is_non_binary[:, j]]))})"
+            for j in np.flatnonzero(is_non_binary.any(axis=0))
         )
         if non_binary == "raise":
             raise ValueError(f"Values other than 0 and 1{where}: {problems}")
@@ -219,6 +237,19 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
         return df.astype(int)
 
 
+def _cached_per_instance(getter):
+    """Cache ``getter(self, k)`` in ``self``, so that stores don't share a cache."""
+
+    @wraps(getter)
+    def cached_getter(self, k):
+        cache = self.__dict__.setdefault("_cache_" + getter.__qualname__, {})
+        if k not in cache:
+            cache[k] = getter(self, k)
+        return cache[k]
+
+    return cached_getter
+
+
 class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):
     def __init__(self, df_store, store=None):
         self.df_store = df_store
@@ -227,7 +258,7 @@ class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):
     def mk_pvar_attrs(self, only_for_cols_in_all_dfs=False):
         self.v = mk_pvar_struct(self.df_store, only_for_cols_in_all_dfs)
 
-    @mk_memoizer({})
+    @_cached_per_instance
     def __getitem__(self, k):
         if isinstance(k, (tuple, PVar)):
             return self.__getitem__(VarSet(k))
@@ -241,7 +272,7 @@ class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):
 
 
 class PotStore(VarSetCountsStore):
-    @mk_memoizer({})
+    @_cached_per_instance
     def __getitem__(self, k):
         if isinstance(k, (tuple, PVar)):
             return self.__getitem__(VarSet(k))

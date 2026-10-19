@@ -71,3 +71,40 @@ def test_df_stores_dont_share_their_cache(tmp_path):
     a = DfStore(str(tmp_path / "A") + os.sep)["X.xlsx"]
     b = DfStore(str(tmp_path / "B") + os.sep)["X.xlsx"]
     assert a.shape != b.shape
+
+
+def test_non_binary_values_in_duplicated_columns():
+    df = pd.DataFrame([[0, 1], [0, 5]], columns=["NJ", "NJ"], index=[20, 21])
+    with pytest.warns(UserWarning, match=r"'NJ' at ages \[21\] \(\[5\]\)"):
+        kept = prep_trajectory_df(df, duplicates="keep")
+    assert kept.values.tolist() == [[0, 1], [0, 1]]
+    with pytest.raises(ValueError, match="other than 0 and 1"):
+        prep_trajectory_df(df, duplicates="keep", non_binary="raise")
+
+
+def test_merge_keeps_odd_values_and_names_visible():
+    df = pd.DataFrame(
+        [[-1, 0, 0, 1], [0, 0, 1, 0]],
+        columns=["NJ", "nj ", None, "GA"],
+        index=[20, 21],
+    )
+    merged = prep_trajectory_df(df, non_binary="keep")
+    assert list(merged.columns) == ["NJ", None, "GA"]  # merged ignoring case/space
+    assert merged["NJ"].tolist() == [-1, 0]  # not hidden by a max
+    with pytest.warns(UserWarning, match=r"'NJ' at ages \[20\] \(\[-1\]\)"):
+        prep_trajectory_df(df)
+
+
+def test_count_stores_dont_share_their_cache():
+    from odus.dacc import VarSetCountsStore
+    from odus.sequential_var_sets import VarSet, PVar
+
+    binarized, kept = DfStore(SURVEYS + os.sep), DfStore(SURVEYS + os.sep)
+    kept.non_binary = "keep"
+    k = VarSet(PVar("INCARCERATION"))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        counts_binarized = VarSetCountsStore(binarized)[k]
+    counts_kept = VarSetCountsStore(kept)[k]
+    assert 16 not in {key[0] for key in counts_binarized}
+    assert 16 in {key[0] for key in counts_kept}
