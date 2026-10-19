@@ -307,7 +307,7 @@ class DelegMap:
 
 class Dacc:
     def __init__(self, xls_rootdir, categories=None):
-        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + "{}.xlsx", mode="b")
+        self.s = DfStore(ensure_slash_suffix(xls_rootdir) + "{}.xlsx")
         if categories is None:
             categories = _commun_columns_of_dfs(self.s.values())
         self.categories = categories
