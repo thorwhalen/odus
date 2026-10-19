@@ -105,7 +105,7 @@ def trajectory(respondent, fields=None, *, store=None):
     missing = [] if wanted is None else [f for f in wanted if f not in df.columns]
     if present == []:
         raise ValueError(f"{respondent!r} has none of the variables {wanted}")
-    fig = plot_trajectory_interactive(df, present, title=respondent)
+    fig = plot_trajectory_interactive(df, present, title=respondent, key=respondent)
     return {
         "respondent": respondent,
         "fields": [str(c) for c in (df.columns if present is None else present)],
@@ -114,4 +114,58 @@ def trajectory(respondent, fields=None, *, store=None):
     }
 
 
-EXPLORE_FUNCS = (respondents, variables, trajectory)  # what the surfaces expose
+def stack(align, fields=None, *, store=None):
+    """Every respondent's trajectory, aligned on the first year of a variable.
+
+    Args:
+        align: The variable to align on: each trajectory's x is the years since it
+            was first non-zero. Also ``"age"`` or ``"year"``.
+        fields: The variables to show (a list of names, or one name). Default: the
+            ``align`` variable. Required for ``"age"`` and ``"year"``.
+        store: The trajectories (default: the bundled surveys).
+
+    Returns:
+        ``{"align", "x_label", "fields", "respondents", "left_out", "unreadable",
+        "figure"}``: ``respondents`` are those shown, in order, ``left_out``
+        counts those that aren't (never had ``align``, or lack some of the
+        ``fields``), and ``unreadable`` lists those whose data can't be read.
+    """
+    from odus.interactive import stacked_trajectories_interactive
+    from odus.plot_utils import _x_label
+
+    if not isinstance(align, str):
+        raise ValueError(f"Align on one variable, not {align!r}")
+    store = _store(store)
+    wanted = _as_list(fields)
+    if wanted is None:
+        if align in ("age", "year"):
+            raise ValueError(f"Choose the variables to line everyone up by {align}")
+        wanted = [align]
+    readable, unreadable = {}, {}
+    for k in sorted(store):
+        try:
+            readable[k] = _trajectory(store, k)
+        except Exception as e:  # one bad file shouldn't hide all the others
+            unreadable[str(k)] = f"{type(e).__name__}: {e}"
+    if align not in ("age", "year") and not any(
+        align in df.columns for df in readable.values()
+    ):
+        raise NotFound(f"No respondent has a variable {align!r}")
+    fig, left_out = stacked_trajectories_interactive(readable, wanted, x_align=align)
+    shown = [k for k in readable if k not in left_out["not_aligned"]]
+    shown = [k for k in shown if k not in left_out["missing_fields"]]
+    return {
+        "align": align,
+        "x_label": _x_label(align),
+        "fields": wanted,
+        "respondents": shown,
+        "left_out": {
+            "not_aligned": len(left_out["not_aligned"]),
+            "missing_fields": len(left_out["missing_fields"]),
+        },
+        "unreadable": unreadable,
+        "figure": json.loads(fig.to_json()),
+    }
+
+
+EXPLORE_FUNCS = (respondents, variables, trajectory, stack)  # what surfaces expose

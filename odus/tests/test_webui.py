@@ -125,3 +125,38 @@ def test_head_requests_have_no_body(store):
     app = make_app(store=store)
     environ = {"PATH_INFO": "/", "REQUEST_METHOD": "HEAD", "wsgi.input": BytesIO()}
     assert b"".join(app(environ, lambda status, headers: None)) == b""
+
+
+def test_stack(store):
+    from odus.explore import stack
+
+    result = stack("HEROIN", store=store)
+    assert result["respondents"] == ["A.xlsx", "B.xlsx"]  # C never had HEROIN
+    assert result["left_out"] == {"not_aligned": 1, "missing_fields": 0}
+    assert result["fields"] == ["HEROIN"]
+    json.dumps(result)
+    with pytest.raises(KeyError, match="No respondent has a variable"):
+        stack("NOPE", store=store)
+    code, _, body = get(make_app(store=store), "/api/stack", "align=HEROIN&fields=WORK")
+    assert code == 200 and json.loads(body)["fields"] == ["WORK"]
+    assert get(make_app(store=store), "/api/stack", "align=NOPE")[0] == 404
+
+
+def test_stack_edge_cases(store):
+    from odus.explore import stack
+
+    class OneBad(dict):
+        def __getitem__(self, k):
+            if k == "C.xlsx":
+                raise RuntimeError("corrupt file")
+            return super().__getitem__(k)
+
+    result = stack("HEROIN", store=OneBad(store))
+    assert result["respondents"] == ["A.xlsx", "B.xlsx"]
+    assert result["unreadable"] == {"C.xlsx": "RuntimeError: corrupt file"}
+    assert result["x_label"] == "years since first HEROIN"
+    with pytest.raises(ValueError, match="Choose the variables"):
+        stack("age", store=store)
+    assert stack("age", ["WORK"], store=store)["x_label"] == "age"
+    with pytest.raises(ValueError, match="one variable"):
+        stack(["HEROIN", "WORK"], store=store)

@@ -65,6 +65,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 #variables .count { color: var(--muted); font-size: 12px; }
 
 #view { overflow-x: auto; }
+#plot .nsewdrag { cursor: pointer; } /* cells are clickable */
 .status { color: var(--muted); min-height: 1.4em; margin: 8px 0; }
 .status.error { color: var(--error); }
 #plot[aria-busy="true"] {
