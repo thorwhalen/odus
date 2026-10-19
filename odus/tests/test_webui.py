@@ -41,7 +41,7 @@ def test_explore_functions(store):
         {"name": "WORK", "n_respondents": 3},
         {"name": "HEROIN", "n_respondents": 2},
     ]
-    result = trajectory("B.xlsx", "HEROIN,NOPE", store=store)
+    result = trajectory("B.xlsx", ["HEROIN", "NOPE"], store=store)
     assert result["fields"] == ["HEROIN"] and result["missing_fields"] == ["NOPE"]
     (heatmap,) = result["figure"]["data"]
     assert heatmap["type"] == "heatmap" and len(heatmap["text"]) == 1
@@ -68,7 +68,7 @@ def test_api(store):
 def test_page_and_assets(store):
     app = make_app(store=store)
     code, ctype, body = get(app, "/")
-    assert code == 200 and ctype == "text/html" and b"odus explorer" in body
+    assert code == 200 and ctype == "text/html; charset=utf-8" and b"odus explorer" in body
     for path in ("/app.js", "/style.css", "/plotly.min.js"):
         assert get(app, path)[0] == 200, path
     for path in ("/../explore.py", "/webui.py", "/x/../../setup.py"):
@@ -79,3 +79,49 @@ def test_bundled_surveys_by_default():
     app = make_app()
     code, _, body = get(app, "/api/trajectory", "respondent=A01.xlsx&fields=HEROIN")
     assert code == 200 and json.loads(body)["respondent"] == "A01.xlsx"
+
+
+def test_variable_names_with_commas(store):
+    store = {k: df.rename(columns={"WORK": "OTHER (WHO?, X)"}) for k, df in store.items()}
+    result = trajectory("A.xlsx", "OTHER (WHO?, X)", store=store)
+    assert result["fields"] == ["OTHER (WHO?, X)"]
+    app = make_app(store=store)
+    query = "respondent=A.xlsx&fields=OTHER+(WHO%3F%2C+X)&fields=HEROIN"
+    code, _, body = get(app, "/api/trajectory", query)
+    assert code == 200 and json.loads(body)["fields"] == ["OTHER (WHO?, X)", "HEROIN"]
+
+
+def test_respondent_keys_cant_reach_other_files(tmp_path):
+    import os
+    import shutil
+
+    from odus import data_dir
+    from odus.dacc import DfStore
+
+    (tmp_path / "data").mkdir()
+    shutil.copy(os.path.join(data_dir, "surveys", "A01.xlsx"), tmp_path / "data")
+    shutil.copy(os.path.join(data_dir, "surveys", "A02.xlsx"), tmp_path / "secret.xlsx")
+    app = make_app(store=DfStore(str(tmp_path / "data") + os.sep))
+    assert get(app, "/api/trajectory", "respondent=A01.xlsx")[0] == 200
+    assert get(app, "/api/trajectory", "respondent=../secret.xlsx")[0] == 404
+
+
+def test_unexpected_errors_are_json_500s(store):
+    class Broken(dict):
+        def __getitem__(self, k):
+            raise RuntimeError("corrupt file")
+
+    broken = Broken(store)
+    assert variables(store=broken)["unreadable"]["A.xlsx"] == "RuntimeError: corrupt file"
+    code, ctype, body = get(make_app(store=broken), "/api/trajectory", "respondent=A.xlsx")
+    assert (code, ctype) == (500, "application/json")
+    assert json.loads(body) == {"error": "corrupt file"}
+    assert json.loads(get(make_app(store=store), "/api/trajectory", "respondent=Z")[2]) == {
+        "error": "No respondent 'Z'"
+    }
+
+
+def test_head_requests_have_no_body(store):
+    app = make_app(store=store)
+    environ = {"PATH_INFO": "/", "REQUEST_METHOD": "HEAD", "wsgi.input": BytesIO()}
+    assert b"".join(app(environ, lambda status, headers: None)) == b""

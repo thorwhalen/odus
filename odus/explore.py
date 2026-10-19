@@ -37,12 +37,20 @@ def _trajectory(store, key):
         return store[key]
 
 
+class NotFound(KeyError):
+    """What was asked for doesn't exist (a surface may map it to "404")."""
+
+    def __str__(self):
+        return str(self.args[0]) if self.args else ""
+
+
 def _as_list(fields):
-    if fields is None or fields == "":
+    """``fields`` as a list: a single name (names may contain commas) or names."""
+    if fields is None or fields == "" or fields == []:
         return None
     if isinstance(fields, str):
-        return [f for f in fields.split(",") if f]
-    return list(fields)
+        return [fields]
+    return [f for f in fields if f != ""]
 
 
 def respondents(*, store=None):
@@ -51,16 +59,23 @@ def respondents(*, store=None):
 
 
 def variables(*, store=None):
-    """The variables, with the number of respondents having each (most common first)."""
+    """The variables, with the number of respondents having each (most common first).
+
+    Respondents whose data can't be read are listed in ``unreadable``, with why.
+    """
     store = _store(store)
-    counts = Counter()
+    counts, unreadable = Counter(), {}
     for k in store:
-        counts.update(set(_trajectory(store, k).columns))
+        try:
+            counts.update(set(_trajectory(store, k).columns))
+        except Exception as e:  # one bad file shouldn't hide all the others
+            unreadable[str(k)] = f"{type(e).__name__}: {e}"
     return {
         "variables": [
             {"name": str(name), "n_respondents": n}
             for name, n in sorted(counts.items(), key=lambda x: (-x[1], str(x[0])))
-        ]
+        ],
+        "unreadable": unreadable,
     }
 
 
@@ -69,8 +84,8 @@ def trajectory(respondent, fields=None, *, store=None):
 
     Args:
         respondent: The key of the respondent.
-        fields: The variables to show (a list, or a comma-separated string).
-            Default: all. Those the respondent doesn't have are listed in
+        fields: The variables to show: a list of names, or one name. Default:
+            all. Those the respondent doesn't have are listed in
             ``missing_fields`` rather than plotted.
         store: The trajectories (default: the bundled surveys).
 
@@ -82,8 +97,8 @@ def trajectory(respondent, fields=None, *, store=None):
     from odus.interactive import plot_trajectory_interactive
 
     store = _store(store)
-    if respondent not in store:
-        raise KeyError(f"No respondent {respondent!r}")
+    if respondent not in set(store):  # only listed keys: never a path to elsewhere
+        raise NotFound(f"No respondent {respondent!r}")
     df = _trajectory(store, respondent)
     wanted = _as_list(fields)
     present = None if wanted is None else [f for f in wanted if f in df.columns]

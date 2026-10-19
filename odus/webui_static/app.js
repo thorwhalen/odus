@@ -1,14 +1,19 @@
 // odus explorer: the page's behaviour.
 //
-// The URL is the state: ?r=<respondent>&f=<comma-separated variables>.
-// Choosing another respondent is going somewhere (a new history entry, so Back
-// returns to the previous one); choosing variables refines the current view (the
-// entry is replaced). The figures are made in Python (odus.explore.trajectory).
+// The URL is the state: ?r=<respondent>&f=<variable>&f=<variable>... (repeated,
+// since variable names may contain commas). Each respondent is a record, so
+// choosing one, prev/next included, is going somewhere: a new history entry, and
+// Back returns to the previous respondent. Choosing variables refines the current
+// view: the entry is replaced. The figures are made in Python (odus.explore).
 "use strict";
 
 const $ = (id) => document.getElementById(id);
 const api = async (name, params = {}) => {
-  const query = new URLSearchParams(params).toString();
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    for (const v of [].concat(value)) search.append(key, v); // arrays repeat the key
+  }
+  const query = search.toString();
   const response = await fetch(`api/${name}${query ? "?" + query : ""}`);
   const body = await response.json();
   if (!response.ok) throw new Error(body.error || response.statusText);
@@ -18,13 +23,12 @@ const api = async (name, params = {}) => {
 // --- route: the one place that reads and writes the URL ---------------------
 function readRoute() {
   const params = new URLSearchParams(location.search);
-  const fields = (params.get("f") || "").split(",").filter(Boolean);
-  return { respondent: params.get("r"), fields };
+  return { respondent: params.get("r"), fields: params.getAll("f").filter(Boolean) };
 }
 function formatRoute({ respondent, fields }) {
   const params = new URLSearchParams();
   if (respondent) params.set("r", respondent);
-  if (fields.length) params.set("f", fields.join(","));
+  for (const field of fields) params.append("f", field);
   const query = params.toString();
   return location.pathname + (query ? "?" + query : "");
 }
@@ -41,13 +45,22 @@ let latestRequest = 0; // only the newest request may draw (latest wins)
 
 async function init() {
   wireControls();
+  await loadData();
+}
+
+async function loadData() {
+  $("plot").setAttribute("aria-busy", "true");
+  setStatus("Loading the respondents…");
   try {
     const [r, v] = await Promise.all([api("respondents"), api("variables")]);
     respondents = r.respondents;
     fillRespondents();
     fillVariables(v.variables);
+    const unreadable = Object.keys(v.unreadable || {});
+    if (unreadable.length) console.warn("odus explorer: unreadable data", v.unreadable);
   } catch (error) {
-    return showError(`Couldn't load the data: ${error.message}`, init);
+    $("plot").removeAttribute("aria-busy");
+    return showError(`Couldn't load the data: ${error.message}`, loadData);
   }
   const route = readRoute();
   if (!route.respondent && respondents.length) {
@@ -89,6 +102,7 @@ function wireControls() {
   $("prev").addEventListener("click", () => step(-1));
   $("next").addEventListener("click", () => step(+1));
   document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return; // browser shortcuts
     if (e.target.closest("input, select, textarea")) return;
     if (e.key === "ArrowLeft") step(-1);
     if (e.key === "ArrowRight") step(+1);
@@ -130,11 +144,16 @@ async function render() {
 
   const plot = $("plot");
   if (window.Plotly) Plotly.purge(plot); // never leave the previous respondent up
+  if (i < 0) {
+    plot.replaceChildren();
+    plot.removeAttribute("aria-busy");
+    return showError(`There is no respondent ${respondent}. Pick one above.`);
+  }
   plot.replaceChildren();
   plot.setAttribute("aria-busy", "true");
   setStatus(`Loading ${respondent}…`);
   try {
-    const result = await api("trajectory", { respondent, fields: fields.join(",") });
+    const result = await api("trajectory", { respondent, fields });
     if (request !== latestRequest) return; // a newer view was asked for meanwhile
     plot.removeAttribute("aria-busy");
     await Plotly.react(plot, result.figure.data, result.figure.layout, { responsive: true });
@@ -160,9 +179,12 @@ function setStatus(text) {
 function showError(text, retry) {
   const status = $("status");
   status.className = "status error";
-  const button = Object.assign(document.createElement("button"), { type: "button", textContent: "Retry" });
-  button.addEventListener("click", retry);
-  status.replaceChildren(`${text} `, button);
+  status.replaceChildren(`${text} `);
+  if (retry) {
+    const button = Object.assign(document.createElement("button"), { type: "button", textContent: "Retry" });
+    button.addEventListener("click", retry);
+    status.append(button);
+  }
 }
 
 init();

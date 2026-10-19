@@ -15,14 +15,17 @@ import argparse
 from functools import lru_cache
 import inspect
 import json
-import mimetypes
 import os
 from urllib.parse import parse_qs
 
-from odus.explore import EXPLORE_FUNCS
+from odus.explore import EXPLORE_FUNCS, NotFound
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "webui_static")
-STATIC_FILES = ("index.html", "app.js", "style.css")  # what the page is made of
+STATIC_FILES = {  # what the page is made of, and their content types
+    "index.html": "text/html; charset=utf-8",
+    "app.js": "text/javascript; charset=utf-8",
+    "style.css": "text/css; charset=utf-8",
+}
 DFLT_HOST = "127.0.0.1"  # this machine only: the data may be confidential
 DFLT_PORT = 8050
 
@@ -35,11 +38,13 @@ def _plotly_js():
 
 
 def _http_status(error):
-    if isinstance(error, KeyError):
+    if isinstance(error, NotFound):
         return "404 Not Found"
     if isinstance(error, ImportError):
         return "501 Not Implemented"
-    return "400 Bad Request"
+    if isinstance(error, (ValueError, TypeError)):
+        return "400 Bad Request"
+    return "500 Internal Server Error"
 
 
 def make_app(*, store=None, funcs=EXPLORE_FUNCS):
@@ -52,24 +57,24 @@ def make_app(*, store=None, funcs=EXPLORE_FUNCS):
     """
     api = {f.__name__: f for f in funcs}
 
-    def respond(start_response, status, body, content_type):
-        start_response(
-            status,
-            [("Content-Type", content_type), ("Content-Length", str(len(body)))],
-        )
-        return [body]
-
     def call_api(name, query):
         func = api[name]
         params = inspect.signature(func).parameters
-        kwargs = {
-            k: v[-1]
+        kwargs = {  # a repeated parameter (?fields=a&fields=b) gives a list
+            k: v if len(v) > 1 else v[0]
             for k, v in parse_qs(query, keep_blank_values=True).items()
             if k in params and k != "store"
         }
         return func(**kwargs, store=store)
 
     def app(environ, start_response):
+        def respond(start_response, status, body, content_type):
+            start_response(
+                status,
+                [("Content-Type", content_type), ("Content-Length", str(len(body)))],
+            )
+            return [] if environ.get("REQUEST_METHOD") == "HEAD" else [body]
+
         path = environ.get("PATH_INFO", "/")
         if path.startswith("/api/"):
             name = path[len("/api/") :]
@@ -81,8 +86,8 @@ def make_app(*, store=None, funcs=EXPLORE_FUNCS):
             try:
                 result = call_api(name, environ.get("QUERY_STRING", ""))
                 status = "200 OK"
-            except (KeyError, ValueError, TypeError, ImportError) as e:
-                result, status = {"error": str(e).strip("'\"")}, _http_status(e)
+            except Exception as e:  # always a JSON answer the page can show
+                result, status = {"error": f"{e}" or type(e).__name__}, _http_status(e)
             return respond(
                 start_response, status, json.dumps(result).encode(), "application/json"
             )
@@ -101,8 +106,7 @@ def make_app(*, store=None, funcs=EXPLORE_FUNCS):
             return respond(start_response, "404 Not Found", b"Not found", "text/plain")
         with open(os.path.join(STATIC_DIR, filename), "rb") as f:
             body = f.read()
-        content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
-        return respond(start_response, "200 OK", body, content_type)
+        return respond(start_response, "200 OK", body, STATIC_FILES[filename])
 
     return app
 
