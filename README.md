@@ -111,14 +111,8 @@ from odus.plot_utils import plot_life_course
 ```python
 from odus import data_dir, data_path_of
 
-survey_dir = data_dir
-data_dir
+survey_dir = data_dir  # the data bundled with odus (the surveys are in its "surveys" folder)
 ```
-
-
-
-
-    '/D/Dropbox/dev/p3/proj/odus/odus/data'
 
 
 

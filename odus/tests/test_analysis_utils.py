@@ -39,3 +39,34 @@ def test_get_stores_v_and_s_default_to_the_bundled_surveys():
     pot = pstore[VarSet(PVar("HEROIN", -1), PVar("HEROIN", 0))]
     counts = pot.tb.set_index(["HEROIN-1", "HEROIN"]).pval.to_dict()
     assert counts == {(0, 0): 1176, (0, 1): 205, (1, 0): 114, (1, 1): 1051}
+
+
+def test_dacc_counts_dont_accumulate_across_calls():
+    from odus.dacc import Dacc
+
+    dacc = Dacc(SURVEYS)
+    k = VarSet(PVar("HEROIN", -1), PVar("HEROIN", 0))
+    first = dict(dacc.mk_counts_of_kps([k])[k])
+    assert dict(dacc.mk_counts_of_kps([k])[k]) == first
+    assert sum(first.values()) == 1176 + 205 + 114 + 1051
+
+
+def test_influence_plots_take_plain_variable_names():
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from odus.analysis_utils import (
+        get_markov_rel_risk,
+        get_stores_v_and_s,
+        plot_influenced,
+        plot_influencers,
+    )
+
+    _, pstore, _, _ = get_stores_v_and_s()
+    lrr = get_markov_rel_risk(pstore, fields=["HEROIN", "INJECTED"])
+    plot_influenced(lrr, "HEROIN")  # failed with: unsupported operand 'str' - 'int'
+    assert plt.gca().get_title() == "Log2 relative risks when exposed to HEROIN"
+    plot_influencers(lrr, "HEROIN")
+    plt.close("all")

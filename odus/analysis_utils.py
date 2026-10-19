@@ -214,7 +214,7 @@ def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
         figsize=figsize,
         **kwargs,
     )
-    lrr.loc[var - 1, :].plot(kind="bar", **kwargs)
+    lrr.loc[VarStr(var) - 1, :].plot(kind="bar", **kwargs)  # the exposure: var-1
     format_for_influencer_plot()
 
 
