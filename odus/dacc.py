@@ -315,7 +315,11 @@ class Dacc:
         self.counts_of = defaultdict(Counter)
 
     def mk_counts_of_kps(self, kps_list):
-        """Count the key patterns of ``kps_list`` (anew: counts don't accumulate)."""
+        """Count the key patterns of ``kps_list``, anew.
+
+        ``self.counts_of`` is replaced by these counts (it used to accumulate them,
+        so that calling twice doubled them).
+        """
         self.counts_of = counts_of_kps(self.s, self.categories, kps_list)
         return self.counts_of
 

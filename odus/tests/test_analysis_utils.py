@@ -66,7 +66,12 @@ def test_influence_plots_take_plain_variable_names():
 
     _, pstore, _, _ = get_stores_v_and_s()
     lrr = get_markov_rel_risk(pstore, fields=["HEROIN", "INJECTED"])
-    plot_influenced(lrr, "HEROIN")  # failed with: unsupported operand 'str' - 'int'
-    assert plt.gca().get_title() == "Log2 relative risks when exposed to HEROIN"
+    for var in ("HEROIN", "HEROIN-1"):  # failed: unsupported operand 'str' - 'int'
+        plot_influenced(lrr, var)
+        ax = plt.gca()
+        assert ax.get_title() == f"Log2 relative risks when exposed to {var}"
+        heights = [bar.get_height() for bar in ax.patches]
+        assert heights == pytest.approx(lrr.loc["HEROIN-1"].tolist())
+        plt.close("all")
     plot_influencers(lrr, "HEROIN")
     plt.close("all")

@@ -111,14 +111,12 @@ from odus.plot_utils import plot_life_course
 ```python
 from odus import data_dir, data_path_of
 
-survey_dir = data_dir  # the data bundled with odus (the surveys are in its "surveys" folder)
+survey_dir = data_path_of("surveys")  # the surveys bundled with odus
 ```
 
 
-
-
 ```python
-df_store = DfStore(data_dir + "/{}.xlsx")
+df_store = DfStore(survey_dir + "/{}.xlsx")  # keys like "A01.xlsx"
 len(df_store)
 cstore = VarSetCountsStore(df_store)
 v = mk_pvar_struct(df_store, only_for_cols_in_all_dfs=True)
@@ -479,7 +477,7 @@ print(f"k: {k}")  # print it
 plot_life(df_store[k])  # plot the trajectory
 ```
 
-    k: surveys/B24.xlsx
+    k: B24.xlsx
 
 
 
@@ -616,7 +614,7 @@ axs = [x for x in life_plots(df_store, fields, keys=keys)]
 from odus.plot_utils import stacked_trajectories
 
 fields = ["PHYSICAL ILLNESS", "AS PRESCRIBED OPIOID", "HEROIN", "OTHER OPIOID"]
-keys = ["surveys/A60.xlsx", "surveys/B32.xlsx", "surveys/B49.xlsx", "surveys/A01.xlsx"]
+keys = ["A60.xlsx", "B32.xlsx", "B49.xlsx", "A01.xlsx"]
 stacked_trajectories(df_store, fields, keys, x_align="HEROIN")
 ```
 
@@ -665,7 +663,7 @@ Before preparing the data, check the raw spreadsheets for data-entry problems. `
 ```python
 from odus.raw_data_diagnosis import print_diagnosis
 
-print_diagnosis(survey_dir + "/surveys")
+print_diagnosis(survey_dir)
 ```
 
     The possibly problematic cells for A03.xlsx:
@@ -704,8 +702,8 @@ not_too_old = Rule(
 )
 rules = select_rules(exclude=["filled_but_uncolored"], extra=[not_too_old])
 
-print_diagnosis(survey_dir + "/surveys", rules=rules)
-diagnosis_table(diagnose_dir(survey_dir + "/surveys", rules=rules))  # as a DataFrame
+print_diagnosis(survey_dir, rules=rules)
+diagnosis_table(diagnose_dir(survey_dir, rules=rules))  # as a DataFrame
 ```
 
 ## Demo s and v
@@ -1233,7 +1231,6 @@ prob_of_heroin_given_not_presc_op / prob_of_heroin_given_presc_op
 
 
 ```python
-# survey_dir = '/D/Dropbox/others/Miriam/python/ProcessedSurveys'
 df_store = DfStore(survey_dir + "/{}.xlsx")
 len(df_store)
 ```
