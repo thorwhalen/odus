@@ -49,6 +49,9 @@ Repository = "https://github.com/thorwhalen/odus"
 Issues = "https://github.com/thorwhalen/odus/issues"
 
 [project.optional-dependencies]
+interactive = [
+    "plotly>=5",
+]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
@@ -116,6 +119,9 @@ test = []
 post_test = []
 lint = []
 format = []
+
+[tool.wads.ci.install]
+extras = "interactive"
 
 [tool.wads.ci.env]
 required_envvars = []
