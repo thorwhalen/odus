@@ -165,7 +165,23 @@ def diagnosis_items(source_dir, sheetname=None):
 YEAR_ROW = 1  # row holding the years (0-based, in the sheet)
 AGE_ROW = 2  # row holding the ages
 DATA_START_ROW = 3  # first row of variables
-NON_VARIABLE_LABELS = ("List of States", "Select States below")  # section titles
+NON_VARIABLE_LABELS = (  # section titles, compared ignoring case and spaces
+    "List of States",
+    "Select States below",
+    "Selects States below",  # a typo found in the surveys
+)
+
+
+def is_section_title(label, *, section_titles=NON_VARIABLE_LABELS):
+    """Whether a row label is a section title (like "Select States below").
+
+    >>> is_section_title(' select states BELOW'), is_section_title('HEROIN')
+    (True, False)
+    """
+    normalize = lambda x: " ".join(str(x).split()).casefold()
+    return normalize(label) in {normalize(t) for t in section_titles}
+
+
 UNREADABLE_SHEET = "unreadable_sheet"  # rule name of a sheet that can't be read
 
 
@@ -263,7 +279,8 @@ def sheet_view(
     label_col = _label_col(vals, data_start_row=data_start_row)
     labels = vals.iloc[:, label_col]
     is_row_label = labels.map(lambda x: not _is_empty(x))
-    n_rows = last_true_idx(is_row_label & ~labels.isin(non_variable_labels))
+    is_title = labels.map(partial(is_section_title, section_titles=non_variable_labels))
+    n_rows = last_true_idx(is_row_label & ~is_title)
     has_age = vals.iloc[age_row, label_col + 1 :].map(lambda x: not _is_empty(x))
     if not has_age.any():
         raise ValueError(f"No ages found in row {age_row + 1} of the sheet")
@@ -276,7 +293,7 @@ def sheet_view(
     is_variable_row[data_start_row:] = True
     labels = vals.iloc[:, label_col]
     is_variable_row &= labels.map(lambda x: not _is_empty(x)).to_numpy()
-    is_variable_row &= ~labels.isin(non_variable_labels).to_numpy()
+    is_variable_row &= ~is_title.iloc[:n_rows].to_numpy(dtype=bool)
     data_mask = np.zeros((n_rows, n_cols), dtype=bool)
     data_mask[np.ix_(is_variable_row, range(label_col + 1, n_cols))] = True
     return SheetView(

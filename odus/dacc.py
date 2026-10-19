@@ -12,6 +12,7 @@ import pandas as pd
 from py2store.caching import mk_memoizer  # like from cachetools import cached
 import os
 import re
+import warnings
 from io import BytesIO
 
 # get py2store here: https://github.com/i2mint/py2store
@@ -116,10 +117,94 @@ class HashableMixin:
         return hash(self) == hash(other)
 
 
+NON_BINARY_POLICIES = ("warn", "binarize", "keep", "raise")
+DUPLICATES_POLICIES = ("merge", "keep", "raise")
+
+
+def prep_trajectory_df(df, *, source=None, non_binary="warn", duplicates="merge"):
+    """Clean a trajectory DataFrame (index: ages, columns: variables).
+
+    - Columns named like a section title of the survey sheet (``NON_VARIABLE_LABELS``
+      of ``odus.raw_data_diagnosis``, e.g. "Select States below") are dropped.
+    - ``duplicates``: what to do with variables appearing more than once (e.g. a
+      state lived in during two periods, entered as two rows). ``"merge"``: one
+      column, 1 wherever any of them is non-zero; ``"keep"``: leave them;
+      ``"raise"``: raise a ``ValueError``.
+    - ``non_binary``: what to do with values other than 0 and 1. ``"warn"``: set
+      them to 1 and say which (variable, ages, values); ``"binarize"``: set them to
+      1 silently; ``"keep"``: leave them; ``"raise"``: raise a ``ValueError``.
+
+    ``source`` (e.g. the file name) is only used in messages.
+
+    >>> df = pd.DataFrame(
+    ...     [[1, 0, 0, 0], [0, 0, 1, 2]],
+    ...     columns=['GA', 'NJ', 'NJ', 'Select States below'],
+    ...     index=pd.Index([20, 21], name='age'),
+    ... )
+    >>> prep_trajectory_df(df)
+        GA  NJ
+    age
+    20   1   0
+    21   0   1
+    """
+    from odus.raw_data_diagnosis import is_section_title
+
+    if non_binary not in NON_BINARY_POLICIES:
+        raise ValueError(f"non_binary should be one of {NON_BINARY_POLICIES}")
+    if duplicates not in DUPLICATES_POLICIES:
+        raise ValueError(f"duplicates should be one of {DUPLICATES_POLICIES}")
+    where = f" in {source}" if source is not None else ""
+
+    df = df.loc[:, [not is_section_title(c) for c in df.columns]]
+
+    dup_names = list(dict.fromkeys(df.columns[df.columns.duplicated()]))
+    if dup_names and duplicates == "raise":
+        raise ValueError(f"Variables appearing more than once{where}: {dup_names}")
+    if dup_names and duplicates == "merge":
+        columns_name = df.columns.name
+        df = df.T.groupby(level=0, sort=False).max().T
+        df.columns.name = columns_name
+
+    is_non_binary = ~df.isin([0, 1])
+    if non_binary != "keep" and is_non_binary.to_numpy().any():
+        problems = "; ".join(
+            f"{col!r} at ages {list(df.index[is_non_binary[col].to_numpy()])} "
+            f"({sorted(set(df[col][is_non_binary[col]]))})"
+            for col in df.columns[is_non_binary.any().to_numpy()]
+        )
+        if non_binary == "raise":
+            raise ValueError(f"Values other than 0 and 1{where}: {problems}")
+        if non_binary == "warn":
+            warnings.warn(
+                f"Values other than 0 and 1{where} were set to 1: {problems}",
+                stacklevel=2,
+            )
+        df = df.where(df.eq(0), 1)
+    return df
+
+
 class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
-    @mk_memoizer({})
+    """The trajectory DataFrames of a folder of survey spreadsheets.
+
+    Values are cleaned by ``prep_trajectory_df``, with the ``non_binary`` and
+    ``duplicates`` policies set as attributes (``store.non_binary = "raise"``, or
+    in a subclass).
+    """
+
+    non_binary = "warn"
+    duplicates = "merge"
+
     def __getitem__(self, k):
-        return super().__getitem__(k)
+        cache = self.__dict__.setdefault("_df_cache", {})
+        policies = (self.non_binary, self.duplicates)
+        if (k, policies) not in cache:
+            cache[k, policies] = prep_trajectory_df(
+                super().__getitem__(k),
+                source=k,
+                non_binary=self.non_binary,
+                duplicates=self.duplicates,
+            )
+        return cache[k, policies]
 
     def _obj_of_data(self, data):
         df = pd.read_excel(BytesIO(data), header=0)
@@ -131,11 +216,7 @@ class DfStore(HashableMixin, ReadOnlyMixin, LocalBinaryStore):
         df.columns = df.iloc[0, :]
         df = df.iloc[1:, 1:]  # TODO: would like to keep year, but not in column
         df = df.set_index("age")
-        df = df.astype(int)
-        df[df != 0] = (
-            1  # TODO: May want to remove this to expose mistakes instead of repairing them
-        )
-        return df
+        return df.astype(int)
 
 
 class VarSetCountsStore(HashableMixin, ReadOnlyMixin, Store):

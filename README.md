@@ -133,6 +133,8 @@ f, df = cstore.df_store.head()
 pstore = PotStore(df_store)
 ```
 
+`DfStore` cleans each trajectory with `prep_trajectory_df`. It drops section-title rows ("Select States below"), merges a variable entered on two rows (a state lived in during two periods) into one column, and sets values other than 0 and 1 to 1 with a warning that names them. Change that with `df_store.non_binary = "keep"` (or `"raise"`, or `"binarize"` to set them to 1 silently) and `df_store.duplicates = "keep"` (or `"raise"`).
+
 # Poking around
 
 ## df_store
