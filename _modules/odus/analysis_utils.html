@@ -6,7 +6,7 @@
 <link rel="alternate" type="text/markdown" href="analysis_utils.html.md">
 <link rel="describedby" href="../../llms.txt" type="text/markdown"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>odus.analysis_utils - odus</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
@@ -452,50 +452,78 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">c</span><span class="p">)[[</span><span class="s2">"var"</span><span class="p">,</span> <span class="s2">"val"</span><span class="p">]]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"var"</span><span class="p">)[</span><span class="s2">"val"</span><span class="p">]</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_as_var_str</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Normalize a variable (``str``, ``VarStr`` or ``PVar``) to a ``VarStr``."""</span>
+    <span class="k">return</span> <span class="n">VarStr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_plot_log2_bars</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Bar-plot ``log2(values)`` -- the y axis is formatted as powers of two."""</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="plot_diagonal">
+<a class="viewcode-back" href="../../_autosummary/odus.analysis_utils.html#odus.analysis_utils.plot_diagonal">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_diagonal</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">diagonal_rr</span><span class="p">(</span><span class="n">lrr</span><span class="p">)</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Self (log2) relative risk"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">t</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Plot the self relative risks (the diagonal of ``lrr``) on a log2 scale."""</span>
+    <span class="n">_plot_log2_bars</span><span class="p">(</span><span class="n">diagonal_rr</span><span class="p">(</span><span class="n">lrr</span><span class="p">),</span> <span class="s2">"Self (log2) relative risk"</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="plot_influencers">
+<a class="viewcode-back" href="../../_autosummary/odus.analysis_utils.html#odus.analysis_utils.plot_influencers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_influencers</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Plot log2 of the relative risks for event ``var`` (str, VarStr or PVar)."""</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">_as_var_str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">_plot_log2_bars</span><span class="p">(</span>
+        <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">],</span> <span class="sa">f</span><span class="s2">"Log2 relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">kwargs</span>
+    <span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="plot_influenced">
+<a class="viewcode-back" href="../../_autosummary/odus.analysis_utils.html#odus.analysis_utils.plot_influenced">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_influenced</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">exposure</span> <span class="o">=</span> <span class="n">var</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"-1"</span><span class="p">)</span> <span class="k">else</span> <span class="n">VarStr</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># rows: var-1</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">exposure</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Plot log2 of the relative risks when exposed to ``var`` (str, VarStr or PVar)."""</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">_as_var_str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">exposure</span> <span class="o">=</span> <span class="n">var</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"-1"</span><span class="p">)</span> <span class="k">else</span> <span class="n">var</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># rows: var-1</span>
+    <span class="n">_plot_log2_bars</span><span class="p">(</span>
+        <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">exposure</span><span class="p">),</span> <span class="p">:],</span>
+        <span class="sa">f</span><span class="s2">"Log2 relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="plot_remission_influencers">
+<a class="viewcode-back" href="../../_autosummary/odus.analysis_utils.html#odus.analysis_utils.plot_remission_influencers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_remission_influencers</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 remission relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Plot log2 of the remission relative risks for event ``var``."""</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">_as_var_str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">_plot_log2_bars</span><span class="p">(</span>
+        <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">var</span><span class="p">],</span>
+        <span class="sa">f</span><span class="s2">"Log2 remission relative risks for event: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="plot_remission_influenced">
+<a class="viewcode-back" href="../../_autosummary/odus.analysis_utils.html#odus.analysis_utils.plot_remission_influenced">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_remission_influenced</span><span class="p">(</span><span class="n">lrr</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">dflt_figsize</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Log2 remission relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">format_for_influencer_plot</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""Plot log2 of the remission relative risks when exposed to ``var``."""</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">_as_var_str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="n">_plot_log2_bars</span><span class="p">(</span>
+        <span class="n">lrr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="p">:],</span>
+        <span class="sa">f</span><span class="s2">"Log2 remission relative risks when exposed to </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
 </pre></div>
         </article>
       </div>
@@ -524,7 +552,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=a8acf705"></script>
+</div><script src="../../_static/documentation_options.js?v=7c40b9fe"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

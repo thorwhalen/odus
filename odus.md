@@ -1,4 +1,4 @@
-> built 2026-10-19 13:37 UTC from 5af62c5 (master) · odus 0.0.19. Details: build_info.json
+> built 2026-10-20 02:46 UTC from e1166f7 (master) · odus 0.0.20. Details: build_info.json
 
 # index.html.md
 
@@ -1450,16 +1450,36 @@ results (influencer/influenced plots, diagonal relative risk, …).
 | `get_markov_remission_rel_risk`(pstore[, fields])                                                 |                                                                                                                                                                                                                                                                     |
 | `get_stores_v_and_s`([survey_dir])                                                                |                                                                                                                                                                                                                                                                     |
 | `get_tick_and_labels`(y_ticks[, y_tick_labels])                                                   |                                                                                                                                                                                                                                                                     |
-| `plot_diagonal`(lrr[, figsize])                                                                   |                                                                                                                                                                                                                                                                     |
-| `plot_influenced`(lrr, var[, figsize])                                                            |                                                                                                                                                                                                                                                                     |
-| `plot_influencers`(lrr, var[, figsize])                                                           |                                                                                                                                                                                                                                                                     |
-| `plot_remission_influenced`(lrr, var[, figsize])                                                  |                                                                                                                                                                                                                                                                     |
-| `plot_remission_influencers`(lrr, var[, figsize])                                                 |                                                                                                                                                                                                                                                                     |
+| [`plot_diagonal`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.plot_diagonal)(lrr[, figsize])                    | Plot the self relative risks (the diagonal of `lrr`) on a log2 scale.                                                                                                                                                                                               |
+| [`plot_influenced`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.plot_influenced)(lrr, var[, figsize])             | Plot log2 of the relative risks when exposed to `var` (str, VarStr or PVar).                                                                                                                                                                                        |
+| [`plot_influencers`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.plot_influencers)(lrr, var[, figsize])            | Plot log2 of the relative risks for event `var` (str, VarStr or PVar).                                                                                                                                                                                              |
+| [`plot_remission_influenced`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.plot_remission_influenced)(lrr, var[, figsize])   | Plot log2 of the remission relative risks when exposed to `var`.                                                                                                                                                                                                    |
+| [`plot_remission_influencers`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.plot_remission_influencers)(lrr, var[, figsize])  | Plot log2 of the remission relative risks for event `var`.                                                                                                                                                                                                          |
 | `print_counts`(pot)                                                                               |                                                                                                                                                                                                                                                                     |
 | `print_relrisk_and_table`(pstore, event, exposure)                                                |                                                                                                                                                                                                                                                                     |
 | `print_relrisk_and_table_from_pot`(pot, event, ...)                                               |                                                                                                                                                                                                                                                                     |
 | [`print_remission_influence_supporting_info`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.print_remission_influence_supporting_info)(...)   | Prints remission influence supporting information. By "remission influence" we mean the relative risk of the event, given the exposure to an influencer during the "previous" time tick, conditioned on the existence of the event. That is, we're looking at::.    |
 | [`remission_relative_risk`](_autosummary/odus.analysis_utils.html.md#odus.analysis_utils.remission_relative_risk)(pstore, event, exposure) | Returns the remission influence of exposure on event. By "remission influence" we mean the relative risk of the event, given the exposure to an influencer during the "previous" time tick, conditioned on the existence of the event. That is, we're looking at::. |
+
+### odus.analysis_utils.plot_diagonal(lrr, figsize=(16, 5), \*\*kwargs)
+
+Plot the self relative risks (the diagonal of `lrr`) on a log2 scale.
+
+### odus.analysis_utils.plot_influenced(lrr, var, figsize=(16, 5), \*\*kwargs)
+
+Plot log2 of the relative risks when exposed to `var` (str, VarStr or PVar).
+
+### odus.analysis_utils.plot_influencers(lrr, var, figsize=(16, 5), \*\*kwargs)
+
+Plot log2 of the relative risks for event `var` (str, VarStr or PVar).
+
+### odus.analysis_utils.plot_remission_influenced(lrr, var, figsize=(16, 5), \*\*kwargs)
+
+Plot log2 of the remission relative risks when exposed to `var`.
+
+### odus.analysis_utils.plot_remission_influencers(lrr, var, figsize=(16, 5), \*\*kwargs)
+
+Plot log2 of the remission relative risks for event `var`.
 
 ### odus.analysis_utils.print_remission_influence_supporting_info(pstore, event, exposure)
 
@@ -2567,18 +2587,18 @@ Serve the explorer at `http://host:port` until interrupted.
 
 # About this build
 
-This documentation was built on **2026-10-19 13:37 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/5af62c540fc08e6b413a363a29d41ad392564f75"><code>5af62c5</code></a> on branch <code>master</code>, for **odus 0.0.19** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 02:46 UTC** from commit <a href="https://github.com/thorwhalen/odus/commit/e1166f73501d6b1691f041adb33b6beafaeb3e28"><code>e1166f7</code></a> on branch <code>master</code>, for **odus 0.0.20** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.19) is behind the latest release on PyPI (0.0.20): `pip install odus` gives newer code than these docs describe.
+- The documented version (0.0.20) is behind the latest release on PyPI (0.0.21): `pip install odus` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                        |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/odus/commit/5af62c540fc08e6b413a363a29d41ad392564f75"><code>5af62c540fc08e6b413a363a29d41ad392564f75</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/odus/commit/e1166f73501d6b1691f041adb33b6beafaeb3e28"><code>e1166f73501d6b1691f041adb33b6beafaeb3e28</code></a> |
 | Branch              | <code>master</code>                                                                                                                                    |
 | Tags at this commit | none                                                                                                                                                   |
 | Working tree        | clean                                                                                                                                                  |
@@ -2589,16 +2609,16 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/odus</code>                                                               |
-| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39261401067">39261401067</a>      |
+| Run          | <a href="https://github.com/thorwhalen/odus/actions/runs/39360450028">39360450028</a>      |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>5af62c540fc08e6b413a363a29d41ad392564f75</code> (in the history of the built commit) |
+| Event commit | <code>e1166f73501d6b1691f041adb33b6beafaeb3e28</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
 | epythet  | 0.2.18  |
-| Sphinx   | 9.1.0   |
+| Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
 
@@ -2616,13 +2636,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/odus/0.0.20/">0.0.20</a>, newer than the documented version (0.0.19).
+Latest release: <a href="https://pypi.org/project/odus/0.0.21/">0.0.21</a>, newer than the documented version (0.0.20).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/odus && cd odus
-git checkout 5af62c540fc08e6b413a363a29d41ad392564f75
+git checkout e1166f73501d6b1691f041adb33b6beafaeb3e28
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
