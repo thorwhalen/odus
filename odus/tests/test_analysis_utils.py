@@ -3,6 +3,7 @@
 import os
 import warnings
 
+import numpy as np
 import pytest
 
 from odus import data_dir
@@ -71,7 +72,7 @@ def test_influence_plots_take_plain_variable_names():
         ax = plt.gca()
         assert ax.get_title() == f"Log2 relative risks when exposed to {var}"
         heights = [bar.get_height() for bar in ax.patches]
-        assert heights == pytest.approx(lrr.loc["HEROIN-1"].tolist())
+        assert heights == pytest.approx(np.log2(lrr.loc["HEROIN-1"]).tolist())
         plt.close("all")
     plot_influencers(lrr, "HEROIN")
     plt.close("all")
