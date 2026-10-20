@@ -193,47 +193,60 @@ def diagonal_rr(lrr):
     return pd.DataFrame(c)[["var", "val"]].set_index("var")["val"]
 
 
-def plot_diagonal(lrr, figsize=dflt_figsize, **kwargs):
-    t = diagonal_rr(lrr)
-    kwargs = dict(title="Self (log2) relative risk", figsize=figsize, **kwargs)
-    t.plot(kind="bar", **kwargs)
+def _as_var_str(var):
+    """Normalize a variable (``str``, ``VarStr`` or ``PVar``) to a ``VarStr``."""
+    return VarStr(str(var))
+
+
+def _plot_log2_bars(values, title, figsize, kwargs):
+    """Bar-plot ``log2(values)`` -- the y axis is formatted as powers of two."""
+    kwargs = dict(title=title, figsize=figsize, **kwargs)
+    np.log2(values).plot(kind="bar", **kwargs)
     format_for_influencer_plot()
+
+
+def plot_diagonal(lrr, figsize=dflt_figsize, **kwargs):
+    """Plot the self relative risks (the diagonal of ``lrr``) on a log2 scale."""
+    _plot_log2_bars(diagonal_rr(lrr), "Self (log2) relative risk", figsize, kwargs)
 
 
 def plot_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(
-        title=f"Log2 relative risks for event: {var}", figsize=figsize, **kwargs
+    """Plot log2 of the relative risks for event ``var`` (str, VarStr or PVar)."""
+    var = _as_var_str(var)
+    _plot_log2_bars(
+        lrr.loc[:, var], f"Log2 relative risks for event: {var}", figsize, kwargs
     )
-    lrr.loc[:, var].plot(kind="bar", **kwargs)
-    format_for_influencer_plot()
 
 
 def plot_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(
-        title=f"Log2 relative risks when exposed to {var}",
-        figsize=figsize,
-        **kwargs,
+    """Plot log2 of the relative risks when exposed to ``var`` (str, VarStr or PVar)."""
+    var = _as_var_str(var)
+    exposure = var if var.endswith("-1") else var - 1  # rows: var-1
+    _plot_log2_bars(
+        lrr.loc[str(exposure), :],
+        f"Log2 relative risks when exposed to {var}",
+        figsize,
+        kwargs,
     )
-    exposure = var if str(var).endswith("-1") else VarStr(var) - 1  # rows: var-1
-    lrr.loc[str(exposure), :].plot(kind="bar", **kwargs)
-    format_for_influencer_plot()
 
 
 def plot_remission_influencers(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(
-        title=f"Log2 remission relative risks for event: {var}",
-        figsize=figsize,
-        **kwargs,
+    """Plot log2 of the remission relative risks for event ``var``."""
+    var = _as_var_str(var)
+    _plot_log2_bars(
+        lrr.loc[:, var],
+        f"Log2 remission relative risks for event: {var}",
+        figsize,
+        kwargs,
     )
-    lrr.loc[:, var].plot(kind="bar", **kwargs)
-    format_for_influencer_plot()
 
 
 def plot_remission_influenced(lrr, var, figsize=dflt_figsize, **kwargs):
-    kwargs = dict(
-        title=f"Log2 remission relative risks when exposed to {var}",
-        figsize=figsize,
-        **kwargs,
+    """Plot log2 of the remission relative risks when exposed to ``var``."""
+    var = _as_var_str(var)
+    _plot_log2_bars(
+        lrr.loc[var, :],
+        f"Log2 remission relative risks when exposed to {var}",
+        figsize,
+        kwargs,
     )
-    lrr.loc[var, :].plot(kind="bar", **kwargs)
-    format_for_influencer_plot()
